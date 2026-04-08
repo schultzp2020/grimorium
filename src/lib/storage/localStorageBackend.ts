@@ -2,24 +2,26 @@ import type { StorageBackend } from './types'
 
 export function createLocalStorageBackend(): StorageBackend {
   return {
-    async get<T>(key: string): Promise<T | null> {
+    get<T>(key: string): Promise<T | null> {
       const data = localStorage.getItem(key)
       if (data === null) {
-        return null
+        return Promise.resolve(null)
       }
       try {
-        return JSON.parse(data) as T
+        return Promise.resolve(JSON.parse(data) as T)
       } catch {
-        return null
+        return Promise.resolve(null)
       }
     },
 
-    async set<T>(key: string, value: T): Promise<void> {
+    set<T>(key: string, value: T): Promise<void> {
       localStorage.setItem(key, JSON.stringify(value))
+      return Promise.resolve()
     },
 
-    async remove(key: string): Promise<void> {
+    remove(key: string): Promise<void> {
       localStorage.removeItem(key)
+      return Promise.resolve()
     },
   }
 }

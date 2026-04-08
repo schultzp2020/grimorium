@@ -19,11 +19,9 @@ function isTauri(): boolean {
 let _backendPromise: Promise<StorageBackend> | null = null
 
 function getBackend(): Promise<StorageBackend> {
-  if (!_backendPromise) {
-    _backendPromise = isTauri()
-      ? import('./tauriBackend').then(({ createTauriBackend }) => createTauriBackend())
-      : Promise.resolve(createLocalStorageBackend())
-  }
+  _backendPromise ??= isTauri()
+    ? import('./tauriBackend').then(({ createTauriBackend }) => createTauriBackend())
+    : Promise.resolve(createLocalStorageBackend())
   return _backendPromise
 }
 

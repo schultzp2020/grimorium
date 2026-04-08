@@ -26,10 +26,6 @@ import type {
   SetupActionProps,
 } from './types'
 
-// ============================================================================
-// SCHEMA TYPES
-// ============================================================================
-
 export interface BaseRoleFields {
   id: RoleId
   team: TeamId
@@ -75,10 +71,6 @@ export interface CustomSchema {
 
 export type RoleSchema = PassiveSchema | TargetActionSchema | InfoNarratorSetupSchema | CustomSchema
 
-// ============================================================================
-// WAKE CONDITION RESOLUTION
-// ============================================================================
-
 function resolveWakeCondition(wakeCondition: WakeCondition): (game: Game, player: PlayerState) => boolean {
   if (typeof wakeCondition === 'function') {
     return wakeCondition
@@ -95,10 +87,6 @@ function resolveWakeCondition(wakeCondition: WakeCondition): (game: Game, player
     }
   }
 }
-
-// ============================================================================
-// FIRST NIGHT REVEAL (for passive roles that only wake to see their team)
-// ============================================================================
 
 const FIRST_NIGHT_REVEAL_ORDER = 4
 
@@ -172,10 +160,6 @@ function buildFirstNightRevealNightAction(roleId: string, icon: IconName, team: 
     )
   }
 }
-
-// ============================================================================
-// CATEGORY BUILDERS
-// ============================================================================
 
 type BaseFields = Pick<
   RoleDefinition,
@@ -271,10 +255,6 @@ function buildCustomRole(base: BaseFields, schema: BaseRoleFields & CustomSchema
     SetupAction: schema.SetupAction,
   }
 }
-
-// ============================================================================
-// MAIN FACTORY
-// ============================================================================
 
 export function defineRole(schema: BaseRoleFields & PassiveSchema): RoleDefinition
 export function defineRole(schema: BaseRoleFields & TargetActionSchema): RoleDefinition

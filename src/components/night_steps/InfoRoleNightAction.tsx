@@ -23,10 +23,6 @@ import {
 } from '../layouts'
 import type { NightStep } from '../layouts'
 
-// ============================================================================
-// CONFIG TYPE
-// ============================================================================
-
 export interface InfoRoleConfig {
   roleId: string
   icon: IconName
@@ -47,10 +43,6 @@ export interface InfoRoleConfig {
     mustIncludeTarget: string
   }
 }
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
 
 type Phase = 'step_list' | 'select_players' | 'configure_malfunction' | 'show_results' | 'no_target_view'
 
@@ -89,10 +81,6 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
     [config.targetTeam],
   )
 
-  // ================================================================
-  // Player classification for smart grouping
-  // ================================================================
-
   /** Players whose actual team or canRegisterAs includes the target team */
   const isTargetTeamPlayer = useCallback(
     (p: PlayerState): boolean => {
@@ -110,10 +98,6 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
 
   // Is there at least one player who could be perceived as the target team?
   const hasTargetTeam = targetGroupPlayers.length > 0
-
-  // ================================================================
-  // Disabled logic for smart selection
-  // ================================================================
 
   const disabledPlayerIds = useMemo(() => {
     const disabled = new Set<string>()
@@ -136,10 +120,6 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
     return disabled
   }, [selectedPlayers, targetGroupPlayers, otherGroupPlayers])
 
-  // ================================================================
-  // Players in selection that are on the target team
-  // ================================================================
-
   const targetsInSelection = selectedPlayers.filter((playerId) => {
     const p = state.players.find((pl) => pl.id === playerId)
     if (!p) {
@@ -148,10 +128,6 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
     const perception = perceive(p, player, 'team', state)
     return perception.team === config.targetTeam || canRegisterAsTeam(p, config.targetTeam)
   })
-
-  // ================================================================
-  // Role options for the picker (inline perception)
-  // ================================================================
 
   const targetRoleOptions = useMemo(() => {
     const roleToPlayers = new Map<string, string[]>()
@@ -193,10 +169,6 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
     return { roles, roleToPlayers }
   }, [targetsInSelection, state, config.targetTeam, player, targetTeamAllRoles])
 
-  // ================================================================
-  // Completion checks
-  // ================================================================
-
   // Healthy flow: can proceed when 2 players selected + target identified + role selected
   const canCompleteHealthySetup =
     selectedPlayers.length === 2 &&
@@ -209,10 +181,6 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
 
   // Malfunction flow: can proceed from configure_malfunction when role selected
   const canCompleteMalfunctionConfig = selectedRoleId !== null
-
-  // ================================================================
-  // Handlers
-  // ================================================================
 
   const handlePlayerToggle = (playerId: string) => {
     setSelectedPlayers((prev) => {
@@ -338,10 +306,6 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
   const targetTeamName = t.teams[config.targetTeam as keyof typeof t.teams].name
   const otherGroupLabel = t.game.otherPlayers
 
-  // ================================================================
-  // Build steps
-  // ================================================================
-
   const steps: NightStep[] = useMemo(() => {
     const result: NightStep[] = []
 
@@ -384,9 +348,6 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
     }
   }
 
-  // ================================================================
-  // Phase: Step List
-  // ================================================================
   if (phase === 'step_list') {
     return (
       <NightStepListLayout
@@ -399,9 +360,6 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
     )
   }
 
-  // ================================================================
-  // Phase: Select Players (healthy, no target team among other players)
-  // ================================================================
   if (phase === 'select_players' && !malfunctioning && !hasTargetTeam) {
     return (
       <NarratorSetupLayout
@@ -419,9 +377,6 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
     )
   }
 
-  // ================================================================
-  // Phase: Select Players (healthy — with constraints + role picking)
-  // ================================================================
   if (phase === 'select_players' && !malfunctioning) {
     return (
       <NarratorSetupLayout
@@ -474,9 +429,6 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
     )
   }
 
-  // ================================================================
-  // Phase: Select Players (malfunctioning — free selection)
-  // ================================================================
   if (phase === 'select_players' && malfunctioning) {
     return (
       <NarratorSetupLayout
@@ -521,9 +473,6 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
     )
   }
 
-  // ================================================================
-  // Phase: Configure Malfunction
-  // ================================================================
   if (phase === 'configure_malfunction') {
     return (
       <NarratorSetupLayout
@@ -557,9 +506,6 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
     )
   }
 
-  // ================================================================
-  // Phase: No Target View (player-facing)
-  // ================================================================
   if (phase === 'no_target_view') {
     return (
       <PlayerFacingScreen playerName={player.name}>
@@ -575,9 +521,6 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
     )
   }
 
-  // ================================================================
-  // Phase: Show Results (player view)
-  // ================================================================
   const player1 = state.players.find((p) => p.id === selectedPlayers[0])
   const player2 = state.players.find((p) => p.id === selectedPlayers[1])
 

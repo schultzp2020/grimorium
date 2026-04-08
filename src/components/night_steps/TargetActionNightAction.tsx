@@ -11,20 +11,15 @@ import type { Game, GameState, PlayerState } from '../../lib/types'
 import { Button, Icon } from '../atoms'
 import type { IconName } from '../atoms/icon'
 import { PlayerPickerList } from '../inputs'
+import { InfoBox } from '../items'
 import { EvilTeamReveal } from '../items/EvilTeamReveal'
 import { HandbackButton, NightActionLayout, NightStepListLayout, PlayerFacingScreen } from '../layouts'
 import type { NightStep } from '../layouts'
 
-// ============================================================================
-// CONFIG TYPES
-// ============================================================================
-
 export type TargetFilterFn = (player: PlayerState, self: PlayerState, state: GameState, game: Game) => boolean
 
 export interface TargetConfig {
-  count?: number | { min: number; max: number }
   filter: 'alive-others' | 'alive-all' | 'dead' | TargetFilterFn
-  memory?: 'different-from-last'
   applyEffect?: EffectToAdd
   applyEffectTo?: 'target' | 'self'
   effectTargetDataKey?: string
@@ -44,10 +39,6 @@ export interface TargetActionConfig {
     shownTeam?: string
   }
 }
-
-// ============================================================================
-// HELPERS
-// ============================================================================
 
 export function resolveTargetFilter(
   filter: TargetConfig['filter'],
@@ -161,10 +152,6 @@ export function buildTargetActionResult(
   }
 }
 
-// ============================================================================
-// COMPONENT
-// ============================================================================
-
 export function TargetActionNightAction({
   config,
   game,
@@ -198,6 +185,28 @@ export function TargetActionNightAction({
 
     const result = buildTargetActionResult(config, player, selectedTarget, isFirstNight, malfunctioning)
     onComplete(result)
+  }
+
+  const handleSkipNoTargets = () => {
+    onComplete({
+      entries: [
+        {
+          type: 'night_action',
+          message: [
+            {
+              type: 'i18n',
+              key: 'history.noEligibleTargetsAction',
+              params: { role: config.roleId },
+            },
+          ],
+          data: {
+            roleId: config.roleId,
+            playerId: player.id,
+            action: 'no_targets',
+          },
+        },
+      ],
+    })
   }
 
   if (phase === 'step_list') {
@@ -256,6 +265,30 @@ export function TargetActionNightAction({
           </HandbackButton>
         </NightActionLayout>
       </PlayerFacingScreen>
+    )
+  }
+
+  if (eligibleTargets.length === 0) {
+    return (
+      <NightActionLayout
+        player={player}
+        title={roleT.info}
+        description={t.game.noEligibleTargetsDescription}
+        audience='player_choice'
+      >
+        <div className='flex flex-1 items-center justify-center'>
+          <InfoBox
+            icon={config.icon}
+            title={t.game.noEligibleTargets}
+            description={t.game.noEligibleTargetsDescription}
+          />
+        </div>
+
+        <Button onClick={handleSkipNoTargets} fullWidth size='lg' variant={isEvil ? 'evil' : 'night'}>
+          <Icon name='check' size='md' className='mr-2' />
+          {t.common.confirm}
+        </Button>
+      </NightActionLayout>
     )
   }
 

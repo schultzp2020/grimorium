@@ -190,6 +190,8 @@ const en: Translations = {
     stepViewGrimoire: 'View Grimoire',
     stepShowEvilTeam: 'Your Evil Team',
     noEvilTeammates: 'No evil teammates in play',
+    noEligibleTargets: 'No eligible targets',
+    noEligibleTargetsDescription: 'There are no valid targets available for this ability tonight.',
 
     // Malfunction Config
     stepConfigureMalfunction: 'Configure Malfunction',
@@ -309,6 +311,7 @@ const en: Translations = {
     dayBegins: 'Day {round} begins',
     learnedRole: '{player} learned they are the {role}',
     noActionTonight: '{role} has no action tonight',
+    noEligibleTargetsAction: '{role} found no eligible targets',
     nominates: '{nominator} nominates {nominee}',
     voteResult: '{player}: {votes} votes ({threshold} needed). ',
     votePassed: '{player} goes on the block!',

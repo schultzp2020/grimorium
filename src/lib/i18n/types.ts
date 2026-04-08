@@ -200,6 +200,8 @@ export interface Translations {
     stepViewGrimoire: string
     stepShowEvilTeam: string
     noEvilTeammates: string
+    noEligibleTargets: string
+    noEligibleTargetsDescription: string
 
     // Malfunction Config
     stepConfigureMalfunction: string
@@ -319,6 +321,7 @@ export interface Translations {
     dayBegins: string
     learnedRole: string
     noActionTonight: string
+    noEligibleTargetsAction: string
     nominates: string
     voteResult: string
     votePassed: string

@@ -191,6 +191,8 @@ const es: Translations = {
     stepViewGrimoire: 'Ver Grimorio',
     stepShowEvilTeam: 'Tu Equipo Malvado',
     noEvilTeammates: 'No hay compañeros malvados en juego',
+    noEligibleTargets: 'Sin objetivos elegibles',
+    noEligibleTargetsDescription: 'No hay objetivos válidos disponibles para esta habilidad esta noche.',
 
     // Malfunction Config
     stepConfigureMalfunction: 'Configurar Mal Funcionamiento',
@@ -312,6 +314,7 @@ const es: Translations = {
     dayBegins: 'Día {round} comienza',
     learnedRole: '{player} descubrió que es el/la {role}',
     noActionTonight: '{role} no tiene acción esta noche',
+    noEligibleTargetsAction: '{role} no encontró objetivos elegibles',
     nominates: '{nominator} nomina a {nominee}',
     voteResult: '{player}: {votes} votos ({threshold} necesarios). ',
     votePassed: '¡{player} está en la cuerda floja!',
@@ -342,7 +345,6 @@ const es: Translations = {
     interestingDescription: 'Una mezcla equilibrada de complejidad',
     chaotic: 'Caótico',
     chaoticDescription: 'Máximo engaño y sorpresas',
-    chaos: 'Caos',
     selectThisPool: 'Seleccionar',
     regenerate: 'Regenerar',
     orPickManually: 'o elige manualmente',

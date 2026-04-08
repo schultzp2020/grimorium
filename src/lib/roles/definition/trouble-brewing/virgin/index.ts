@@ -3,13 +3,13 @@ import { defineRole } from '../../../defineRole'
 import en from './i18n/en'
 import es from './i18n/es'
 
-registerRoleTranslations('soldier', 'en', en)
-registerRoleTranslations('soldier', 'es', es)
+registerRoleTranslations('virgin', 'en', en)
+registerRoleTranslations('virgin', 'es', es)
 
 export default defineRole({
-  id: 'soldier',
+  id: 'virgin',
   category: 'passive',
   team: 'townsfolk',
-  icon: 'shield',
-  initialEffects: [{ type: 'safe', data: { source: 'soldier' }, expiresAt: 'never' }],
+  icon: 'flower',
+  initialEffects: [{ type: 'pure', expiresAt: 'never' }],
 })

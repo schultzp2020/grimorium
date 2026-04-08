@@ -144,6 +144,33 @@ describe('createProtectionHandler', () => {
     })
   })
 
+  describe('historyDataReason', () => {
+    it('uses historyDataReason in data when provided', () => {
+      const customHandler = createProtectionHandler({
+        intentType: 'kill',
+        priority: 10,
+        reason: 'protected',
+        historyDataReason: 'safe',
+        historyKey: 'test.key',
+      })
+
+      const player = makePlayer({ id: 'p1' })
+      const state = makeState({ players: [player] })
+      const game = makeGame(state)
+      const intent: KillIntent = {
+        type: 'kill',
+        sourceId: 'p2',
+        targetId: 'p1',
+        cause: 'demon',
+      }
+
+      const result = customHandler.handle(intent, player, state, game)
+      assert(result.action === 'prevent')
+      expect(result.reason).toBe('protected')
+      expect(result.stateChanges?.entries[0].data).toMatchObject({ reason: 'safe' })
+    })
+  })
+
   // NOTE: intentType is restricted to 'kill' because both factories
   // hardcode KillIntent field access (sourceId, targetId). NominateIntent
   // and ExecuteIntent have different field names and would produce

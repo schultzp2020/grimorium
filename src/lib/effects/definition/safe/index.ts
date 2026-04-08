@@ -16,7 +16,7 @@ const definition: EffectDefinition = {
       intentType: 'kill',
       priority: 10, // after deflect (5) -- redirect before protection
       reason: 'protected',
-      dataReason: 'safe',
+      historyDataReason: 'safe',
       historyKey: 'roles.imp.history.failedToKill',
     }),
   ],

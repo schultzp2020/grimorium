@@ -11,13 +11,13 @@ export interface ProtectionHandlerConfig {
   appliesTo?: (intent: Intent, player: PlayerState, state: GameState) => boolean
   reason: string
   /** Reason stored in history data; defaults to `reason` if omitted */
-  dataReason?: string
+  historyDataReason?: string
   historyKey: string
 }
 
 export function createProtectionHandler(config: ProtectionHandlerConfig): IntentHandler {
   const defaultAppliesTo = (intent: Intent, effectPlayer: PlayerState, _state: GameState): boolean =>
-    'targetId' in intent && intent.targetId === effectPlayer.id
+    intent.type === config.intentType && 'targetId' in intent && intent.targetId === effectPlayer.id
 
   return {
     intentType: config.intentType,
@@ -46,7 +46,7 @@ export function createProtectionHandler(config: ProtectionHandlerConfig): Intent
                 action: 'kill_failed',
                 sourceId: kill.sourceId,
                 targetId: effectPlayer.id,
-                reason: config.dataReason ?? config.reason,
+                reason: config.historyDataReason ?? config.reason,
               },
             },
           ],
@@ -68,7 +68,7 @@ export interface RedirectHandlerConfig {
 
 export function createRedirectHandler(config: RedirectHandlerConfig): IntentHandler {
   const defaultAppliesTo = (intent: Intent, effectPlayer: PlayerState, _state: GameState): boolean =>
-    'targetId' in intent && intent.targetId === effectPlayer.id
+    intent.type === config.intentType && 'targetId' in intent && intent.targetId === effectPlayer.id
 
   return {
     intentType: config.intentType,

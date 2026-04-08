@@ -11,21 +11,19 @@ const DialogTrigger = DialogPrimitive.Trigger
 const DialogPortal = DialogPrimitive.Portal
 const DialogClose = DialogPrimitive.Close
 
-const DialogOverlay = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Overlay>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
->(({ className, ...props }, ref) => (
-  <DialogPrimitive.Overlay
-    ref={ref}
-    className={cn(
-      'fixed inset-0 z-50 bg-black/40 backdrop-blur-sm',
-      'data-[state=open]:animate-overlay-in data-[state=closed]:animate-overlay-out',
-      className,
-    )}
-    {...props}
-  />
-))
-DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
+function DialogOverlay({ className, ref, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay> & { ref?: React.Ref<React.ComponentRef<typeof DialogPrimitive.Overlay>> }) {
+  return (
+    <DialogPrimitive.Overlay
+      ref={ref}
+      className={cn(
+        'fixed inset-0 z-50 bg-black/40 backdrop-blur-sm',
+        'data-[state=open]:animate-overlay-in data-[state=closed]:animate-overlay-out',
+        className,
+      )}
+      {...props}
+    />
+  )
+}
 
 // ============================================================================
 // DRAG-TO-DISMISS CONSTANTS
@@ -40,10 +38,7 @@ const VELOCITY_THRESHOLD = 0.5
 // DIALOG CONTENT WITH DRAG-TO-DISMISS
 // ============================================================================
 
-const DialogContent = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => {
+function DialogContent({ className, children, ref, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { ref?: React.Ref<React.ComponentRef<typeof DialogPrimitive.Content>> }) {
   const { t } = useI18n()
   const [dragY, setDragY] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
@@ -185,8 +180,7 @@ const DialogContent = React.forwardRef<
       </DialogPrimitive.Content>
     </DialogPortal>
   )
-})
-DialogContent.displayName = DialogPrimitive.Content.displayName
+}
 
 /**
  * Inner wrapper that passes the body ref to DialogBody children via context.
@@ -216,32 +210,28 @@ const DialogHeader = ({
 )
 DialogHeader.displayName = 'DialogHeader'
 
-const DialogTitle = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Title>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
->(({ className, ...props }, ref) => (
-  <DialogPrimitive.Title
-    ref={ref}
-    className={cn(
-      'font-tarot text-xl text-parchment-100 tracking-wider uppercase',
-      className,
-    )}
-    {...props}
-  />
-))
-DialogTitle.displayName = DialogPrimitive.Title.displayName
+function DialogTitle({ className, ref, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title> & { ref?: React.Ref<React.ComponentRef<typeof DialogPrimitive.Title>> }) {
+  return (
+    <DialogPrimitive.Title
+      ref={ref}
+      className={cn(
+        'font-tarot text-xl text-parchment-100 tracking-wider uppercase',
+        className,
+      )}
+      {...props}
+    />
+  )
+}
 
-const DialogDescription = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Description>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
->(({ className, ...props }, ref) => (
-  <DialogPrimitive.Description
-    ref={ref}
-    className={cn('text-sm text-parchment-400', className)}
-    {...props}
-  />
-))
-DialogDescription.displayName = DialogPrimitive.Description.displayName
+function DialogDescription({ className, ref, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description> & { ref?: React.Ref<React.ComponentRef<typeof DialogPrimitive.Description>> }) {
+  return (
+    <DialogPrimitive.Description
+      ref={ref}
+      className={cn('text-sm text-parchment-400', className)}
+      {...props}
+    />
+  )
+}
 
 const DialogBody = ({
   className,

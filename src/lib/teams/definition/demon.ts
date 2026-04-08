@@ -5,7 +5,7 @@ const definition: TeamDefinition = {
   icon: 'skull',
   isEvil: true,
   colors: {
-    cardBg: 'bg-gradient-to-b from-grimoire-darker to-grimoire-blood',
+    cardBg: 'bg-linear-to-b from-grimoire-darker to-grimoire-blood',
     cardBorder: 'border-red-600/40',
     cardText: 'text-parchment-100',
     cardGlow: 'rgba(200, 0, 0, 0.4)',

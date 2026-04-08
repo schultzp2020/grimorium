@@ -155,7 +155,7 @@ export function PlayerPickerList({
         {isSelected && (
           <div
             className={cn(
-              'w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0',
+              'w-5 h-5 rounded-full flex items-center justify-center shrink-0',
               variant === 'red' ? 'bg-red-500/20' : 'bg-blue-500/20',
             )}
           >
@@ -215,7 +215,7 @@ function EffectIcons({ player }: { player: PlayerState }) {
   }
 
   return (
-    <div className='ml-auto flex flex-shrink-0 items-center gap-0.5'>
+    <div className='ml-auto flex shrink-0 items-center gap-0.5'>
       {effectIcons.map((e) => (
         <Icon key={e.id} name={e.icon} size='xs' className='text-parchment-600' />
       ))}

@@ -53,9 +53,9 @@ export function DayPhase({
     : []
 
   return (
-    <div className='flex min-h-app flex-col bg-gradient-to-b from-orange-950 via-amber-950 to-grimoire-dark'>
+    <div className='flex min-h-app flex-col bg-linear-to-b from-orange-950 via-amber-950 to-grimoire-dark'>
       {/* Header */}
-      <div className='bg-gradient-to-b from-amber-900/50 to-transparent px-4 py-4'>
+      <div className='bg-linear-to-b from-amber-900/50 to-transparent px-4 py-4'>
         <div className='mx-auto max-w-lg'>
           {/* Menu button row */}
           <div className='mb-4 flex items-center'>
@@ -160,7 +160,7 @@ export function DayPhase({
               onClick={nominationsBlocked ? undefined : onNominate}
               disabled={nominationsBlocked}
               className={cn(
-                'w-full flex items-center gap-4 p-4 rounded-xl transition-colors group bg-gradient-to-r border',
+                'w-full flex items-center gap-4 p-4 rounded-xl transition-colors group bg-linear-to-r border',
                 nominationsBlocked
                   ? 'from-gray-900/30 to-gray-800/20 border-gray-500/20 opacity-50 cursor-not-allowed'
                   : 'from-red-900/30 to-red-800/20 border-red-500/30 hover:border-red-500/50',
@@ -186,7 +186,7 @@ export function DayPhase({
                 type='button'
                 key={action.id}
                 onClick={() => onDayAction(action)}
-                className='group flex w-full items-center gap-4 rounded-xl border border-amber-500/30 bg-gradient-to-r from-amber-900/30 to-orange-800/20 p-4 transition-colors hover:border-amber-500/50'
+                className='group flex w-full items-center gap-4 rounded-xl border border-amber-500/30 bg-linear-to-r from-amber-900/30 to-orange-800/20 p-4 transition-colors hover:border-amber-500/50'
               >
                 <div className='flex h-12 w-12 items-center justify-center rounded-full border border-amber-500/40 bg-amber-900/40 transition-transform group-hover:scale-105'>
                   <Icon name={action.icon} size='lg' className='text-amber-400' />

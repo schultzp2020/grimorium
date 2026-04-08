@@ -16,9 +16,9 @@ export function DawnScreen({ state, deaths, round, onContinue }: Props) {
   const deadPlayers = deaths.map((id) => state.players.find((p) => p.id === id)).filter(Boolean)
 
   return (
-    <div className='flex min-h-app flex-col bg-gradient-to-b from-amber-950 via-orange-950 to-grimoire-dark'>
+    <div className='flex min-h-app flex-col bg-linear-to-b from-amber-950 via-orange-950 to-grimoire-dark'>
       {/* Header */}
-      <div className='bg-gradient-to-b from-amber-900/40 to-transparent px-4 py-6'>
+      <div className='bg-linear-to-b from-amber-900/40 to-transparent px-4 py-6'>
         <div className='mx-auto max-w-lg text-center'>
           <div className='mb-3 flex justify-center'>
             <Icon name='sunrise' size='4xl' className='text-amber-400 text-glow-gold' />
@@ -46,7 +46,7 @@ export function DawnScreen({ state, deaths, round, onContinue }: Props) {
                     key={player.id}
                     className='flex items-center gap-4 rounded-xl border border-red-500/30 bg-red-950/40 p-5'
                   >
-                    <div className='flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full border-2 border-red-500/40 bg-red-900/50'>
+                    <div className='flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-red-500/40 bg-red-900/50'>
                       <Icon name='skull' size='xl' className='text-red-400' />
                     </div>
                     <div className='flex-1'>

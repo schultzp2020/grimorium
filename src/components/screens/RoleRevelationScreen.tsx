@@ -29,9 +29,9 @@ export function RoleRevelationScreen({ game, state, onRevealRole, onStartNight, 
   const revealedCount = state.players.filter((p) => revealedPlayerIds.has(p.id)).length
 
   return (
-    <div className='flex min-h-app flex-col bg-gradient-to-b from-grimoire-purple via-grimoire-dark to-grimoire-darker'>
+    <div className='flex min-h-app flex-col bg-linear-to-b from-grimoire-purple via-grimoire-dark to-grimoire-darker'>
       {/* Header */}
-      <div className='bg-gradient-to-b from-mystic-gold/10 to-transparent px-4 py-4'>
+      <div className='bg-linear-to-b from-mystic-gold/10 to-transparent px-4 py-4'>
         <div className='mx-auto max-w-lg'>
           {/* Back button row */}
           <div className='mb-4 flex items-center'>
@@ -52,7 +52,7 @@ export function RoleRevelationScreen({ game, state, onRevealRole, onStartNight, 
               {revealedCount} / {state.players.length}
             </p>
             <p className='text-parchment-600 mt-3 flex items-center justify-center gap-1.5 text-xs'>
-              <Icon name='eye' size='xs' className='flex-shrink-0' />
+              <Icon name='eye' size='xs' className='shrink-0' />
               <span>{t.game.roleRevelationNarratorHint}</span>
             </p>
           </div>
@@ -125,7 +125,7 @@ function PlayerRevealRow({
       {/* Role Icon */}
       <div
         className={cn(
-          'w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 border',
+          'w-10 h-10 rounded-full flex items-center justify-center shrink-0 border',
           isRevealed
             ? 'bg-parchment-500/10 border-parchment-500/20'
             : team?.isEvil

@@ -439,7 +439,7 @@ function ShaderCanvas({ teamId }: { teamId: TeamId }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   useShaderBackground(canvasRef, TEAM_SHADERS[teamId])
   return (
-    <canvas ref={canvasRef} className={cn('absolute inset-0 w-full h-full bg-gradient-to-br', team.colors.gradient)} />
+    <canvas ref={canvasRef} className={cn('absolute inset-0 w-full h-full bg-linear-to-br', team.colors.gradient)} />
   )
 }
 

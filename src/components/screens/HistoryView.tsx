@@ -37,7 +37,7 @@ export function HistoryView({ game, onClose }: Props) {
   }
 
   return (
-    <div className='min-h-app bg-gradient-to-b from-grimoire-purple via-grimoire-dark to-grimoire-darker'>
+    <div className='min-h-app bg-linear-to-b from-grimoire-purple via-grimoire-dark to-grimoire-darker'>
       {/* Header */}
       <div className='sticky top-0 z-10 border-b border-mystic-gold/20 bg-grimoire-dark/95 px-4 py-3 backdrop-blur-xs'>
         <div className='mx-auto flex max-w-lg items-center gap-3'>
@@ -66,7 +66,7 @@ export function HistoryView({ game, onClose }: Props) {
                   {/* Event row */}
                   <div className='flex gap-4 py-3'>
                     {/* Icon */}
-                    <div className='mt-0.5 flex-shrink-0'>
+                    <div className='mt-0.5 shrink-0'>
                       {iconConfig ? (
                         <Icon name={iconConfig.name} size='sm' className={iconConfig.className} />
                       ) : (

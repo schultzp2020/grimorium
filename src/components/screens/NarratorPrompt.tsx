@@ -51,7 +51,7 @@ export function NarratorPrompt({ player, action, onProceed, onMainMenu }: Props)
   const icon = getIcon()
 
   return (
-    <div className='flex min-h-app flex-col bg-gradient-to-b from-grimoire-purple via-grimoire-dark to-grimoire-darker'>
+    <div className='flex min-h-app flex-col bg-linear-to-b from-grimoire-purple via-grimoire-dark to-grimoire-darker'>
       {/* Back button */}
       <div className='px-4 py-4'>
         <BackButton onClick={onMainMenu} label={t.common.mainMenu} />

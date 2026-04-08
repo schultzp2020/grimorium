@@ -91,7 +91,7 @@ export function RolesLibrary({ selectedRoleId, onBack, onSelectRole, onDeselectR
   }
 
   return (
-    <div className='flex min-h-app flex-col bg-gradient-to-b from-grimoire-purple via-grimoire-dark to-grimoire-darker'>
+    <div className='flex min-h-app flex-col bg-linear-to-b from-grimoire-purple via-grimoire-dark to-grimoire-darker'>
       {/* Header */}
       <div className='px-4 pt-6 pb-4'>
         <div className='mb-4 flex items-center gap-3'>

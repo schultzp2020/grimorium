@@ -93,9 +93,9 @@ export function NightDashboard({
   const reviewPlayer = reviewPlayerId ? state.players.find((p) => p.id === reviewPlayerId) : null
 
   return (
-    <div className='flex min-h-app flex-col bg-gradient-to-b from-indigo-950 via-grimoire-purple to-grimoire-darker'>
+    <div className='flex min-h-app flex-col bg-linear-to-b from-indigo-950 via-grimoire-purple to-grimoire-darker'>
       {/* Header */}
-      <div className='bg-gradient-to-b from-indigo-900/50 to-transparent px-4 py-4'>
+      <div className='bg-linear-to-b from-indigo-900/50 to-transparent px-4 py-4'>
         <div className='mx-auto max-w-lg'>
           {/* Menu button row */}
           <div className='mb-4 flex items-center'>
@@ -387,7 +387,7 @@ function DashboardRow({
       {/* Order number */}
       <div
         className={cn(
-          'w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold',
+          'w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs font-bold',
           isNext
             ? isFollowUp
               ? 'bg-purple-500/30 text-purple-300 border border-purple-400/40'
@@ -403,7 +403,7 @@ function DashboardRow({
       {/* Icon */}
       <div
         className={cn(
-          'w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 border',
+          'w-10 h-10 rounded-full flex items-center justify-center shrink-0 border',
           isNext
             ? isFollowUp
               ? 'bg-purple-500/20 border-purple-400/30'

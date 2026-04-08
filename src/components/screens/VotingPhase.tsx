@@ -120,9 +120,9 @@ export function VotingPhase({ state, nomineeId, blockStatus, onVoteComplete, onC
   }
 
   return (
-    <div className='flex min-h-app flex-col bg-gradient-to-b from-red-950 via-grimoire-blood to-grimoire-darker'>
+    <div className='flex min-h-app flex-col bg-linear-to-b from-red-950 via-grimoire-blood to-grimoire-darker'>
       {/* Header */}
-      <div className='bg-gradient-to-b from-red-900/50 to-transparent px-4 py-4'>
+      <div className='bg-linear-to-b from-red-900/50 to-transparent px-4 py-4'>
         <div className='mx-auto max-w-lg'>
           {/* Back button row */}
           <div className='mb-4 flex items-center'>

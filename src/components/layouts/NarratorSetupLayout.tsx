@@ -44,7 +44,7 @@ export function NarratorSetupLayout({
   return (
     <div
       className={cn(
-        'min-h-app flex flex-col bg-gradient-to-b',
+        'min-h-app flex flex-col bg-linear-to-b',
         isPlayerChoice
           ? 'from-amber-950 via-orange-950/50 to-grimoire-darker'
           : 'from-indigo-950 via-grimoire-purple to-grimoire-darker',
@@ -54,7 +54,7 @@ export function NarratorSetupLayout({
       {audience === 'narrator' && (
         <div className='mx-4 mt-4 mb-0 w-full max-w-lg self-center'>
           <div className='flex items-center gap-2 rounded-lg border border-blue-500/30 bg-blue-900/30 px-3 py-2'>
-            <Icon name='eye' size='sm' className='flex-shrink-0 text-blue-400' />
+            <Icon name='eye' size='sm' className='shrink-0 text-blue-400' />
             <span className='text-xs text-blue-300'>{t.game.storytellerDecision}</span>
           </div>
         </div>
@@ -62,7 +62,7 @@ export function NarratorSetupLayout({
       {isPlayerChoice && (
         <div className='mx-4 mt-4 mb-0 w-full max-w-lg self-center'>
           <div className='flex items-center gap-2 rounded-lg border border-amber-500/40 bg-amber-900/40 px-3 py-2'>
-            <Icon name='userRound' size='sm' className='flex-shrink-0 text-amber-400' />
+            <Icon name='userRound' size='sm' className='shrink-0 text-amber-400' />
             <span className='text-xs font-medium text-amber-300'>
               {interpolate(t.game.wakePlayerPrompt, { player: playerName })}
             </span>
@@ -74,8 +74,8 @@ export function NarratorSetupLayout({
       <div
         className={cn(
           'px-4 py-6 text-center',
-          !isPlayerChoice && 'bg-gradient-to-b from-blue-900/50 to-transparent',
-          isPlayerChoice && 'bg-gradient-to-b from-amber-900/30 to-transparent',
+          !isPlayerChoice && 'bg-linear-to-b from-blue-900/50 to-transparent',
+          isPlayerChoice && 'bg-linear-to-b from-amber-900/30 to-transparent',
         )}
       >
         <div className='mb-3 flex justify-center'>

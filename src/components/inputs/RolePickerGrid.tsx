@@ -137,7 +137,7 @@ export function RolePickerGrid({
                     className={cn(
                       'rounded-xl border-2 transition-all relative flex flex-col',
                       isSelected
-                        ? cn(borderClass, 'bg-gradient-to-b from-white/10 to-white/5')
+                        ? cn(borderClass, 'bg-linear-to-b from-white/10 to-white/5')
                         : 'border-white/10 bg-white/5 hover:bg-white/[0.08]',
                       isDisabled && 'opacity-40 cursor-not-allowed',
                     )}
@@ -228,7 +228,7 @@ function PlayerRow({ player }: { player: PlayerState }) {
       <Icon
         name={isDead ? 'skull' : isDrunk ? 'beer' : 'user'}
         size='xs'
-        className={cn('flex-shrink-0', isDrunk && !isDead ? 'text-amber-400' : 'text-parchment-500')}
+        className={cn('shrink-0', isDrunk && !isDead ? 'text-amber-400' : 'text-parchment-500')}
       />
       <span
         className={cn('text-[11px] truncate flex-1', isDead ? 'text-parchment-500 line-through' : 'text-parchment-400')}
@@ -236,7 +236,7 @@ function PlayerRow({ player }: { player: PlayerState }) {
         {player.name}
       </span>
       {effectIcons.length > 0 && (
-        <div className='flex flex-shrink-0 items-center gap-0.5'>
+        <div className='flex shrink-0 items-center gap-0.5'>
           {effectIcons.map((e) => (
             <Icon key={e.id} name={e.icon} size='xs' className='text-parchment-600' />
           ))}

@@ -17,7 +17,7 @@ export function ScriptSelection({ players, onSelect, onBack }: Props) {
   const getScriptName = (id: ScriptId) => t.scripts[id as keyof typeof t.scripts]
 
   return (
-    <div className='flex min-h-app flex-col bg-gradient-to-b from-grimoire-purple via-grimoire-dark to-grimoire-darker'>
+    <div className='flex min-h-app flex-col bg-linear-to-b from-grimoire-purple via-grimoire-dark to-grimoire-darker'>
       {/* Header */}
       <div className='sticky top-0 z-10 border-b border-mystic-gold/20 bg-grimoire-dark/95 px-4 py-3 backdrop-blur-xs'>
         <div className='mx-auto flex max-w-lg items-center gap-3'>
@@ -56,8 +56,8 @@ export function ScriptSelection({ players, onSelect, onBack }: Props) {
                   'p-5 text-left',
                   'active:scale-[0.98]',
                   isCustom
-                    ? 'border-parchment-500/30 bg-gradient-to-br from-white/5 to-white/[0.02] hover:border-parchment-400/40'
-                    : 'border-mystic-gold/30 bg-gradient-to-br from-mystic-gold/10 to-mystic-gold/[0.02] hover:border-mystic-gold/50',
+                    ? 'border-parchment-500/30 bg-linear-to-br from-white/5 to-white/[0.02] hover:border-parchment-400/40'
+                    : 'border-mystic-gold/30 bg-linear-to-br from-mystic-gold/10 to-mystic-gold/[0.02] hover:border-mystic-gold/50',
                 )}
                 style={
                   !isCustom
@@ -71,7 +71,7 @@ export function ScriptSelection({ players, onSelect, onBack }: Props) {
                   {/* Icon */}
                   <div
                     className={cn(
-                      'w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0',
+                      'w-12 h-12 rounded-xl flex items-center justify-center shrink-0',
                       isCustom
                         ? 'bg-parchment-500/10 border border-parchment-500/20'
                         : 'bg-mystic-gold/10 border border-mystic-gold/30',
@@ -113,7 +113,7 @@ export function ScriptSelection({ players, onSelect, onBack }: Props) {
                   <Icon
                     name='chevronRight'
                     size='md'
-                    className={cn('flex-shrink-0 mt-1', isCustom ? 'text-parchment-500/50' : 'text-mystic-gold/50')}
+                    className={cn('shrink-0 mt-1', isCustom ? 'text-parchment-500/50' : 'text-mystic-gold/50')}
                   />
                 </div>
               </button>

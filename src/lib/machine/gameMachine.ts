@@ -41,14 +41,6 @@ export const gameMachine = setup({
     hasEndOfDayWinner: ({ context }) => hasEndOfDayWinner(context),
     hasPendingDeathReveals: ({ context }) => context.deathRevealQueue.length > 0,
     hasPipelineNeedsInput: ({ context }) => context.pipelineUI !== null,
-    hasNightDeaths: ({ context }) => {
-      const deaths = getLastNightDeaths(context.game)
-      return deaths.length > 0
-    },
-    noNightDeaths: ({ context }) => {
-      const deaths = getLastNightDeaths(context.game)
-      return deaths.length === 0
-    },
     hasRoleNightAction: ({ event }) => {
       if (event.type !== 'OPEN_NIGHT_ACTION') return false
       const role = getRole(event.roleId)

@@ -35,4 +35,5 @@ test-results
 blob-report
 
 TODO.md
+src/routeTree.gen.ts
 

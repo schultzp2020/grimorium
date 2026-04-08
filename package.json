@@ -60,5 +60,8 @@
     "vite-plugin-pwa": {
       "vite": "$vite"
     }
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

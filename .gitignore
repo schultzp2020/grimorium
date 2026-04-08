@@ -29,5 +29,10 @@ dist-ssr
 # PWA
 dev-dist
 
+# Playwright
+playwright-report
+test-results
+blob-report
+
 TODO.md
 

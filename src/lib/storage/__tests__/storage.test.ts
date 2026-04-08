@@ -43,4 +43,10 @@ describe('LocalStorageBackend', () => {
   it('remove is a no-op for missing keys', async () => {
     await expect(backend.remove('nonexistent')).resolves.toBeUndefined()
   })
+
+  it('get returns null for corrupt JSON', async () => {
+    localStorage.setItem('key', 'not-valid-json{{{')
+    const result = await backend.get<string>('key')
+    expect(result).toBeNull()
+  })
 })

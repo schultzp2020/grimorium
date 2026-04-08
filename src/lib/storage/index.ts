@@ -64,14 +64,16 @@ export async function getGame(gameId: string): Promise<Game | undefined> {
   return games.find((g) => g.id === gameId)
 }
 
-export async function deleteGame(gameId: string): Promise<void> {
-  const backend = await getBackend()
-  const games = (await getAllGames()).filter((g) => g.id !== gameId)
-  await backend.set(GAMES_KEY, games)
+export function deleteGame(gameId: string): Promise<void> {
+  return serialized(async () => {
+    const backend = await getBackend()
+    const games = (await getAllGames()).filter((g) => g.id !== gameId)
+    await backend.set(GAMES_KEY, games)
 
-  if ((await getCurrentGameId()) === gameId) {
-    await clearCurrentGame()
-  }
+    if ((await getCurrentGameId()) === gameId) {
+      await clearCurrentGame()
+    }
+  })
 }
 
 export async function setCurrentGameId(gameId: string): Promise<void> {

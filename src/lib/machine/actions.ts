@@ -3,11 +3,7 @@ import {
   addEffectToPlayer,
   applyNightAction,
   applySetupAction,
-  checkEndOfDayWinConditions,
-  checkWinCondition,
-  endGame,
   executeAtEndOfDay,
-  getLastNightDeaths,
   markRoleRevealed,
   nominate,
   processAutoSkips,
@@ -109,9 +105,7 @@ export function applyEndDay(ctx: GameMachineContext): {
   deaths: DeathRevealEntry[]
 } {
   const state = getCurrentState(ctx.game)
-  const preExecAliveIds = new Set(
-    state.players.filter((p) => !p.effects.some((e) => e.type === 'dead')).map((p) => p.id),
-  )
+  const preExecAliveIds = new Set(state.players.filter(isAlive).map((p) => p.id))
 
   const afterExec = executeAtEndOfDay(ctx.game)
   const postState = getCurrentState(afterExec)
@@ -121,47 +115,11 @@ export function applyEndDay(ctx: GameMachineContext): {
   return { game: afterExec, deaths }
 }
 
-export function applyEndGameIfWinner(game: Game): Game | null {
-  const state = getCurrentState(game)
-  const winner = checkWinCondition(state, game)
-  if (winner) {
-    return persist(endGame(game, winner))
-  }
-  return null
-}
-
-export function applyEndGameIfEndOfDayWinner(game: Game): Game | null {
-  const state = getCurrentState(game)
-  const winner = checkEndOfDayWinConditions(state, game)
-  if (winner) {
-    return persist(endGame(game, winner))
-  }
-  return null
-}
-
-export function applyEndGameWithWinner(game: Game): Game {
-  const state = getCurrentState(game)
-  const winner = checkWinCondition(state, game)
-  if (winner) {
-    return persist(endGame(game, winner))
-  }
-  return game
-}
-
-export function computeDawnData(game: Game): {
-  deaths: string[]
-  round: number
-} {
-  const deaths = getLastNightDeaths(game)
-  const state = getCurrentState(game)
-  return { deaths, round: state.round }
-}
-
 export function computeDeathRevealQueue(preAliveIds: Set<string>, postState: GameState): DeathRevealEntry[] {
   const deaths: DeathRevealEntry[] = []
   for (const id of preAliveIds) {
     const player = postState.players.find((p) => p.id === id)
-    if (player && player.effects.some((e) => e.type === 'dead')) {
+    if (player && !isAlive(player)) {
       deaths.push({
         playerId: player.id,
         playerName: player.name,
@@ -170,12 +128,6 @@ export function computeDeathRevealQueue(preAliveIds: Set<string>, postState: Gam
     }
   }
   return deaths
-}
-
-export function computeDeathsAfterStartDay(game: Game, preState: GameState): DeathRevealEntry[] {
-  const preAliveIds = new Set(preState.players.filter(isAlive).map((p) => p.id))
-  const postState = getCurrentState(game)
-  return computeDeathRevealQueue(preAliveIds, postState)
 }
 
 export function applyAddEffect(

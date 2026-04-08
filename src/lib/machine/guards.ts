@@ -30,35 +30,8 @@ export function isGameOver(ctx: GameMachineContext): boolean {
   return winner !== null
 }
 
-export function isGameOverAfterExecution(ctx: GameMachineContext): boolean {
-  return isGameOver(ctx)
-}
-
 export function hasEndOfDayWinner(ctx: GameMachineContext): boolean {
   const state = getCurrentState(ctx.game)
   const winner = checkEndOfDayWinConditions(state, ctx.game)
   return winner !== null
-}
-
-export function hasPendingDeathReveals(ctx: GameMachineContext): boolean {
-  return ctx.deathRevealQueue.length > 0
-}
-
-export function hasPipelineNeedsInput(ctx: GameMachineContext): boolean {
-  return ctx.pipelineUI !== null
-}
-
-export function hasDeathsAfterNomination(ctx: GameMachineContext, preNominationAliveIds: Set<string>): boolean {
-  const state = getCurrentState(ctx.game)
-  const postAliveIds = new Set(state.players.filter((p) => !p.effects.some((e) => e.type === 'dead')).map((p) => p.id))
-  for (const id of preNominationAliveIds) {
-    if (!postAliveIds.has(id)) {
-      return true
-    }
-  }
-  return false
-}
-
-export function hasDeathsAfterDayAction(ctx: GameMachineContext, preActionAliveIds: Set<string>): boolean {
-  return hasDeathsAfterNomination(ctx, preActionAliveIds)
 }

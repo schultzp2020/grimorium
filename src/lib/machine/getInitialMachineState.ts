@@ -46,6 +46,8 @@ export function getInitialMachineState(game: Game): string {
     case 'day':
       return 'playing.day.main'
 
+    // `voting` is ephemeral — it only exists within a day's nomination flow
+    // and cannot be serialized/restored, so we fall through to `day.main`
     default:
       return 'playing.day.main'
   }

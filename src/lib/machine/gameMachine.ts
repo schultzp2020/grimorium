@@ -1,7 +1,7 @@
 import { assign, setup } from 'xstate'
 
 import type { DeathRevealEntry } from '../../components/screens/DeathRevealScreen'
-import { checkWinCondition, endGame, getLastNightDeaths } from '../game'
+import { checkEndOfDayWinConditions, checkWinCondition, endGame, getLastNightDeaths } from '../game'
 import { getRole } from '../roles/registry'
 import { saveGame } from '../storage'
 import { getCurrentState, isAlive } from '../types'
@@ -57,9 +57,18 @@ export const gameMachine = setup({
   },
   actions: {
     persistGame: ({ context }) => {
-      // Side effect: save to localStorage
       saveGame(context.game)
     },
+    applyEndOfDayWin: assign({
+      game: ({ context }) => {
+        const state = getCurrentState(context.game)
+        const winner = checkEndOfDayWinConditions(state, context.game)
+        if (winner) {
+          return endGame(context.game, winner)
+        }
+        return context.game
+      },
+    }),
 
     setSetupActionTarget: assign({
       setupActionPlayerId: ({ event }) => {
@@ -124,7 +133,6 @@ export const gameMachine = setup({
         const winner = checkWinCondition(state, gameAfterDirect)
         if (winner) {
           const finalGame = endGame(gameAfterDirect, winner)
-          saveGame(finalGame)
           return {
             game: finalGame,
             nightActionPlayerId: null,
@@ -149,7 +157,6 @@ export const gameMachine = setup({
         const winner = checkWinCondition(state, gameAfterPipeline)
         if (winner) {
           const finalGame = endGame(gameAfterPipeline, winner)
-          saveGame(finalGame)
           return {
             game: finalGame,
             nightActionPlayerId: null,
@@ -206,7 +213,6 @@ export const gameMachine = setup({
       const winner = checkWinCondition(newState, newGame)
       if (winner) {
         const finalGame = endGame(newGame, winner)
-        saveGame(finalGame)
         return { game: finalGame }
       }
 
@@ -236,7 +242,6 @@ export const gameMachine = setup({
       deathRevealQueue: () => [] as DeathRevealEntry[],
     }),
 
-    setNominationTarget: assign({}),
     applyNomination: assign(({ context, event }) => {
       if (event.type !== 'NOMINATE') return {}
 
@@ -249,7 +254,6 @@ export const gameMachine = setup({
       const winner = checkWinCondition(newState, newGame)
       if (winner) {
         const finalGame = endGame(newGame, winner)
-        saveGame(finalGame)
         return { game: finalGame }
       }
 
@@ -287,7 +291,6 @@ export const gameMachine = setup({
       const postExecWinner = checkWinCondition(postState, afterExecGame)
       if (postExecWinner) {
         const finalGame = endGame(afterExecGame, postExecWinner)
-        saveGame(finalGame)
         return { game: finalGame }
       }
 
@@ -319,7 +322,6 @@ export const gameMachine = setup({
       const winner = checkWinCondition(newState, newGame)
       if (winner) {
         const finalGame = endGame(newGame, winner)
-        saveGame(finalGame)
         return { game: finalGame, activeDayAction: null }
       }
 
@@ -411,7 +413,6 @@ export const gameMachine = setup({
         const winner = checkWinCondition(state, gameAfterPipeline)
         if (winner) {
           const finalGame = endGame(gameAfterPipeline, winner)
-          saveGame(finalGame)
           return {
             game: finalGame,
             pipelineUI: null,
@@ -452,9 +453,9 @@ export const gameMachine = setup({
     CLOSE_GRIMOIRE_ROLE_CARD: { actions: 'closeGrimoireRoleCard' },
     OPEN_HISTORY: { actions: 'openHistory' },
     CLOSE_HISTORY: { actions: 'closeHistory' },
-    ADD_EFFECT: { actions: 'addEffect' },
-    REMOVE_EFFECT: { actions: 'removeEffect' },
-    UPDATE_EFFECT: { actions: 'updateEffect' },
+    ADD_EFFECT: { actions: ['addEffect', 'persistGame'] },
+    REMOVE_EFFECT: { actions: ['removeEffect', 'persistGame'] },
+    UPDATE_EFFECT: { actions: ['updateEffect', 'persistGame'] },
     SET_PLAYER_FACING: { actions: 'setPlayerFacing' },
   },
 
@@ -487,7 +488,7 @@ export const gameMachine = setup({
           on: {
             SETUP_ACTION_COMPLETE: {
               target: 'actions_list',
-              actions: 'applySetupAction',
+              actions: ['applySetupAction', 'persistGame'],
             },
           },
         },
@@ -505,7 +506,7 @@ export const gameMachine = setup({
             },
             START_FIRST_NIGHT: {
               target: '#game.playing',
-              actions: 'startNight',
+              actions: ['startNight', 'persistGame'],
             },
           },
         },
@@ -513,7 +514,7 @@ export const gameMachine = setup({
           on: {
             ROLE_REVEAL_DISMISS: {
               target: 'list',
-              actions: 'markRoleRevealed',
+              actions: ['markRoleRevealed', 'persistGame'],
             },
           },
         },
@@ -536,7 +537,7 @@ export const gameMachine = setup({
                   },
                   {
                     target: 'dashboard',
-                    actions: 'autoSkipNightAction',
+                    actions: ['autoSkipNightAction', 'persistGame'],
                   },
                 ],
                 OPEN_NIGHT_FOLLOW_UP: {
@@ -545,7 +546,7 @@ export const gameMachine = setup({
                 },
                 START_DAY: {
                   target: '#game.playing.transition_to_day',
-                  actions: 'applyStartDay',
+                  actions: ['applyStartDay', 'persistGame'],
                 },
               },
             },
@@ -553,11 +554,11 @@ export const gameMachine = setup({
               on: {
                 NIGHT_ACTION_COMPLETE: {
                   target: 'resolving_night_action',
-                  actions: 'applyNightActionDirect',
+                  actions: ['applyNightActionDirect', 'persistGame'],
                 },
                 NIGHT_ACTION_SKIP: {
                   target: 'dashboard',
-                  actions: 'skipNightAction',
+                  actions: ['skipNightAction', 'persistGame'],
                 },
               },
             },
@@ -572,7 +573,7 @@ export const gameMachine = setup({
               on: {
                 NIGHT_FOLLOW_UP_COMPLETE: {
                   target: 'dashboard',
-                  actions: 'applyNightFollowUp',
+                  actions: ['applyNightFollowUp', 'persistGame'],
                 },
               },
             },
@@ -580,7 +581,7 @@ export const gameMachine = setup({
               on: {
                 PIPELINE_INPUT_COMPLETE: {
                   target: 'resolving_pipeline',
-                  actions: 'processPipelineInput',
+                  actions: ['processPipelineInput', 'persistGame'],
                 },
               },
             },
@@ -641,7 +642,7 @@ export const gameMachine = setup({
                 },
                 END_DAY: {
                   target: '#game.playing.end_of_day',
-                  actions: 'applyEndDay',
+                  actions: ['applyEndDay', 'persistGame'],
                 },
               },
             },
@@ -649,7 +650,7 @@ export const gameMachine = setup({
               on: {
                 NOMINATE: {
                   target: 'resolving_nomination',
-                  actions: 'applyNomination',
+                  actions: ['applyNomination', 'persistGame'],
                 },
                 BACK_FROM_NOMINATION: {
                   target: 'main',
@@ -667,7 +668,7 @@ export const gameMachine = setup({
               on: {
                 VOTE_COMPLETE: {
                   target: 'main',
-                  actions: 'applyVote',
+                  actions: ['applyVote', 'persistGame'],
                 },
                 CANCEL_VOTE: {
                   target: 'main',
@@ -678,7 +679,7 @@ export const gameMachine = setup({
               on: {
                 DAY_ACTION_COMPLETE: {
                   target: 'resolving_day_action',
-                  actions: 'applyDayAction',
+                  actions: ['applyDayAction', 'persistGame'],
                 },
                 BACK_FROM_DAY_ACTION: {
                   target: 'main',
@@ -705,6 +706,7 @@ export const gameMachine = setup({
             {
               target: '#game.game_over',
               guard: 'hasEndOfDayWinner',
+              actions: ['applyEndOfDayWin', 'persistGame'],
             },
             {
               target: '#game.playing.transition_to_night',
@@ -713,7 +715,7 @@ export const gameMachine = setup({
         },
 
         transition_to_night: {
-          entry: 'startNight',
+          entry: ['startNight', 'persistGame'],
           always: [
             {
               target: 'death_reveal',

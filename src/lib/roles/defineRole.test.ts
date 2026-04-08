@@ -32,9 +32,7 @@ describe('defineRole', () => {
         initialEffects: [{ type: 'safe', data: { source: 'soldier' }, expiresAt: 'never' }],
       })
 
-      expect(role.initialEffects).toEqual([
-        { type: 'safe', data: { source: 'soldier' }, expiresAt: 'never' },
-      ])
+      expect(role.initialEffects).toEqual([{ type: 'safe', data: { source: 'soldier' }, expiresAt: 'never' }])
     })
 
     it('passes through winConditions', () => {
@@ -83,8 +81,8 @@ describe('defineRole', () => {
       const gameRound1 = makeGame(makeState({ round: 1, players: [player] }))
       const gameRound2 = makeGame(makeState({ round: 2, players: [player] }))
 
-      expect(role.shouldWake(gameRound1, player)).toBe(true)
-      expect(role.shouldWake(gameRound2, player)).toBe(false)
+      expect(role.shouldWake(gameRound1, player)).toBeTruthy()
+      expect(role.shouldWake(gameRound2, player)).toBeFalsy()
     })
   })
 
@@ -133,10 +131,10 @@ describe('defineRole', () => {
       const player = makePlayer({ roleId: 'monk' })
 
       const round1 = makeGame(makeState({ round: 1, players: [player] }))
-      expect(role.shouldWake(round1, player)).toBe(false)
+      expect(role.shouldWake(round1, player)).toBeFalsy()
 
       const round2 = makeGame(makeState({ round: 2, players: [player] }))
-      expect(role.shouldWake(round2, player)).toBe(true)
+      expect(role.shouldWake(round2, player)).toBeTruthy()
     })
 
     it('resolves wakeCondition "always" (dead players do not wake)', () => {
@@ -159,8 +157,8 @@ describe('defineRole', () => {
       const dead = addEffectTo(makePlayer({ roleId: 'poisoner' }), 'dead')
       const game = makeGame(makeState({ round: 2, players: [alive] }))
 
-      expect(role.shouldWake(game, alive)).toBe(true)
-      expect(role.shouldWake(game, dead)).toBe(false)
+      expect(role.shouldWake(game, alive)).toBeTruthy()
+      expect(role.shouldWake(game, dead)).toBeFalsy()
     })
 
     it('resolves wakeCondition "first-night-only"', () => {
@@ -182,10 +180,10 @@ describe('defineRole', () => {
       const player = makePlayer({ roleId: 'washerwoman' })
 
       const round1 = makeGame(makeState({ round: 1, players: [player] }))
-      expect(role.shouldWake(round1, player)).toBe(true)
+      expect(role.shouldWake(round1, player)).toBeTruthy()
 
       const round2 = makeGame(makeState({ round: 2, players: [player] }))
-      expect(role.shouldWake(round2, player)).toBe(false)
+      expect(role.shouldWake(round2, player)).toBeFalsy()
     })
 
     it('generates nightSteps with conditional team reveal step', () => {
@@ -213,8 +211,8 @@ describe('defineRole', () => {
       assert(role.nightSteps?.[0].condition)
       const p = makePlayer({ roleId: 'poisoner' })
       const g = makeGame(makeState({ round: 1, players: [p] }))
-      expect(role.nightSteps?.[0].condition(g, p, makeState({ round: 1 }))).toBe(true)
-      expect(role.nightSteps?.[0].condition(g, p, makeState({ round: 2 }))).toBe(false)
+      expect(role.nightSteps?.[0].condition(g, p, makeState({ round: 1 }))).toBeTruthy()
+      expect(role.nightSteps?.[0].condition(g, p, makeState({ round: 2 }))).toBeFalsy()
     })
   })
 
@@ -255,9 +253,7 @@ describe('defineRole', () => {
   describe('custom category', () => {
     it('passes through NightAction and nightSteps directly', () => {
       const MockNightAction = () => null
-      const steps = [
-        { id: 'step1', icon: 'user' as const, getLabel: () => 'Step 1' },
-      ]
+      const steps = [{ id: 'step1', icon: 'user' as const, getLabel: () => 'Step 1' }]
 
       const role = defineRole({
         id: 'imp',
@@ -309,8 +305,8 @@ describe('defineRole', () => {
       const dead = addEffectTo(makePlayer({ roleId: 'spy' }), 'dead')
       const game = makeGame(makeState({ round: 2, players: [alive] }))
 
-      expect(role.shouldWake(game, alive)).toBe(true)
-      expect(role.shouldWake(game, dead)).toBe(false)
+      expect(role.shouldWake(game, alive)).toBeTruthy()
+      expect(role.shouldWake(game, dead)).toBeFalsy()
     })
 
     it('allows custom wakeCondition function', () => {
@@ -320,9 +316,7 @@ describe('defineRole', () => {
         team: 'townsfolk',
         icon: 'bird',
         nightOrder: 25,
-        wakeCondition: (_game, player) => {
-          return player.effects.some((e) => e.type === 'dead')
-        },
+        wakeCondition: (_game, player) => player.effects.some((e) => e.type === 'dead'),
         NightAction: () => null,
       })
 
@@ -330,7 +324,7 @@ describe('defineRole', () => {
       const dead = addEffectTo(makePlayer({ roleId: 'ravenkeeper' }), 'dead')
       const game = makeGame(makeState({ round: 2, players: [dead] }))
 
-      expect(role.shouldWake(game, dead)).toBe(true)
+      expect(role.shouldWake(game, dead)).toBeTruthy()
     })
   })
 })

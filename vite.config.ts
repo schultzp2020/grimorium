@@ -1,6 +1,6 @@
 import babel from '@rolldown/plugin-babel'
 import tailwindcss from '@tailwindcss/vite'
-import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
+import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import react, { reactCompilerPreset } from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import { defineConfig } from 'vitest/config'
@@ -21,7 +21,7 @@ export default defineConfig({
   },
   base: '/',
   plugins: [
-    TanStackRouterVite({
+    tanstackRouter({
       target: 'react',
       autoCodeSplitting: true,
       routeFileIgnorePattern: '.test.',

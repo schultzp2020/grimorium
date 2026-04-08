@@ -8,7 +8,7 @@ const GAMES_KEY = 'grimoire_games'
 const CURRENT_GAME_KEY = 'grimoire_current_game'
 
 function isTauri(): boolean {
-  return typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window
+  return typeof globalThis !== 'undefined' && '__TAURI_INTERNALS__' in globalThis
 }
 
 // Cached promise -- resolved once, reused for all subsequent calls.
@@ -91,7 +91,9 @@ export async function clearCurrentGame(): Promise<void> {
 
 export async function getCurrentGame(): Promise<Game | undefined> {
   const gameId = await getCurrentGameId()
-  if (!gameId) return undefined
+  if (!gameId) {
+    return undefined
+  }
   return getGame(gameId)
 }
 
@@ -106,12 +108,16 @@ export interface GameSummary {
 
 export async function getLastGamePlayers(): Promise<string[]> {
   const games = await getAllGames()
-  if (games.length === 0) return []
+  if (games.length === 0) {
+    return []
+  }
 
   const sorted = [...games].sort((a, b) => b.createdAt - a.createdAt)
   const [lastGame] = sorted
   const lastEntry = lastGame.history.at(-1)
-  if (!lastEntry) return []
+  if (!lastEntry) {
+    return []
+  }
 
   return lastEntry.stateAfter.players.map((p) => p.name)
 }

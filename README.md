@@ -39,12 +39,13 @@ Everything happens inside the app.
 - **Role Selection** — Pick a script and choose the roles in play, or let Grimorium generate a balanced set for you.
 - **Role Reveal** — Show each player their role privately, with themed role cards.
 - **Night Management** — The app walks you through each night in the correct wake order, resolving abilities, poisoning, protection, and death timing automatically.
-- **Day Phase** — Handle day abilities, track statuses, and move the game forward.
-- **Nominations & Voting** — Run nominations, collect votes, and resolve executions.
-- **Win Detection** — The game detects when a win condition is met.
+- **Day Phase** — Handle day abilities (like the Slayer's shot), track statuses, and move the game forward.
+- **Nominations & Voting** — Run nominations, collect votes, and resolve executions with automatic vote threshold tracking.
+- **Win Detection** — The game detects when a win condition is met, including dynamic conditions like the Saint and the Mayor.
 - **Full History** — Every action and state change is recorded in a reviewable event log.
+- **Bilingual** — Full English and Spanish support.
 
-Poisoning, drunkenness, misinformation... The app handles the mechanics, but every decision stays with the Storyteller.
+Poisoning, drunkenness, misinformation, role changes... The app handles the mechanics, but every decision stays with the Storyteller.
 
 ---
 
@@ -67,14 +68,14 @@ The system handles the rest.
 
 ## Modular by Design
 
-Although only **Trouble Brewing** is currently implemented, the system is built around a modular role architecture.
+**Trouble Brewing** is fully implemented — all 23 roles — and the system is built around a modular role architecture ready for additional scripts.
 
 Each character defines:
 
-- When it acts
-- What decisions it requires
+- When it acts and in what order
+- What decisions it requires from the Storyteller
 - How it affects the game state
-- How it interacts with other roles
+- How it interacts with other roles through a decoupled intent pipeline
 
 <p align="center">
   <img src="public/roles.png" alt="Role cards — Fortune Teller and Imp" width="700">
@@ -94,8 +95,7 @@ Grimorium is built upon several advanced architectural patterns to ensure flexib
 - **The Intent Pipeline:** Roles and effects do not reference each other's logic. Characters emit "intents" (e.g., "kill this player"), which are pushed through a middleware pipeline where other effects can intercept, modify, or prevent them.
 - **Decoupled Roles & Effects:** Roles are thin wrappers; all passive ability rule interactions live within modular **Effects**.
 - **Malfunction System:** Automatically tracks and overrides abilities producing false results (from Poisoned or Drunk effects) without needing narrator rule-lookups.
-
-This engine doesn't just list characters — it fundamentally simulates how they behave and interact.
+- **Perception System:** Information roles query perceived identity rather than actual identity, allowing misregistration effects (Recluse, Spy) to work without hardcoded role checks.
 
 ---
 
@@ -115,18 +115,23 @@ Your games stay yours.
 
 ---
 
-## Current Script Support
+## Script Support
 
-- ✅ Trouble Brewing
+- ✅ **Trouble Brewing** — All 23 roles (13 Townsfolk, 4 Outsiders, 4 Minions, 2 Demons)
 - ⏳ Additional scripts planned
 
 ---
 
 ## Development
 
+Requires Node.js 22+.
+
 ```bash
 npm install
-npm run dev
+npm run dev        # start dev server
+npm test           # run tests
+npm run lint       # oxlint (type-aware)
+npm run format     # oxfmt
 ```
 
 Contributions, ideas, and discussions are welcome.

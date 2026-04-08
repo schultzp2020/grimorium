@@ -3,9 +3,11 @@ import type { EffectInstance } from '../types'
 import type { EffectDefinition, EffectId, EffectType } from './types'
 
 const EFFECTS = new Map<EffectId, EffectDefinition>()
+let initialized = false
 
 export function registerEffect(effect: EffectDefinition): void {
   EFFECTS.set(effect.id, effect)
+  initialized = true
 }
 
 /** Remove an effect definition from the registry (used for test cleanup). */
@@ -13,11 +15,21 @@ export function unregisterEffect(effectId: EffectId): void {
   EFFECTS.delete(effectId)
 }
 
+function ensureInitialized(): void {
+  if (!initialized) {
+    throw new Error(
+      'Effect registry not initialized. Ensure lib/effects/index.ts is imported before calling getEffect().',
+    )
+  }
+}
+
 export function getEffect(effectId: string): EffectDefinition | undefined {
+  ensureInitialized()
   return EFFECTS.get(effectId as EffectId)
 }
 
 export function getAllEffects(): EffectDefinition[] {
+  ensureInitialized()
   return [...EFFECTS.values()]
 }
 

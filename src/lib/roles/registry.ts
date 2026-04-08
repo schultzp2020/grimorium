@@ -1,16 +1,26 @@
 import type { RoleDefinition, RoleId } from './types'
 
 const ROLES = new Map<RoleId, RoleDefinition>()
+let initialized = false
 
 export function registerRole(role: RoleDefinition): void {
   ROLES.set(role.id, role)
+  initialized = true
+}
+
+function ensureInitialized(): void {
+  if (!initialized) {
+    throw new Error('Role registry not initialized. Ensure lib/roles/index.ts is imported before calling getRole().')
+  }
 }
 
 export function getRole(roleId: string): RoleDefinition | undefined {
+  ensureInitialized()
   return ROLES.get(roleId as RoleId)
 }
 
 export function getAllRoles(): RoleDefinition[] {
+  ensureInitialized()
   return [...ROLES.values()]
 }
 

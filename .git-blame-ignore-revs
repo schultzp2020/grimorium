@@ -1,2 +1,5 @@
-# oxfmt initial formatting
+# oxfmt initial formatting (double-quote default)
 4c812b1e77faaa8be0a2d01e2d14fdceafb3cbc4
+
+# oxfmt reformat with correct config (single-quote, no semi)
+eaf296aa0cef40607c0e4edfbdd18a40a4f97a85

@@ -7,7 +7,7 @@
   "lsp": {
     "typescript-language-server": {
       "binary": {
-        "path": "node_modules/@typescript/native-preview/bin/tsgo"
+        "path": "node_modules/@typescript/native-preview/bin/tsgo.js"
       }
     }
   }

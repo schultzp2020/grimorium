@@ -69,10 +69,10 @@ describe('Route tree smoke tests (post-cleanup)', () => {
     })
   })
 
-  it('main.tsx does not import App', async () => {
+  it('main.tsx does not import App', () => {
     // The new main.tsx uses RouterProvider, not App
     // If App.tsx existed and was imported, this test file would fail to compile
     // since we deleted it. This test serves as documentation.
-    expect(true).toBe(true)
+    expect(true).toBeTruthy()
   })
 })

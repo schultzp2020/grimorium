@@ -8,7 +8,9 @@ export interface WizardState {
 
 export function getWizardState(): WizardState {
   const raw = sessionStorage.getItem(WIZARD_STATE_KEY)
-  if (!raw) return {}
+  if (!raw) {
+    return {}
+  }
   try {
     return JSON.parse(raw) as WizardState
   } catch {

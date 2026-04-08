@@ -112,7 +112,10 @@ export function applyEndDay(ctx: GameMachineContext): {
 
   const deaths = computeDeathRevealQueue(preExecAliveIds, postState)
 
-  return { game: afterExec, deaths }
+  const nightGame = startNight(afterExec)
+  const readyGame = processAutoSkips(nightGame)
+
+  return { game: persist(readyGame), deaths }
 }
 
 export function computeDeathRevealQueue(preAliveIds: Set<string>, postState: GameState): DeathRevealEntry[] {

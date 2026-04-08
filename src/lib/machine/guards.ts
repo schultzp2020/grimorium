@@ -1,7 +1,11 @@
 import { checkEndOfDayWinConditions, checkWinCondition } from '../game'
 import { getRole } from '../roles/registry'
-import { getCurrentState } from '../types'
+import { type Phase, getCurrentState } from '../types'
 import type { GameMachineContext } from './types'
+
+function getPhase(ctx: GameMachineContext): Phase {
+  return getCurrentState(ctx.game).phase
+}
 
 export function hasSetupActions(ctx: GameMachineContext): boolean {
   const state = getCurrentState(ctx.game)
@@ -34,4 +38,12 @@ export function hasEndOfDayWinner(ctx: GameMachineContext): boolean {
   const state = getCurrentState(ctx.game)
   const winner = checkEndOfDayWinConditions(state, ctx.game)
   return winner !== null
+}
+
+export function isNightPhase(ctx: GameMachineContext): boolean {
+  return getPhase(ctx) === 'night'
+}
+
+export function isDayPhase(ctx: GameMachineContext): boolean {
+  return getPhase(ctx) === 'day'
 }

@@ -26,7 +26,7 @@ import {
   processAutoSkipsOnGame,
   resolveIntentFromResult,
 } from './actions'
-import { hasEndOfDayWinner, hasSetupActions, isGameOver } from './guards'
+import { hasEndOfDayWinner, hasSetupActions, isDayPhase, isGameOver, isNightPhase } from './guards'
 import { type GameMachineContext, type GameMachineEvent, createInitialContext } from './types'
 
 export const gameMachine = setup({
@@ -54,6 +54,8 @@ export const gameMachine = setup({
       const role = getRole(event.roleId)
       return role?.NightAction !== null && role?.NightAction !== undefined
     },
+    isNightPhase: ({ context }) => isNightPhase(context),
+    isDayPhase: ({ context }) => isDayPhase(context),
   },
   actions: {
     persistGame: ({ context }) => {
@@ -465,6 +467,8 @@ export const gameMachine = setup({
     initializing: {
       always: [
         { target: 'game_over', guard: 'isGameOver' },
+        { target: 'playing.night.dashboard', guard: 'isNightPhase' },
+        { target: 'playing.day.main', guard: 'isDayPhase' },
         { target: 'setup', guard: 'hasSetupActions' },
         { target: 'revelation' },
       ],
@@ -709,22 +713,22 @@ export const gameMachine = setup({
               actions: ['applyEndOfDayWin', 'persistGame'],
             },
             {
-              target: '#game.playing.transition_to_night',
-            },
-          ],
-        },
-
-        transition_to_night: {
-          entry: ['startNight', 'persistGame'],
-          always: [
-            {
-              target: 'death_reveal',
+              target: 'death_reveal_to_night',
               guard: 'hasPendingDeathReveals',
             },
             {
               target: 'night.dashboard',
             },
           ],
+        },
+
+        death_reveal_to_night: {
+          on: {
+            DEATH_REVEAL_CONTINUE: {
+              target: 'night.dashboard',
+              actions: 'clearDeathRevealQueue',
+            },
+          },
         },
       },
     },

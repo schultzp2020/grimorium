@@ -1,9 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/')({
-  component: IndexPage,
-})
+import { MainMenu } from '../components/screens'
 
-function IndexPage() {
-  return <div>Home placeholder</div>
-}
+export const Route = createFileRoute('/')({
+  component: MainMenu,
+})

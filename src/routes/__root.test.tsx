@@ -6,13 +6,14 @@ import { I18nProvider } from '../lib/i18n'
 import { type RouterContext, Route as rootRoute } from './__root'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test helper uses the real root route with ad-hoc children
-function renderWithRouter(initialPath: string, routes: any[]) {
+async function renderWithRouter(initialPath: string, routes: any[]) {
   const routeTree = rootRoute.addChildren(routes)
   const router = createRouter({
     routeTree,
     history: createMemoryHistory({ initialEntries: [initialPath] }),
     context: {} satisfies RouterContext,
   })
+  await router.load()
   return render(
     <I18nProvider>
       <RouterProvider router={router} />
@@ -28,7 +29,7 @@ describe('Root Layout', () => {
       component: () => <div>Test Page</div>,
     })
 
-    renderWithRouter('/', [testRoute])
+    await renderWithRouter('/', [testRoute])
 
     expect(await screen.findByRole('button', { name: /english/i })).toBeInTheDocument()
   })
@@ -41,7 +42,7 @@ describe('Root Layout', () => {
       beforeLoad: () => ({ hideLanguagePicker: true }),
     })
 
-    renderWithRouter('/', [testRoute])
+    await renderWithRouter('/', [testRoute])
 
     expect(await screen.findByTestId('game-page')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /english/i })).not.toBeInTheDocument()

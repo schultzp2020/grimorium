@@ -1,54 +1,28 @@
-import { useCallback, useMemo, useState } from 'react'
-import type { FC } from 'react'
+import { useMachine } from '@xstate/react'
+import { useMemo } from 'react'
 
 import {
-  addEffectToPlayer,
-  applyNightAction,
-  applySetupAction,
-  checkEndOfDayWinConditions,
-  checkWinCondition,
-  endGame,
-  executeAtEndOfDay,
   getBlockStatus,
   getLastNightDeaths,
   getNominatorsToday,
   getNomineesToday,
   hasVirginExecutionToday,
-  markRoleRevealed,
-  nominate,
-  processAutoSkips,
-  removeEffectFromPlayer,
-  resolveVote,
-  skipNightAction,
-  startDay,
-  startNight,
-  updateEffectData,
 } from '../../lib/game'
 import { useI18n } from '../../lib/i18n'
-import { applyPipelineChanges, getAvailableDayActions, resolveIntent } from '../../lib/pipeline'
-import {
-  type AvailableDayAction,
-  type AvailableNightFollowUp,
-  type DayActionResult,
-  type NightFollowUpResult,
-  type Intent,
-  type PipelineInputProps,
-  type PipelineResult,
-} from '../../lib/pipeline/types'
+import { gameMachine } from '../../lib/machine'
+import { getAvailableDayActions } from '../../lib/pipeline'
 import { getRole } from '../../lib/roles/registry'
-import type { NightActionResult, SetupActionResult } from '../../lib/roles/types'
-import { saveGame } from '../../lib/storage'
 import { getTeam } from '../../lib/teams'
-import { type Game, type PlayerState, getCurrentState, getPlayer, isAlive } from '../../lib/types'
+import { type Game, getCurrentState, getPlayer } from '../../lib/types'
 import { Icon, LanguagePicker } from '../atoms'
 import { PlayerFacingContext } from '../context/PlayerFacingContext'
-import { type GrimoireIntent, GrimoireModal } from '../items/GrimoireModal'
+import { GrimoireModal } from '../items/GrimoireModal'
 import { RoleCard } from '../items/RoleCard'
 import { CardLink, TeamBackground } from '../items/TeamBackground'
 import { PlayerFacingScreen } from '../layouts/PlayerFacingScreen'
 import { DawnScreen } from './DawnScreen'
 import { DayPhase } from './DayPhase'
-import { type DeathRevealEntry, DeathRevealScreen } from './DeathRevealScreen'
+import { DeathRevealScreen } from './DeathRevealScreen'
 import { GameOver } from './GameOver'
 import { HistoryView } from './HistoryView'
 import { NightDashboard } from './NightDashboard'
@@ -62,462 +36,28 @@ interface Props {
   onMainMenu: () => void
 }
 
-type Screen =
-  | { type: 'setup_actions' }
-  | { type: 'setup_action'; playerId: string; roleId: string }
-  | { type: 'role_revelation' }
-  | { type: 'showing_role'; playerId: string }
-  | { type: 'night_dashboard' }
-  | { type: 'night_action'; playerId: string; roleId: string }
-  | { type: 'night_follow_up'; followUp: AvailableNightFollowUp }
-  | { type: 'dawn'; deaths: string[]; round: number }
-  | { type: 'day' }
-  | { type: 'nomination' }
-  | { type: 'day_action'; action: AvailableDayAction }
-  | { type: 'voting'; nomineeId: string }
-  | { type: 'pipeline_input' }
-  | { type: 'game_over' }
-  | { type: 'death_reveal'; deaths: DeathRevealEntry[]; next: Screen }
-  | { type: 'grimoire_role_card'; playerId: string; returnTo: Screen }
-
 export function GameScreen({ initialGame, onMainMenu }: Props) {
   const { t } = useI18n()
-  const [game, setGame] = useState<Game>(initialGame)
-  const [screen, setScreen] = useState<Screen>(() => getInitialScreen(initialGame))
-  const [showHistory, setShowHistory] = useState(false)
-  const [showGrimoire, setShowGrimoire] = useState(false)
-  const [grimoireIntent, setGrimoireIntent] = useState<GrimoireIntent>({
-    view: 'list',
+
+  const [snapshot, send] = useMachine(gameMachine, {
+    input: { game: initialGame },
   })
 
-  // Pipeline UI state — shown when an intent needs narrator input mid-resolution
-  const [pipelineUI, setPipelineUI] = useState<{
-    Component: FC<PipelineInputProps>
-    intent: Intent
-    onResult: (result: unknown) => void
-  } | null>(null)
-
-  // Player-facing state — set by PlayerFacingScreen wrapper inside NightAction components
-  const [isPlayerFacing, setIsPlayerFacing] = useState(false)
-  const playerFacingCtx = useMemo(() => ({ setPlayerFacing: setIsPlayerFacing }), [])
-
+  const { context } = snapshot
+  const { game } = context
   const state = getCurrentState(game)
 
-  const updateGame = useCallback((newGame: Game) => {
-    setGame(newGame)
-    saveGame(newGame)
-  }, [])
-
-  // ========================================================================
-  // PIPELINE INTEGRATION
-  // ========================================================================
-
-  /**
-   * Process a pipeline result. If resolved/prevented, apply changes.
-   * If needs_input, show the pipeline's UI component.
-   * Returns the updated game, or null if waiting for UI input.
-   */
-  const processPipelineResult = useCallback(
-    (result: PipelineResult, currentGame: Game, afterComplete: (updatedGame: Game) => void) => {
-      if (result.type === 'resolved' || result.type === 'prevented') {
-        const newGame = applyPipelineChanges(currentGame, result.stateChanges)
-        updateGame(newGame)
-        setPipelineUI(null)
-        afterComplete(newGame)
-      } else {
-        const resumeFn = result.resume
-        setPipelineUI({
-          Component: result.UIComponent,
-          intent: result.intent,
-          onResult: (uiResult: unknown) => {
-            const resumed = resumeFn(uiResult)
-            processPipelineResult(resumed, currentGame, afterComplete)
-          },
-        })
-        setScreen({ type: 'pipeline_input' })
-      }
-    },
-    [updateGame],
+  const playerFacingCtx = useMemo(
+    () => ({
+      setPlayerFacing: (value: boolean) => send({ type: 'SET_PLAYER_FACING', value }),
+    }),
+    [send],
   )
 
-  // ========================================================================
-  // ROLE REVELATION FLOW
-  // ========================================================================
-
-  const handleRevealRole = (playerId: string) => {
-    setScreen({ type: 'showing_role', playerId })
-  }
-
-  const handleRoleRevealDismiss = () => {
-    if (screen.type !== 'showing_role') {
-      return
-    }
-
-    const newGame = markRoleRevealed(game, screen.playerId)
-    updateGame(newGame)
-    setScreen({ type: 'role_revelation' })
-  }
-
-  const handleStartFirstNight = () => {
-    const nightGame = startNight(game)
-    // Process auto-skips so the dashboard is ready
-    const readyGame = processAutoSkips(nightGame)
-    updateGame(readyGame)
-    setScreen({ type: 'night_dashboard' })
-  }
-
-  // ========================================================================
-  // SETUP ACTIONS FLOW
-  // ========================================================================
-
-  const handleOpenSetupAction = (playerId: string, roleId: string) => {
-    setScreen({ type: 'setup_action', playerId, roleId })
-  }
-
-  const handleSetupActionComplete = (result: SetupActionResult) => {
-    if (screen.type !== 'setup_action') {
-      return
-    }
-
-    const newGame = applySetupAction(game, screen.playerId, result)
-    updateGame(newGame)
-    setScreen({ type: 'setup_actions' })
-  }
-
-  const handleSetupActionsContinue = () => {
-    setScreen({ type: 'role_revelation' })
-  }
-
-  // ========================================================================
-  // NIGHT DASHBOARD FLOW
-  // ========================================================================
-
-  const handleOpenNightAction = (playerId: string, roleId: string) => {
-    const player = getPlayer(state, playerId)
-    if (!player) {
-      return
-    }
-
-    const role = getRole(roleId)
-    if (!role?.NightAction) {
-      // Role has no night action component — auto-skip
-      const newGame = skipNightAction(game, roleId, playerId)
-      const readyGame = processAutoSkips(newGame)
-      updateGame(readyGame)
-      setScreen({ type: 'night_dashboard' })
-      return
-    }
-
-    setScreen({ type: 'night_action', playerId, roleId })
-  }
-
-  const handleOpenNightFollowUp = (followUp: AvailableNightFollowUp) => {
-    setScreen({ type: 'night_follow_up', followUp })
-  }
-
-  const handleNightActionComplete = (result: NightActionResult) => {
-    if (screen.type !== 'night_action') {
-      return
-    }
-
-    // Apply direct entries/effects (not the intent)
-    const newGame = applyNightAction(game, result)
-    updateGame(newGame)
-
-    if (result.intent) {
-      // Resolve the intent through the pipeline
-      const pipelineResult = resolveIntent(result.intent, getCurrentState(newGame), newGame)
-      processPipelineResult(pipelineResult, newGame, (updatedGame) => {
-        // After pipeline resolution, check win conditions and return to dashboard
-        const winner = checkWinCondition(getCurrentState(updatedGame), updatedGame)
-        if (winner) {
-          const finalGame = endGame(updatedGame, winner)
-          updateGame(finalGame)
-          setScreen({ type: 'game_over' })
-        } else {
-          // Process auto-skips and return to night dashboard
-          const readyGame = processAutoSkips(updatedGame)
-          updateGame(readyGame)
-          setScreen({ type: 'night_dashboard' })
-        }
-      })
-    } else {
-      // No intent — check win conditions and return to dashboard
-      const winner = checkWinCondition(getCurrentState(newGame), newGame)
-      if (winner) {
-        const finalGame = endGame(newGame, winner)
-        updateGame(finalGame)
-        setScreen({ type: 'game_over' })
-      } else {
-        // Process auto-skips and return to night dashboard
-        const readyGame = processAutoSkips(newGame)
-        updateGame(readyGame)
-        setScreen({ type: 'night_dashboard' })
-      }
-    }
-  }
-
-  const handleNightActionSkip = () => {
-    if (screen.type !== 'night_action') {
-      return
-    }
-
-    const newGame = skipNightAction(game, screen.roleId, screen.playerId)
-    const readyGame = processAutoSkips(newGame)
-    updateGame(readyGame)
-    setScreen({ type: 'night_dashboard' })
-  }
-
-  const handleStartDay = () => {
-    const newGame = startDay(game)
-    updateGame(newGame)
-
-    const winner = checkWinCondition(getCurrentState(newGame), newGame)
-    if (winner) {
-      const finalGame = endGame(newGame, winner)
-      updateGame(finalGame)
-      setScreen({ type: 'game_over' })
-    } else {
-      const deaths = getLastNightDeaths(newGame)
-      const deadPlayers = deaths.flatMap((id) => {
-        const p = state.players.find((p) => p.id === id)
-        return p ? [{ playerId: p.id, playerName: p.name, roleId: p.roleId }] : []
-      })
-
-      if (deadPlayers.length > 0) {
-        // Death reveal goes straight to day — dawn announcement is redundant
-        setScreen({ type: 'death_reveal', deaths: deadPlayers, next: { type: 'day' } })
-      } else {
-        // No deaths: show dawn screen with "no one died" message
-        setScreen({ type: 'dawn', deaths, round: state.round })
-      }
-    }
-  }
-
-  const handleDawnContinue = () => {
-    setScreen({ type: 'day' })
-  }
-
-  // ========================================================================
-  // DAY FLOW
-  // ========================================================================
-
-  const handleOpenNomination = () => {
-    setScreen({ type: 'nomination' })
-  }
-
-  const handleNominate = (nominatorId: string, nomineeId: string) => {
-    const newGame = nominate(game, nominatorId, nomineeId)
-    updateGame(newGame)
-
-    const newState = getCurrentState(newGame)
-    // Check if an effect intercepted (e.g., Virgin killing the nominator)
-    const winner = checkWinCondition(newState, newGame)
-    if (winner) {
-      const finalGame = endGame(newGame, winner)
-      updateGame(finalGame)
-      setScreen({ type: 'game_over' })
-    } else {
-      // Check if the virgin killed someone
-      const oldPlayerSet = new Set(state.players.filter(isAlive).map((p) => p.id))
-      const newPlayerSet = new Set(newState.players.filter(isAlive).map((p) => p.id))
-      const deaths = [...oldPlayerSet].filter((id) => !newPlayerSet.has(id))
-
-      if (deaths.length > 0) {
-        // Virgin triggered — skip voting, go back to day (no further nominations)
-        const deadPlayers = deaths.flatMap((id) => {
-          const p = newState.players.find((p) => p.id === id)
-          return p ? [{ playerId: p.id, playerName: p.name, roleId: p.roleId }] : []
-        })
-        setScreen({ type: 'death_reveal', deaths: deadPlayers, next: { type: 'day' } })
-      } else {
-        // Show voting screen for this nominee
-        setScreen({ type: 'voting', nomineeId })
-      }
-    }
-  }
-
-  const handleVoteComplete = (voteCount: number, votedIds?: string[]) => {
-    if (screen.type !== 'voting') {
-      return
-    }
-
-    const newGame = resolveVote(game, screen.nomineeId, voteCount, votedIds)
-    updateGame(newGame)
-
-    // No execution here — deferred to end of day
-    setScreen({ type: 'day' })
-  }
-
-  const handleEndDay = () => {
-    // Check who is alive before execution
-    const preExecAliveIds = new Set(
-      state.players.filter((p) => !p.effects.some((e) => e.type === 'dead')).map((p) => p.id),
-    )
-
-    // Execute whoever is on the block (deferred execution)
-    const currentGame = executeAtEndOfDay(game)
-
-    // Check who is alive after
-    const postState = getCurrentState(currentGame)
-    const postExecAliveIds = new Set(
-      postState.players.filter((p) => !p.effects.some((e) => e.type === 'dead')).map((p) => p.id),
-    )
-    const deaths = [...preExecAliveIds].filter((id) => !postExecAliveIds.has(id))
-
-    // Check win conditions after execution
-    const postExecWinner = checkWinCondition(postState, currentGame)
-    if (postExecWinner) {
-      const finalGame = endGame(currentGame, postExecWinner)
-      updateGame(finalGame)
-      setScreen({ type: 'game_over' })
-      return
-    }
-
-    // Check dynamic end-of-day win conditions (e.g., Mayor's peaceful victory)
-    const endOfDayWinner = checkEndOfDayWinConditions(postState, currentGame)
-    if (endOfDayWinner) {
-      const finalGame = endGame(currentGame, endOfDayWinner)
-      updateGame(finalGame)
-      setScreen({ type: 'game_over' })
-      return
-    }
-
-    const newGame = startNight(currentGame)
-    // Process auto-skips so the dashboard is ready
-    const readyGame = processAutoSkips(newGame)
-    updateGame(readyGame)
-
-    const nightDashboardScreen: Screen = { type: 'night_dashboard' }
-
-    if (deaths.length > 0) {
-      const deadPlayers = deaths.flatMap((id) => {
-        const p = postState.players.find((p) => p.id === id)
-        return p ? [{ playerId: p.id, playerName: p.name, roleId: p.roleId }] : []
-      })
-      setScreen({ type: 'death_reveal', deaths: deadPlayers, next: nightDashboardScreen })
-    } else {
-      setScreen(nightDashboardScreen)
-    }
-  }
-
-  const handleCancelVote = () => {
-    setScreen({ type: 'day' })
-  }
-
-  const handleBackFromNomination = () => {
-    setScreen({ type: 'day' })
-  }
-
-  // ========================================================================
-  // GENERIC DAY ACTIONS
-  // ========================================================================
-
-  const handleOpenDayAction = (action: AvailableDayAction) => {
-    setScreen({ type: 'day_action', action })
-  }
-
-  const handleDayActionComplete = (result: DayActionResult) => {
-    const changes = {
-      entries: result.entries,
-      addEffects: result.addEffects,
-      removeEffects: result.removeEffects,
-    }
-    const newGame = applyPipelineChanges(game, changes)
-    updateGame(newGame)
-
-    const newState = getCurrentState(newGame)
-    const winner = checkWinCondition(newState, newGame)
-    if (winner) {
-      const finalGame = endGame(newGame, winner)
-      updateGame(finalGame)
-      setScreen({ type: 'game_over' })
-    } else {
-      // Check if action caused any deaths
-      const oldPlayerSet = new Set(state.players.filter(isAlive).map((p) => p.id))
-      const newPlayerSet = new Set(newState.players.filter(isAlive).map((p) => p.id))
-      const deaths = [...oldPlayerSet].filter((id) => !newPlayerSet.has(id))
-
-      const nextScreen: Screen = { type: 'day' }
-
-      if (deaths.length > 0) {
-        const deadPlayers = deaths.flatMap((id) => {
-          const p = newState.players.find((p) => p.id === id)
-          return p ? [{ playerId: p.id, playerName: p.name, roleId: p.roleId }] : []
-        })
-        setScreen({ type: 'death_reveal', deaths: deadPlayers, next: nextScreen })
-      } else {
-        setScreen(nextScreen)
-      }
-    }
-  }
-
-  const handleBackFromDayAction = () => {
-    setScreen({ type: 'day' })
-  }
-
-  // ========================================================================
-  // NIGHT FOLLOW-UPS
-  // ========================================================================
-
-  const handleNightFollowUpComplete = (result: NightFollowUpResult) => {
-    const changes = {
-      entries: result.entries,
-      addEffects: result.addEffects,
-      removeEffects: result.removeEffects,
-    }
-    const newGame = applyPipelineChanges(game, changes)
-    updateGame(newGame)
-    setScreen({ type: 'night_dashboard' })
-  }
-
-  // ========================================================================
-  // OTHER HANDLERS
-  // ========================================================================
-
-  const handleOpenEditEffects = (player: PlayerState) => {
-    setGrimoireIntent({ view: 'edit_effects', player })
-    setShowGrimoire(true)
-  }
-
-  const handleAddEffect = (playerId: string, effectType: string, data?: Record<string, unknown>) => {
-    const newGame = addEffectToPlayer(game, playerId, effectType, data)
-    updateGame(newGame)
-  }
-
-  const handleRemoveEffect = (playerId: string, effectType: string) => {
-    const newGame = removeEffectFromPlayer(game, playerId, effectType)
-    updateGame(newGame)
-  }
-
-  const handleUpdateEffect = (playerId: string, effectType: string, data: Record<string, unknown>) => {
-    const newGame = updateEffectData(game, playerId, effectType, data)
-    updateGame(newGame)
-  }
-
-  const handleShowRoleCard = (player: PlayerState) => {
-    setShowGrimoire(false)
-    setScreen({
-      type: 'grimoire_role_card',
-      playerId: player.id,
-      returnTo: screen,
-    })
-  }
-
-  const handleRoleCardClose = () => {
-    if (screen.type === 'grimoire_role_card') {
-      setScreen(screen.returnTo)
-    }
-  }
-
-  // ========================================================================
-  // RENDER
-  // ========================================================================
-
-  if (showHistory) {
+  if (context.historyOpen) {
     return (
       <div className='relative'>
-        <HistoryView game={game} onClose={() => setShowHistory(false)} />
+        <HistoryView game={game} onClose={() => send({ type: 'CLOSE_HISTORY' })} />
         <div className='fixed top-4 right-4 z-50'>
           <LanguagePicker variant='floating' />
         </div>
@@ -525,253 +65,275 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
     )
   }
 
-  const renderScreen = () => {
-    switch (screen.type) {
-      case 'setup_actions': {
-        return (
-          <SetupActionsScreen
-            game={game}
-            state={state}
-            onOpenSetupAction={handleOpenSetupAction}
-            onContinue={handleSetupActionsContinue}
-            onShowRoleCard={handleShowRoleCard}
-            onEditEffects={handleOpenEditEffects}
-          />
-        )
-      }
-
-      case 'setup_action': {
-        const setupPlayer = getPlayer(state, screen.playerId)
-        if (!setupPlayer) {
-          return null
-        }
-        const setupRole = getRole(screen.roleId)
-        if (!setupRole?.SetupAction) {
-          return null
-        }
-
-        return <setupRole.SetupAction player={setupPlayer} state={state} onComplete={handleSetupActionComplete} />
-      }
-
-      case 'role_revelation': {
-        return (
-          <RoleRevelationScreen
-            game={game}
-            state={state}
-            onRevealRole={handleRevealRole}
-            onStartNight={handleStartFirstNight}
-            onMainMenu={onMainMenu}
-          />
-        )
-      }
-
-      case 'showing_role': {
-        const player = getPlayer(state, screen.playerId)
-        if (!player) {
-          return null
-        }
-        const role = getRole(player.roleId)
-        if (!role) {
-          return null
-        }
-
-        return (
-          <PlayerFacingScreen playerName={player.name}>
-            <role.RoleReveal player={player} onContinue={handleRoleRevealDismiss} />
-          </PlayerFacingScreen>
-        )
-      }
-
-      case 'night_dashboard': {
-        return (
-          <NightDashboard
-            game={game}
-            state={state}
-            onOpenNightAction={handleOpenNightAction}
-            onOpenNightFollowUp={handleOpenNightFollowUp}
-            onStartDay={handleStartDay}
-            onMainMenu={onMainMenu}
-            onShowRoleCard={handleShowRoleCard}
-            onEditEffects={handleOpenEditEffects}
-            onOpenGrimoirePlayer={(player) => {
-              setGrimoireIntent({ view: 'player_detail', player })
-              setShowGrimoire(true)
-            }}
-          />
-        )
-      }
-
-      case 'night_follow_up': {
-        const FollowUpComponent = screen.followUp.ActionComponent
-        return (
-          <FollowUpComponent
-            state={state}
-            game={game}
-            playerId={screen.followUp.playerId}
-            onComplete={handleNightFollowUpComplete}
-          />
-        )
-      }
-
-      case 'night_action': {
-        const player = getPlayer(state, screen.playerId)
-        if (!player) {
-          return null
-        }
-        const role = getRole(screen.roleId)
-        if (!role) {
-          return null
-        }
-
-        if (!role.NightAction) {
-          handleNightActionSkip()
-          return null
-        }
-
-        return (
-          <role.NightAction
-            game={game}
-            state={state}
-            player={player}
-            onComplete={handleNightActionComplete}
-            onOpenGrimoire={(intent, readOnly) => {
-              setGrimoireIntent({ ...intent, readOnly })
-              setShowGrimoire(true)
-            }}
-          />
-        )
-      }
-
-      case 'dawn': {
-        return <DawnScreen state={state} deaths={screen.deaths} round={screen.round} onContinue={handleDawnContinue} />
-      }
-
-      case 'death_reveal': {
-        return <DeathRevealScreen deaths={screen.deaths} onContinue={() => setScreen(screen.next)} />
-      }
-
-      case 'day': {
-        // Collect available day actions from active effects
-        const dayActions = getAvailableDayActions(state, t)
-        const deaths = getLastNightDeaths(game)
-
-        return (
-          <DayPhase
-            state={state}
-            blockStatus={getBlockStatus(game)}
-            dayActions={dayActions}
-            nightSummary={{ deaths, round: state.round - 1 || state.round }}
-            nominationsBlocked={hasVirginExecutionToday(game)}
-            onNominate={handleOpenNomination}
-            onDayAction={handleOpenDayAction}
-            onEndDay={handleEndDay}
-            onMainMenu={onMainMenu}
-            onShowRoleCard={handleShowRoleCard}
-            onEditEffects={handleOpenEditEffects}
-            onOpenGrimoirePlayer={(player) => {
-              setGrimoireIntent({ view: 'player_detail', player })
-              setShowGrimoire(true)
-            }}
-          />
-        )
-      }
-
-      case 'day_action': {
-        const { ActionComponent } = screen.action
-        return (
-          <ActionComponent
-            state={state}
-            playerId={screen.action.playerId}
-            onComplete={handleDayActionComplete}
-            onBack={handleBackFromDayAction}
-          />
-        )
-      }
-
-      case 'pipeline_input': {
-        if (!pipelineUI) {
-          return null
-        }
-        const PipelineComponent = pipelineUI.Component
-        return <PipelineComponent state={state} intent={pipelineUI.intent} onComplete={pipelineUI.onResult} />
-      }
-
-      case 'grimoire_role_card': {
-        const player = getPlayer(state, screen.playerId)
-        if (!player) {
-          return null
-        }
-        const cardRole = getRole(player.roleId)
-        const cardTeamId = cardRole?.team ?? 'townsfolk'
-        const cardTeam = getTeam(cardTeamId)
-        return (
-          <TeamBackground teamId={cardTeamId}>
-            <RoleCard roleId={player.roleId} />
-            <CardLink onClick={handleRoleCardClose} isEvil={cardTeam.isEvil}>
-              {t.common.back}
-            </CardLink>
-          </TeamBackground>
-        )
-      }
-
-      case 'nomination': {
-        return (
-          <NominationScreen
-            state={state}
-            nominatorsToday={getNominatorsToday(game)}
-            nomineesToday={getNomineesToday(game)}
-            onNominate={handleNominate}
-            onBack={handleBackFromNomination}
-          />
-        )
-      }
-
-      case 'voting': {
-        return (
-          <VotingPhase
-            state={state}
-            nomineeId={screen.nomineeId}
-            blockStatus={getBlockStatus(game)}
-            onVoteComplete={handleVoteComplete}
-            onCancel={handleCancelVote}
-          />
-        )
-      }
-
-      case 'game_over': {
-        return <GameOver state={state} onMainMenu={onMainMenu} onShowHistory={() => setShowHistory(true)} />
-      }
-
-      default: {
-        return null
-      }
+  if (context.grimoireRoleCardPlayerId) {
+    const player = getPlayer(state, context.grimoireRoleCardPlayerId)
+    if (player) {
+      const cardRole = getRole(player.roleId)
+      const cardTeamId = cardRole?.team ?? 'townsfolk'
+      const cardTeam = getTeam(cardTeamId)
+      return (
+        <TeamBackground teamId={cardTeamId}>
+          <RoleCard roleId={player.roleId} />
+          <CardLink onClick={() => send({ type: 'CLOSE_GRIMOIRE_ROLE_CARD' })} isEvil={cardTeam.isEvil}>
+            {t.common.back}
+          </CardLink>
+        </TeamBackground>
+      )
     }
   }
 
-  // Floating buttons are shown everywhere except:
-  // - game_over: dedicated summary screen
-  // - grimoire_role_card: full-screen role card overlay
-  // - when a child component signals it's player-facing (via PlayerFacingScreen)
-  const showFloatingButtons = screen.type !== 'game_over' && screen.type !== 'grimoire_role_card' && !isPlayerFacing
+  const renderScreen = () => {
+    if (snapshot.matches({ setup: 'actions_list' })) {
+      return (
+        <SetupActionsScreen
+          game={game}
+          state={state}
+          onOpenSetupAction={(playerId, roleId) => send({ type: 'OPEN_SETUP_ACTION', playerId, roleId })}
+          onContinue={() => send({ type: 'SETUP_ACTIONS_CONTINUE' })}
+          onShowRoleCard={(player) => send({ type: 'SHOW_GRIMOIRE_ROLE_CARD', playerId: player.id })}
+          onEditEffects={(player) =>
+            send({
+              type: 'OPEN_GRIMOIRE',
+              intent: { view: 'edit_effects', player },
+            })
+          }
+        />
+      )
+    }
+
+    if (snapshot.matches({ setup: 'action' })) {
+      const setupPlayer = context.setupActionPlayerId ? getPlayer(state, context.setupActionPlayerId) : null
+      const setupRole = context.setupActionRoleId ? getRole(context.setupActionRoleId) : null
+      if (!setupPlayer || !setupRole?.SetupAction) return null
+
+      return (
+        <setupRole.SetupAction
+          player={setupPlayer}
+          state={state}
+          onComplete={(result) => send({ type: 'SETUP_ACTION_COMPLETE', result })}
+        />
+      )
+    }
+
+    if (snapshot.matches({ revelation: 'list' })) {
+      return (
+        <RoleRevelationScreen
+          game={game}
+          state={state}
+          onRevealRole={(playerId) => send({ type: 'REVEAL_ROLE', playerId })}
+          onStartNight={() => send({ type: 'START_FIRST_NIGHT' })}
+          onMainMenu={onMainMenu}
+        />
+      )
+    }
+
+    if (snapshot.matches({ revelation: 'showing_role' })) {
+      const player = context.showingRolePlayerId ? getPlayer(state, context.showingRolePlayerId) : null
+      if (!player) return null
+      const role = getRole(player.roleId)
+      if (!role) return null
+
+      return (
+        <PlayerFacingScreen playerName={player.name}>
+          <role.RoleReveal player={player} onContinue={() => send({ type: 'ROLE_REVEAL_DISMISS' })} />
+        </PlayerFacingScreen>
+      )
+    }
+
+    if (snapshot.matches({ playing: { night: 'dashboard' } })) {
+      return (
+        <NightDashboard
+          game={game}
+          state={state}
+          onOpenNightAction={(playerId, roleId) => send({ type: 'OPEN_NIGHT_ACTION', playerId, roleId })}
+          onOpenNightFollowUp={(followUp) => send({ type: 'OPEN_NIGHT_FOLLOW_UP', followUp })}
+          onStartDay={() => send({ type: 'START_DAY' })}
+          onMainMenu={onMainMenu}
+          onShowRoleCard={(player) => send({ type: 'SHOW_GRIMOIRE_ROLE_CARD', playerId: player.id })}
+          onEditEffects={(player) =>
+            send({
+              type: 'OPEN_GRIMOIRE',
+              intent: { view: 'edit_effects', player },
+            })
+          }
+          onOpenGrimoirePlayer={(player) =>
+            send({
+              type: 'OPEN_GRIMOIRE',
+              intent: { view: 'player_detail', player },
+            })
+          }
+        />
+      )
+    }
+
+    if (snapshot.matches({ playing: { night: 'action' } })) {
+      const player = context.nightActionPlayerId ? getPlayer(state, context.nightActionPlayerId) : null
+      const role = context.nightActionRoleId ? getRole(context.nightActionRoleId) : null
+      if (!player || !role?.NightAction) return null
+
+      return (
+        <role.NightAction
+          game={game}
+          state={state}
+          player={player}
+          onComplete={(result) => send({ type: 'NIGHT_ACTION_COMPLETE', result })}
+          onOpenGrimoire={(intent, readOnly) =>
+            send({
+              type: 'OPEN_GRIMOIRE',
+              intent: { ...intent, readOnly },
+            })
+          }
+        />
+      )
+    }
+
+    if (snapshot.matches({ playing: { night: 'follow_up' } })) {
+      const followUp = context.activeFollowUp
+      if (!followUp) return null
+      const FollowUpComponent = followUp.ActionComponent
+      return (
+        <FollowUpComponent
+          state={state}
+          game={game}
+          playerId={followUp.playerId}
+          onComplete={(result) => send({ type: 'NIGHT_FOLLOW_UP_COMPLETE', result })}
+        />
+      )
+    }
+
+    if (snapshot.matches({ playing: { night: 'pipeline_input' } })) {
+      if (!context.pipelineUI) return null
+      const PipelineComponent = context.pipelineUI.Component
+      return (
+        <PipelineComponent
+          state={state}
+          intent={context.pipelineUI.intent}
+          onComplete={(result) => send({ type: 'PIPELINE_INPUT_COMPLETE', result })}
+        />
+      )
+    }
+
+    if (snapshot.matches({ playing: 'death_reveal' }) || snapshot.matches({ playing: 'death_reveal_to_night' })) {
+      return (
+        <DeathRevealScreen
+          deaths={context.deathRevealQueue}
+          onContinue={() => send({ type: 'DEATH_REVEAL_CONTINUE' })}
+        />
+      )
+    }
+
+    if (snapshot.matches({ playing: 'dawn' })) {
+      return (
+        <DawnScreen
+          state={state}
+          deaths={context.dawnDeaths}
+          round={context.dawnRound}
+          onContinue={() => send({ type: 'DAWN_CONTINUE' })}
+        />
+      )
+    }
+
+    if (snapshot.matches({ playing: { day: 'main' } })) {
+      const dayActions = getAvailableDayActions(state, t)
+      const deaths = getLastNightDeaths(game)
+
+      return (
+        <DayPhase
+          state={state}
+          blockStatus={getBlockStatus(game)}
+          dayActions={dayActions}
+          nightSummary={{
+            deaths,
+            round: state.round - 1 || state.round,
+          }}
+          nominationsBlocked={hasVirginExecutionToday(game)}
+          onNominate={() => send({ type: 'OPEN_NOMINATION' })}
+          onDayAction={(action) => send({ type: 'OPEN_DAY_ACTION', action })}
+          onEndDay={() => send({ type: 'END_DAY' })}
+          onMainMenu={onMainMenu}
+          onShowRoleCard={(player) => send({ type: 'SHOW_GRIMOIRE_ROLE_CARD', playerId: player.id })}
+          onEditEffects={(player) =>
+            send({
+              type: 'OPEN_GRIMOIRE',
+              intent: { view: 'edit_effects', player },
+            })
+          }
+          onOpenGrimoirePlayer={(player) =>
+            send({
+              type: 'OPEN_GRIMOIRE',
+              intent: { view: 'player_detail', player },
+            })
+          }
+        />
+      )
+    }
+
+    if (snapshot.matches({ playing: { day: 'nomination' } })) {
+      return (
+        <NominationScreen
+          state={state}
+          nominatorsToday={getNominatorsToday(game)}
+          nomineesToday={getNomineesToday(game)}
+          onNominate={(nominatorId, nomineeId) => send({ type: 'NOMINATE', nominatorId, nomineeId })}
+          onBack={() => send({ type: 'BACK_FROM_NOMINATION' })}
+        />
+      )
+    }
+
+    if (snapshot.matches({ playing: { day: 'voting' } })) {
+      if (!context.votingNomineeId) return null
+      return (
+        <VotingPhase
+          state={state}
+          nomineeId={context.votingNomineeId}
+          blockStatus={getBlockStatus(game)}
+          onVoteComplete={(voteCount, votedIds) => send({ type: 'VOTE_COMPLETE', voteCount, votedIds })}
+          onCancel={() => send({ type: 'CANCEL_VOTE' })}
+        />
+      )
+    }
+
+    if (snapshot.matches({ playing: { day: 'day_action' } })) {
+      if (!context.activeDayAction) return null
+      const { ActionComponent } = context.activeDayAction
+      return (
+        <ActionComponent
+          state={state}
+          playerId={context.activeDayAction.playerId}
+          onComplete={(result) => send({ type: 'DAY_ACTION_COMPLETE', result })}
+          onBack={() => send({ type: 'BACK_FROM_DAY_ACTION' })}
+        />
+      )
+    }
+
+    if (snapshot.matches('game_over')) {
+      return <GameOver state={state} onMainMenu={onMainMenu} onShowHistory={() => send({ type: 'OPEN_HISTORY' })} />
+    }
+
+    return null
+  }
+
+  const showFloatingButtons =
+    !snapshot.matches('game_over') && !context.grimoireRoleCardPlayerId && !context.isPlayerFacing
 
   return (
     <div className='relative'>
       <PlayerFacingContext.Provider value={playerFacingCtx}>{renderScreen()}</PlayerFacingContext.Provider>
 
-      {/* Floating Language Toggle */}
       <div className='fixed top-4 right-4 z-50'>
         <LanguagePicker variant='floating' />
       </div>
 
-      {/* Floating Action Buttons */}
       {showFloatingButtons && (
         <div className='fixed right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] flex flex-col gap-2'>
           <button
             type='button'
-            onClick={() => {
-              setGrimoireIntent({ view: 'list' })
-              setShowGrimoire(true)
-            }}
+            onClick={() =>
+              send({
+                type: 'OPEN_GRIMOIRE',
+                intent: { view: 'list' },
+              })
+            }
             className='flex h-12 w-12 items-center justify-center rounded-full border border-mystic-gold/30 bg-grimoire-dark/90 text-mystic-gold shadow-lg transition-colors hover:border-mystic-gold/50 hover:bg-grimoire-dark'
             title={t.game.grimoire}
           >
@@ -780,7 +342,7 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
 
           <button
             type='button'
-            onClick={() => setShowHistory(true)}
+            onClick={() => send({ type: 'OPEN_HISTORY' })}
             className='flex h-12 w-12 items-center justify-center rounded-full border border-parchment-500/30 bg-grimoire-dark/90 text-parchment-400 shadow-lg transition-colors hover:border-parchment-400/50 hover:bg-grimoire-dark hover:text-parchment-300'
             title={t.common.history}
           >
@@ -789,68 +351,16 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
         </div>
       )}
 
-      {/* Grimoire Modal — unified player list, detail, edit effects, effect config */}
       <GrimoireModal
         state={state}
-        open={showGrimoire}
-        onClose={() => setShowGrimoire(false)}
-        intent={grimoireIntent}
-        onShowRoleCard={handleShowRoleCard}
-        onAddEffect={handleAddEffect}
-        onRemoveEffect={handleRemoveEffect}
-        onUpdateEffect={handleUpdateEffect}
+        open={context.grimoireOpen}
+        onClose={() => send({ type: 'CLOSE_GRIMOIRE' })}
+        intent={context.grimoireIntent}
+        onShowRoleCard={(player) => send({ type: 'SHOW_GRIMOIRE_ROLE_CARD', playerId: player.id })}
+        onAddEffect={(playerId, effectType, data) => send({ type: 'ADD_EFFECT', playerId, effectType, data })}
+        onRemoveEffect={(playerId, effectType) => send({ type: 'REMOVE_EFFECT', playerId, effectType })}
+        onUpdateEffect={(playerId, effectType, data) => send({ type: 'UPDATE_EFFECT', playerId, effectType, data })}
       />
     </div>
   )
-}
-
-function hasSetupActions(game: Game): boolean {
-  const state = getCurrentState(game)
-  // Check if any player's current role has a SetupAction that hasn't been completed yet
-  const completedSetupPlayerIds = new Set(
-    game.history.filter((e) => e.type === 'setup_action').map((e) => e.data.playerId as string),
-  )
-
-  return state.players.some((p) => {
-    if (completedSetupPlayerIds.has(p.id)) {
-      return false
-    }
-    const role = getRole(p.roleId)
-    return role?.SetupAction !== undefined
-  })
-}
-
-function getInitialScreen(game: Game): Screen {
-  const state = getCurrentState(game)
-
-  // Check win conditions
-  if (state.phase === 'ended') {
-    return { type: 'game_over' }
-  }
-
-  if (state.phase !== 'setup') {
-    const winner = checkWinCondition(state, game)
-    if (winner) {
-      return { type: 'game_over' }
-    }
-  }
-
-  switch (state.phase) {
-    case 'setup': {
-      // Check if there are pending setup actions (e.g., Drunk choosing believed role)
-      if (hasSetupActions(game)) {
-        return { type: 'setup_actions' }
-      }
-      return { type: 'role_revelation' }
-    }
-    case 'night': {
-      return { type: 'night_dashboard' }
-    }
-    case 'day': {
-      return { type: 'day' }
-    }
-    default: {
-      return { type: 'day' }
-    }
-  }
 }

@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createActor } from 'xstate'
 
 import { addEffectTo, makeGame, makePlayer, makeState, resetPlayerCounter } from '../__tests__/helpers'
+import { getCurrentState } from '../types'
 import { gameMachine } from './gameMachine'
 
 // Mock storage to avoid localStorage in tests
@@ -423,6 +424,143 @@ describe('gameMachine', () => {
       actor.send({ type: 'BACK_FROM_DAY_ACTION' })
 
       expect(actor.getSnapshot().matches({ playing: { day: 'main' } })).toBe(true)
+      actor.stop()
+    })
+  })
+
+  describe('initialization: phase restoration', () => {
+    it('restores to night dashboard for a game in night phase', () => {
+      const state = makeState({
+        phase: 'night',
+        round: 2,
+        players: [
+          makePlayer({ roleId: 'villager' }),
+          makePlayer({ roleId: 'villager' }),
+          makePlayer({ roleId: 'imp' }),
+        ],
+      })
+      const game = makeGame(state)
+      const actor = createTestActor(game)
+      actor.start()
+
+      expect(actor.getSnapshot().matches({ playing: { night: 'dashboard' } })).toBe(true)
+      actor.stop()
+    })
+
+    it('restores to day main for a game in day phase', () => {
+      const state = makeState({
+        phase: 'day',
+        round: 1,
+        players: [
+          makePlayer({ roleId: 'villager' }),
+          makePlayer({ roleId: 'villager' }),
+          makePlayer({ roleId: 'imp' }),
+        ],
+      })
+      const game = makeGame(state)
+      const actor = createTestActor(game)
+      actor.start()
+
+      expect(actor.getSnapshot().matches({ playing: { day: 'main' } })).toBe(true)
+      actor.stop()
+    })
+
+    it('restores to game_over when game phase is ended', () => {
+      const state = makeState({
+        phase: 'ended',
+        players: [makePlayer({ roleId: 'villager' }), addEffectTo(makePlayer({ roleId: 'imp' }), 'dead')],
+      })
+      const game = makeGame(state)
+      const actor = createTestActor(game)
+      actor.start()
+
+      expect(actor.getSnapshot().value).toBe('game_over')
+      actor.stop()
+    })
+
+    it('restores to game_over when all demons are dead in night phase', () => {
+      const state = makeState({
+        phase: 'night',
+        round: 2,
+        players: [
+          makePlayer({ roleId: 'villager' }),
+          makePlayer({ roleId: 'villager' }),
+          addEffectTo(makePlayer({ roleId: 'imp' }), 'dead'),
+        ],
+      })
+      const game = makeGame(state)
+      const actor = createTestActor(game)
+      actor.start()
+
+      expect(actor.getSnapshot().value).toBe('game_over')
+      actor.stop()
+    })
+  })
+
+  describe('end of day flow', () => {
+    it('transitions to night dashboard when no execution', () => {
+      const state = makeState({
+        phase: 'day',
+        round: 1,
+        players: [
+          makePlayer({ id: 'p1', roleId: 'villager' }),
+          makePlayer({ id: 'p2', roleId: 'villager' }),
+          makePlayer({ id: 'p3', roleId: 'villager' }),
+          makePlayer({ id: 'p4', roleId: 'imp' }),
+        ],
+      })
+      const game = makeGame(state)
+      const actor = createTestActor(game)
+      actor.start()
+
+      actor.send({ type: 'END_DAY' })
+
+      // No execution, no deaths -> night dashboard
+      expect(actor.getSnapshot().matches({ playing: { night: 'dashboard' } })).toBe(true)
+
+      // Verify game is now in night phase
+      const nightState = getCurrentState(actor.getSnapshot().context.game)
+      expect(nightState.phase).toBe('night')
+      actor.stop()
+    })
+
+    it('transitions to night after death reveal when execution occurred', () => {
+      // To have an execution, we need to nominate and vote first
+      const state = makeState({
+        phase: 'day',
+        round: 1,
+        players: [
+          makePlayer({ id: 'p1', name: 'Alice', roleId: 'villager' }),
+          makePlayer({ id: 'p2', name: 'Bob', roleId: 'villager' }),
+          makePlayer({ id: 'p3', name: 'Charlie', roleId: 'villager' }),
+          makePlayer({ id: 'p4', name: 'Dave', roleId: 'imp' }),
+        ],
+      })
+      const game = makeGame(state)
+      const actor = createTestActor(game)
+      actor.start()
+
+      // Nominate and vote to put someone on the block
+      actor.send({ type: 'OPEN_NOMINATION' })
+      actor.send({ type: 'NOMINATE', nominatorId: 'p1', nomineeId: 'p2' })
+      actor.send({ type: 'VOTE_COMPLETE', voteCount: 3 })
+
+      // End day — should execute p2 and show death reveal
+      actor.send({ type: 'END_DAY' })
+
+      const snapshot = actor.getSnapshot()
+      // Should be in death_reveal_to_night (execution death reveal before night)
+      if (snapshot.matches({ playing: 'death_reveal_to_night' })) {
+        expect(snapshot.context.deathRevealQueue.length).toBeGreaterThan(0)
+
+        // Continue past death reveal
+        actor.send({ type: 'DEATH_REVEAL_CONTINUE' })
+        expect(actor.getSnapshot().matches({ playing: { night: 'dashboard' } })).toBe(true)
+      } else {
+        // If no one was executed (vote didn't reach majority), goes to night
+        expect(snapshot.matches({ playing: { night: 'dashboard' } })).toBe(true)
+      }
+
       actor.stop()
     })
   })

@@ -465,6 +465,7 @@ export function checkDynamicWinConditions(
   return null
 }
 
+export { createProtectionHandler, createRedirectHandler } from './factories'
 export {
   perceive,
   canRegisterAsTeam,

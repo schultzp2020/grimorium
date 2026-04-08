@@ -105,7 +105,7 @@ export function DeathRevealScreen({ deaths, onContinue }: Props) {
 
                                 {/* "DEAD" Stamp */}
                                 <div className='absolute inset-x-0 bottom-[15%] flex justify-center pointer-events-none'>
-                                    <div className='bg-red-950/90 border-2 border-red-500/50 px-6 py-2 rounded shadow-[0_0_30px_rgba(239,68,68,0.5)] transform -rotate-12 backdrop-blur-sm'>
+                                    <div className='bg-red-950/90 border-2 border-red-500/50 px-6 py-2 rounded-sm shadow-[0_0_30px_rgba(239,68,68,0.5)] transform -rotate-12 backdrop-blur-xs'>
                                         <span className='font-tarot text-2xl text-red-400 tracking-widest-xl uppercase'>
                                             {t.game.deathRevealDead}
                                         </span>

@@ -232,25 +232,25 @@ export function VotingPhase({
                     </span>
                   )}
                   {isDead && !ghostVoteSpent && canVote && !isNominee && (
-                    <span className='text-blue-400/80 text-xs inline-flex items-center gap-1 bg-blue-900/20 px-1.5 py-0.5 rounded'>
+                    <span className='text-blue-400/80 text-xs inline-flex items-center gap-1 bg-blue-900/20 px-1.5 py-0.5 rounded-sm'>
                       <Icon name='ghost' size='xs' />
                       {t.game.ghostVoteAvailable}
                     </span>
                   )}
                   {ghostVoteSpent && (
-                    <span className='text-parchment-500/50 text-xs inline-flex items-center gap-1 bg-white/5 px-1.5 py-0.5 rounded'>
+                    <span className='text-parchment-500/50 text-xs inline-flex items-center gap-1 bg-white/5 px-1.5 py-0.5 rounded-sm'>
                       <Icon name='ghost' size='xs' />
                       {t.game.ghostVoteSpent}
                     </span>
                   )}
                   {!isDead && !canVote && !isNominee && (
-                    <span className='text-parchment-500/50 text-xs inline-flex items-center gap-1 bg-white/5 px-1.5 py-0.5 rounded'>
+                    <span className='text-parchment-500/50 text-xs inline-flex items-center gap-1 bg-white/5 px-1.5 py-0.5 rounded-sm'>
                       {t.game.cannotVote}
                     </span>
                   )}
                 </div>
                 {butlerMaster && (
-                  <div className='flex items-center gap-1.5 mb-2 px-2 py-1 rounded bg-amber-900/30 border border-amber-500/30'>
+                  <div className='flex items-center gap-1.5 mb-2 px-2 py-1 rounded-sm bg-amber-900/30 border border-amber-500/30'>
                     <Icon name='handHeart' size='sm' className='text-amber-400' />
                     <span className='text-amber-300 text-xs font-medium'>
                       {interpolate(butlerT.masterLabel ?? '', {

@@ -194,7 +194,7 @@ export function RoleSelection({ players, scriptId, onNext, onBack }: Props) {
   return (
     <div className='min-h-app bg-gradient-to-b from-grimoire-purple via-grimoire-dark to-grimoire-darker flex flex-col'>
       {/* Header */}
-      <div className='sticky top-0 z-10 bg-grimoire-dark/95 backdrop-blur-sm border-b border-mystic-gold/20 px-4 py-3'>
+      <div className='sticky top-0 z-10 bg-grimoire-dark/95 backdrop-blur-xs border-b border-mystic-gold/20 px-4 py-3'>
         <div className='flex items-center gap-3 max-w-lg mx-auto'>
           <BackButton onClick={onBack} />
           <div className='flex-1'>
@@ -219,7 +219,7 @@ export function RoleSelection({ players, scriptId, onNext, onBack }: Props) {
                 className={cn(
                   'flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-xs font-medium tracking-wide uppercase transition-all',
                   mode === 'generate'
-                    ? 'bg-mystic-gold/20 text-mystic-gold shadow-sm border border-mystic-gold/30'
+                    ? 'bg-mystic-gold/20 text-mystic-gold shadow-xs border border-mystic-gold/30'
                     : 'text-parchment-500 hover:text-parchment-300 border border-transparent',
                 )}
               >
@@ -232,7 +232,7 @@ export function RoleSelection({ players, scriptId, onNext, onBack }: Props) {
                 className={cn(
                   'flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-xs font-medium tracking-wide uppercase transition-all',
                   mode === 'manual'
-                    ? 'bg-mystic-gold/20 text-mystic-gold shadow-sm border border-mystic-gold/30'
+                    ? 'bg-mystic-gold/20 text-mystic-gold shadow-xs border border-mystic-gold/30'
                     : 'text-parchment-500 hover:text-parchment-300 border border-transparent',
                 )}
               >
@@ -280,7 +280,7 @@ export function RoleSelection({ players, scriptId, onNext, onBack }: Props) {
         {appliedToast && (
           <div className='sticky top-0 z-20 px-4 pt-2 pb-0 animate-toast-in'>
             <div className='max-w-lg mx-auto'>
-              <div className='bg-green-500/15 border border-green-400/30 rounded-lg px-3 py-2 flex items-center gap-2 backdrop-blur-sm'>
+              <div className='bg-green-500/15 border border-green-400/30 rounded-lg px-3 py-2 flex items-center gap-2 backdrop-blur-xs'>
                 <div className='w-5 h-5 rounded-full bg-green-400/20 flex items-center justify-center flex-shrink-0'>
                   <Icon name='check' size='xs' className='text-green-300' />
                 </div>
@@ -778,7 +778,7 @@ function TeamSection({
   return (
     <div>
       {/* Sticky Team Header */}
-      <div className='sticky top-0 z-[5] bg-grimoire-dark/95 backdrop-blur-sm border-b border-white/[0.06] px-4 py-2'>
+      <div className='sticky top-0 z-[5] bg-grimoire-dark/95 backdrop-blur-xs border-b border-white/[0.06] px-4 py-2'>
         <div className='max-w-lg mx-auto flex items-center gap-2'>
           <Icon name={team.icon} size='sm' className={team.colors.text} />
           <span
@@ -947,7 +947,7 @@ function RoleCard({
           <button
             type='button'
             onClick={onDecrement}
-            className='w-6 h-6 flex items-center justify-center text-parchment-400 hover:text-parchment-100 hover:bg-white/10 rounded transition-colors'
+            className='w-6 h-6 flex items-center justify-center text-parchment-400 hover:text-parchment-100 hover:bg-white/10 rounded-sm transition-colors'
           >
             <Icon name='minus' size='xs' />
           </button>
@@ -962,7 +962,7 @@ function RoleCard({
           <button
             type='button'
             onClick={onIncrement}
-            className='w-6 h-6 flex items-center justify-center text-parchment-400 hover:text-parchment-100 hover:bg-white/10 rounded transition-colors'
+            className='w-6 h-6 flex items-center justify-center text-parchment-400 hover:text-parchment-100 hover:bg-white/10 rounded-sm transition-colors'
           >
             <Icon name='plus' size='xs' />
           </button>

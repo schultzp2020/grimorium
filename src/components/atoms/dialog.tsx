@@ -16,7 +16,7 @@ function DialogOverlay({ className, ref, ...props }: React.ComponentPropsWithout
     <DialogPrimitive.Overlay
       ref={ref}
       className={cn(
-        'fixed inset-0 z-50 bg-black/40 backdrop-blur-sm',
+        'fixed inset-0 z-50 bg-black/40 backdrop-blur-xs',
         'data-[state=open]:animate-overlay-in data-[state=closed]:animate-overlay-out',
         className,
       )}
@@ -128,7 +128,7 @@ function DialogContent({ className, children, ref, ...props }: React.ComponentPr
     <DialogPortal>
       <DialogPrimitive.Overlay
         className={cn(
-          'fixed inset-0 z-50 bg-black/40 backdrop-blur-sm',
+          'fixed inset-0 z-50 bg-black/40 backdrop-blur-xs',
           // When drag-dismissing, skip the keyframe animation — it would
           // flash the overlay back to opacity 1 (its first keyframe).
           // Instead, we use a CSS transition to fade from current opacity to 0.

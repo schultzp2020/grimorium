@@ -93,7 +93,7 @@ function FortuneTellerSetupAction({
   return (
     <div className='min-h-app bg-gradient-to-b from-grimoire-purple via-grimoire-dark to-grimoire-darker flex flex-col'>
       {/* Header */}
-      <div className='sticky top-0 z-10 bg-grimoire-dark/95 backdrop-blur-sm border-b border-mystic-gold/20 px-4 py-3'>
+      <div className='sticky top-0 z-10 bg-grimoire-dark/95 backdrop-blur-xs border-b border-mystic-gold/20 px-4 py-3'>
         <div className='flex items-center gap-3 max-w-lg mx-auto'>
           <div className='w-10 h-10 rounded-full bg-amber-900/30 border border-amber-700/50 flex items-center justify-center'>
             <Icon name='eye' size='md' className='text-amber-400' />
@@ -136,7 +136,7 @@ function FortuneTellerSetupAction({
       </div>
 
       {/* Footer */}
-      <div className='sticky bottom-0 bg-grimoire-dark/95 backdrop-blur-sm border-t border-mystic-gold/20 px-4 py-3'>
+      <div className='sticky bottom-0 bg-grimoire-dark/95 backdrop-blur-xs border-t border-mystic-gold/20 px-4 py-3'>
         <div className='max-w-lg mx-auto'>
           <Button
             onClick={handleConfirm}

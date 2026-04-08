@@ -256,7 +256,7 @@ export function MainMenu({
             /* ═══════════ SEALED / BREAKING VIEW ═══════════ */
             <button
               onClick={handleBreakSeal}
-              className='flex flex-col items-center text-center focus:outline-none active:scale-[0.98] transition-transform'
+              className='flex flex-col items-center text-center focus:outline-hidden active:scale-[0.98] transition-transform'
               aria-label={t.mainMenu.tapToOpen}
             >
               {/* Arcane Seal */}

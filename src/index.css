@@ -1,8 +1,111 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@theme {
+  --font-tarot: 'Cinzel', serif;
+  --font-body: 'Inter', sans-serif;
+
+  --tracking-widest-xl: 0.2em;
+
+  --color-parchment-50: #FFFEF8;
+  --color-parchment-100: #FDF8E7;
+  --color-parchment-200: #F5EDD6;
+  --color-parchment-300: #E8DCC0;
+  --color-parchment-400: #D4C5A2;
+  --color-parchment-500: #B8A77D;
+
+  --color-mystic-gold: #D4AF37;
+  --color-mystic-bronze: #CD7F32;
+  --color-mystic-silver: #C0C0C0;
+  --color-mystic-crimson: #8B0000;
+  --color-mystic-midnight: #191970;
+
+  --color-grimoire-dark: #0D0D0D;
+  --color-grimoire-darker: #080808;
+  --color-grimoire-purple: #1A0A2E;
+  --color-grimoire-blood: #2D0A0A;
+
+  --shadow-tarot: 0 0 0 1px rgba(212, 175, 55, 0.3), 0 4px 20px rgba(0, 0, 0, 0.3);
+  --shadow-tarot-glow: 0 0 20px rgba(212, 175, 55, 0.2);
+
+  --background-image-tarot-pattern: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.03) 0%, transparent 50%);
+  --background-image-parchment-texture: radial-gradient(ellipse at 20% 20%, rgba(255,250,240,0.03) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(255,250,240,0.02) 0%, transparent 50%);
+
+  --animate-sheet-in: sheet-in 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  --animate-sheet-out: sheet-out 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+  --animate-overlay-in: overlay-in 0.3s ease-out;
+  --animate-overlay-out: overlay-out 0.2s ease-out;
+  --animate-toast-in: toast-in 0.3s ease-out;
+  --animate-toast-out: toast-out 0.2s ease-out;
+  --animate-popover-in: popover-in 0.15s ease-out;
+  --animate-popover-out: popover-out 0.1s ease-in;
+}
+
+@keyframes sheet-in {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes sheet-out {
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
+}
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes overlay-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes toast-out {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-8px); }
+}
+@keyframes popover-in {
+  from { opacity: 0; transform: scale(0.95) translateY(-4px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes popover-out {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to { opacity: 0; transform: scale(0.95) translateY(-4px); }
+}
+
+@utility text-glow-gold {
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+@utility text-glow-crimson {
+  text-shadow: 0 0 10px rgba(139, 0, 0, 0.7);
+}
+
+@utility min-h-app {
+  min-height: var(--app-height);
+  max-height: var(--app-height);
+  overflow-y: auto;
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
 
 @layer base {
 
@@ -27,7 +130,9 @@
   }
 
   body {
-    @apply font-body bg-grimoire-dark text-white;
+    font-family: var(--font-body);
+    background-color: var(--color-grimoire-dark);
+    color: white;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     margin: 0;

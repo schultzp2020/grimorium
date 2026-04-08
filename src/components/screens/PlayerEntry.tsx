@@ -183,7 +183,7 @@ export function PlayerEntry({ onNext, onBack }: Props) {
   return (
     <div className='min-h-app bg-gradient-to-b from-grimoire-purple via-grimoire-dark to-grimoire-darker flex flex-col'>
       {/* Header */}
-      <div className='sticky top-0 z-10 bg-grimoire-dark/95 backdrop-blur-sm border-b border-mystic-gold/20 px-4 py-3'>
+      <div className='sticky top-0 z-10 bg-grimoire-dark/95 backdrop-blur-xs border-b border-mystic-gold/20 px-4 py-3'>
         <div className='flex items-center gap-3 max-w-lg mx-auto'>
           <BackButton onClick={onBack} />
           <div>
@@ -244,7 +244,7 @@ export function PlayerEntry({ onNext, onBack }: Props) {
                 value={player.name}
                 onChange={(e) => updatePlayer(index, e.target.value)}
                 placeholder={`${t.newGame.playerPlaceholder} ${index + 1}`}
-                className='flex-1 bg-white/5 border border-parchment-500/30 text-parchment-100 placeholder-parchment-500 rounded-lg px-4 py-3 focus:outline-none focus:border-mystic-gold/50 focus:ring-1 focus:ring-mystic-gold/30 transition-colors'
+                className='flex-1 bg-white/5 border border-parchment-500/30 text-parchment-100 placeholder:text-parchment-500 rounded-lg px-4 py-3 focus:outline-hidden focus:border-mystic-gold/50 focus:ring-1 focus:ring-mystic-gold/30 transition-colors'
               />
               {players.length > MIN_PLAYERS && (
                 <button

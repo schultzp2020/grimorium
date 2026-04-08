@@ -79,7 +79,7 @@ export function NominationScreen({
   return (
     <div className='min-h-app bg-gradient-to-b from-red-950 via-grimoire-blood to-grimoire-darker flex flex-col'>
       {/* Header */}
-      <div className='sticky top-0 z-10 bg-grimoire-dark/95 backdrop-blur-sm border-b border-red-500/30 px-4 py-3'>
+      <div className='sticky top-0 z-10 bg-grimoire-dark/95 backdrop-blur-xs border-b border-red-500/30 px-4 py-3'>
         <div className='flex items-center gap-3 max-w-lg mx-auto'>
           <BackButton onClick={onBack} />
           <div>

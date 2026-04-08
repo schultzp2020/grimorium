@@ -10,7 +10,6 @@ import {
   TeamBackground,
   VisionReveal,
 } from '../../../../../components/items'
-import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
 import {
   HandbackCardLink,
   NarratorSetupLayout,
@@ -22,9 +21,9 @@ import { isMalfunctioning } from '../../../../effects/registry'
 import { getRoleName, getRoleTranslations, interpolate, registerRoleTranslations, useI18n } from '../../../../i18n'
 import { applyPerceptionOverrides, getAmbiguousPlayers, perceive } from '../../../../pipeline'
 import type { Perception } from '../../../../pipeline/types'
-import { isAlive } from '../../../../types'
+import { defineRole } from '../../../defineRole'
 import { getRole } from '../../../registry'
-import { type NightActionResult, type RoleDefinition, type SetupActionProps } from '../../../types'
+import type { NightActionProps, NightActionResult, NightStepDefinition, SetupActionProps } from '../../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 
@@ -127,334 +126,332 @@ function FortuneTellerSetupAction({ player, state, onComplete }: SetupActionProp
   )
 }
 
-const definition: RoleDefinition = {
-  id: 'fortune_teller',
-  team: 'townsfolk',
-  icon: 'eye',
-  nightOrder: 15,
-  shouldWake: (_game, player) => isAlive(player),
+const fortuneTellerNightSteps: NightStepDefinition[] = [
+  {
+    id: 'select_players',
+    icon: 'users',
+    getLabel: (t) => t.game.stepSelectPlayers,
+    audience: 'player_choice',
+  },
+  {
+    id: 'configure_malfunction',
+    icon: 'flask',
+    getLabel: (t) => t.game.stepConfigureMalfunction,
+    condition: (_game, player) => isMalfunctioning(player),
+    audience: 'narrator',
+  },
+  {
+    id: 'show_result',
+    icon: 'eye',
+    getLabel: (t) => t.game.stepShowResult,
+    audience: 'player_reveal',
+  },
+]
 
-  nightSteps: [
-    {
+function FortuneTellerNightAction({ state, player, onComplete }: NightActionProps) {
+  const { t, language } = useI18n()
+
+  const roleT = getRoleTranslations('fortune_teller', language)
+
+  const malfunctioning = isMalfunctioning(player)
+
+  const [phase, setPhase] = useState<Phase>('step_list')
+  const [selectedPlayers, setSelectedPlayers] = useState<string[]>([])
+  const [selectPlayersDone, setSelectPlayersDone] = useState(false)
+  const [malfunctionValue, setMalfunctionValue] = useState<boolean | null>(null)
+  const [malfunctionConfigDone, setMalfunctionConfigDone] = useState(false)
+  const [perceptionOverrides, setPerceptionOverrides] = useState<Record<string, Partial<Perception>>>({})
+  const [perceptionConfigDone, setPerceptionConfigDone] = useState(false)
+
+  // Get all players for the nightly check (Fortune Teller can select themselves)
+  const selectablePlayers = state.players
+
+  // Check if selected players include ambiguous players for "role" perception (only when NOT malfunctioning)
+  const selectedPlayerObjects = useMemo(
+    () => state.players.filter((p) => selectedPlayers.includes(p.id)),
+    [selectedPlayers, state.players],
+  )
+  const ambiguousPlayers = useMemo(
+    () => (!malfunctioning && selectPlayersDone ? getAmbiguousPlayers(selectedPlayerObjects, 'team') : []),
+    [selectedPlayerObjects, malfunctioning, selectPlayersDone],
+  )
+  const needsPerceptionConfig = ambiguousPlayers.length > 0
+
+  const getPlayerName = (playerId: string) => state.players.find((p) => p.id === playerId)?.name ?? t.ui.unknown
+
+  // Build steps: Select players, Configure Perceptions (cond.), Configure Malfunction (cond.), Show Result
+  const steps: NightStep[] = useMemo(() => {
+    const result: NightStep[] = []
+
+    result.push({
       id: 'select_players',
       icon: 'users',
-      getLabel: (t) => t.game.stepSelectPlayers,
-      audience: 'player_choice',
-    },
-    {
-      id: 'configure_malfunction',
-      icon: 'flask',
-      getLabel: (t) => t.game.stepConfigureMalfunction,
-      condition: (_game, player) => isMalfunctioning(player),
-      audience: 'narrator',
-    },
-    {
+      label: t.game.stepSelectPlayers,
+      status: selectPlayersDone ? 'done' : 'pending',
+      audience: 'player_choice' as const,
+    })
+
+    if (selectPlayersDone && needsPerceptionConfig) {
+      result.push({
+        id: 'configure_perceptions',
+        icon: 'hatGlasses',
+        label: t.game.stepConfigurePerceptions,
+        status: perceptionConfigDone ? 'done' : 'pending',
+        audience: 'narrator' as const,
+      })
+    }
+
+    if (malfunctioning) {
+      result.push({
+        id: 'configure_malfunction',
+        icon: 'flask',
+        label: t.game.stepConfigureMalfunction,
+        status: malfunctionConfigDone ? 'done' : 'pending',
+        audience: 'narrator' as const,
+      })
+    }
+
+    result.push({
       id: 'show_result',
       icon: 'eye',
-      getLabel: (t) => t.game.stepShowResult,
-      audience: 'player_reveal',
-    },
-  ],
+      label: t.game.stepShowResult,
+      status: 'pending',
+      audience: 'player_reveal' as const,
+    })
 
-  SetupAction: FortuneTellerSetupAction,
+    return result
+  }, [selectPlayersDone, needsPerceptionConfig, perceptionConfigDone, malfunctioning, malfunctionConfigDone, t])
 
-  RoleReveal: DefaultRoleReveal,
+  const handleSelectStep = (stepId: string) => {
+    if (stepId === 'select_players') {
+      setPhase('select_players')
+    } else if (stepId === 'configure_perceptions') {
+      setPhase('configure_perceptions')
+    } else if (stepId === 'configure_malfunction') {
+      setPhase('configure_malfunction')
+    } else if (stepId === 'show_result') {
+      setPhase('show_result')
+    }
+  }
 
-  NightAction: ({ state, player, onComplete }) => {
-    const { t, language } = useI18n()
+  const handleMalfunctionComplete = (value: boolean) => {
+    setMalfunctionValue(value)
+    setMalfunctionConfigDone(true)
+    setPhase('step_list')
+  }
 
-    const roleT = getRoleTranslations('fortune_teller', language)
+  const handlePerceptionComplete = (overrides: Record<string, Partial<Perception>>) => {
+    setPerceptionOverrides(overrides)
+    setPerceptionConfigDone(true)
+    setPhase('step_list')
+  }
 
-    const malfunctioning = isMalfunctioning(player)
-
-    const [phase, setPhase] = useState<Phase>('step_list')
-    const [selectedPlayers, setSelectedPlayers] = useState<string[]>([])
-    const [selectPlayersDone, setSelectPlayersDone] = useState(false)
-    const [malfunctionValue, setMalfunctionValue] = useState<boolean | null>(null)
-    const [malfunctionConfigDone, setMalfunctionConfigDone] = useState(false)
-    const [perceptionOverrides, setPerceptionOverrides] = useState<Record<string, Partial<Perception>>>({})
-    const [perceptionConfigDone, setPerceptionConfigDone] = useState(false)
-
-    // Get all players for the nightly check (Fortune Teller can select themselves)
-    const selectablePlayers = state.players
-
-    // Check if selected players include ambiguous players for "role" perception (only when NOT malfunctioning)
-    const selectedPlayerObjects = useMemo(
-      () => state.players.filter((p) => selectedPlayers.includes(p.id)),
-      [selectedPlayers, state.players],
-    )
-    const ambiguousPlayers = useMemo(
-      () => (!malfunctioning && selectPlayersDone ? getAmbiguousPlayers(selectedPlayerObjects, 'team') : []),
-      [selectedPlayerObjects, malfunctioning, selectPlayersDone],
-    )
-    const needsPerceptionConfig = ambiguousPlayers.length > 0
-
-    const getPlayerName = (playerId: string) => state.players.find((p) => p.id === playerId)?.name ?? t.ui.unknown
-
-    // Build steps: Select players, Configure Perceptions (cond.), Configure Malfunction (cond.), Show Result
-    const steps: NightStep[] = useMemo(() => {
-      const result: NightStep[] = []
-
-      result.push({
-        id: 'select_players',
-        icon: 'users',
-        label: t.game.stepSelectPlayers,
-        status: selectPlayersDone ? 'done' : 'pending',
-        audience: 'player_choice' as const,
-      })
-
-      if (selectPlayersDone && needsPerceptionConfig) {
-        result.push({
-          id: 'configure_perceptions',
-          icon: 'hatGlasses',
-          label: t.game.stepConfigurePerceptions,
-          status: perceptionConfigDone ? 'done' : 'pending',
-          audience: 'narrator' as const,
-        })
+  const handlePlayerToggle = (playerId: string) => {
+    setSelectedPlayers((prev) => {
+      if (prev.includes(playerId)) {
+        return prev.filter((id) => id !== playerId)
+      } else if (prev.length < 2) {
+        return [...prev, playerId]
       }
+      return prev
+    })
+  }
 
-      if (malfunctioning) {
-        result.push({
-          id: 'configure_malfunction',
-          icon: 'flask',
-          label: t.game.stepConfigureMalfunction,
-          status: malfunctionConfigDone ? 'done' : 'pending',
-          audience: 'narrator' as const,
-        })
-      }
+  const handleSelectPlayersDone = () => {
+    if (selectedPlayers.length !== 2) {
+      return
+    }
+    setSelectPlayersDone(true)
+    setPhase('step_list')
+  }
 
-      result.push({
-        id: 'show_result',
-        icon: 'eye',
-        label: t.game.stepShowResult,
-        status: 'pending',
-        audience: 'player_reveal' as const,
-      })
+  // Apply perception overrides for result calculation
+  const effectiveState = useMemo(
+    () => applyPerceptionOverrides(state, perceptionOverrides),
+    [state, perceptionOverrides],
+  )
 
-      return result
-    }, [selectPlayersDone, needsPerceptionConfig, perceptionConfigDone, malfunctioning, malfunctionConfigDone, t])
-
-    const handleSelectStep = (stepId: string) => {
-      if (stepId === 'select_players') {
-        setPhase('select_players')
-      } else if (stepId === 'configure_perceptions') {
-        setPhase('configure_perceptions')
-      } else if (stepId === 'configure_malfunction') {
-        setPhase('configure_malfunction')
-      } else if (stepId === 'show_result') {
-        setPhase('show_result')
-      }
+  const handleComplete = () => {
+    if (selectedPlayers.length !== 2) {
+      return
     }
 
-    const handleMalfunctionComplete = (value: boolean) => {
-      setMalfunctionValue(value)
-      setMalfunctionConfigDone(true)
-      setPhase('step_list')
-    }
-
-    const handlePerceptionComplete = (overrides: Record<string, Partial<Perception>>) => {
-      setPerceptionOverrides(overrides)
-      setPerceptionConfigDone(true)
-      setPhase('step_list')
-    }
-
-    const handlePlayerToggle = (playerId: string) => {
-      setSelectedPlayers((prev) => {
-        if (prev.includes(playerId)) {
-          return prev.filter((id) => id !== playerId)
-        } else if (prev.length < 2) {
-          return [...prev, playerId]
-        }
-        return prev
-      })
-    }
-
-    const handleSelectPlayersDone = () => {
-      if (selectedPlayers.length !== 2) {
-        return
-      }
-      setSelectPlayersDone(true)
-      setPhase('step_list')
-    }
-
-    // Apply perception overrides for result calculation
-    const effectiveState = useMemo(
-      () => applyPerceptionOverrides(state, perceptionOverrides),
-      [state, perceptionOverrides],
-    )
-
-    const handleComplete = () => {
-      if (selectedPlayers.length !== 2) {
-        return
-      }
-
-      const player1 = effectiveState.players.find((p) => p.id === selectedPlayers[0])
-      const player2 = effectiveState.players.find((p) => p.id === selectedPlayers[1])
-      if (!player1 || !player2) {
-        return
-      }
-
-      const effectiveObserver = effectiveState.players.find((p) => p.id === player.id) ?? player
-
-      // Check if either selected player registers as a Demon
-      const registersDemon = (p: typeof player1) => {
-        const perception = perceive(p, effectiveObserver, 'team', effectiveState)
-        return perception.team === 'demon'
-      }
-
-      const calculatedSawDemon = registersDemon(player1) || registersDemon(player2)
-      // Use malfunction override if set, otherwise use calculated result
-      const sawDemon = malfunctionValue ?? calculatedSawDemon
-
-      const entries: NightActionResult['entries'] = []
-
-      // Log the check result
-      entries.push({
-        type: 'night_action',
-        message: [
-          {
-            type: 'i18n',
-            key: sawDemon ? 'roles.fortune_teller.history.sawDemon' : 'roles.fortune_teller.history.sawNoDemon',
-            params: {
-              player: player.id,
-              player1: player1.id,
-              player2: player2.id,
-            },
-          },
-        ],
-        data: {
-          roleId: 'fortune_teller',
-          playerId: player.id,
-          action: 'check',
-          checkedPlayers: selectedPlayers,
-          result: sawDemon ? 'yes' : 'no',
-          ...(malfunctioning
-            ? {
-                malfunctioned: true,
-                actualResult: calculatedSawDemon ? 'yes' : 'no',
-              }
-            : {}),
-          perceptionOverrides: Object.keys(perceptionOverrides).length > 0 ? perceptionOverrides : undefined,
-        },
-      })
-
-      onComplete({ entries })
-    }
-
-    // Phase: Step List
-    if (phase === 'step_list') {
-      return (
-        <NightStepListLayout
-          icon='eye'
-          roleName={getRoleName('fortune_teller', language)}
-          playerName={player.name}
-          steps={steps}
-          onSelectStep={handleSelectStep}
-        />
-      )
-    }
-
-    // Phase: Configure Malfunction
-    if (phase === 'configure_malfunction') {
-      return (
-        <MalfunctionConfigStep
-          type='boolean'
-          roleIcon='eye'
-          roleName={getRoleName('fortune_teller', language)}
-          playerName={player.name}
-          trueLabel={roleT.yesOneIsDemon}
-          falseLabel={roleT.noNeitherIsDemon}
-          onComplete={handleMalfunctionComplete}
-        />
-      )
-    }
-
-    // Phase: Configure Perceptions
-    if (phase === 'configure_perceptions') {
-      return (
-        <PerceptionConfigStep
-          ambiguousPlayers={ambiguousPlayers}
-          context='team'
-          state={state}
-          roleIcon='eye'
-          roleName={getRoleName('fortune_teller', language)}
-          playerName={player.name}
-          onComplete={handlePerceptionComplete}
-        />
-      )
-    }
-
-    // Phase: Select players - narrator picks 2 players to check
-    if (phase === 'select_players') {
-      return (
-        <NarratorSetupLayout
-          icon='eye'
-          roleName={getRoleName('fortune_teller', language)}
-          audience='player_choice'
-          playerName={getPlayerName(player.id)}
-          onShowToPlayer={handleSelectPlayersDone}
-          showToPlayerDisabled={selectedPlayers.length !== 2}
-          showToPlayerLabel={t.common.confirm}
-        >
-          <StepSection
-            step={1}
-            label={interpolate(roleT.selectTwoPlayersToCheck, { player: getPlayerName(player.id) })}
-            count={{ current: selectedPlayers.length, max: 2 }}
-          >
-            <PlayerPickerList
-              players={selectablePlayers}
-              selected={selectedPlayers}
-              onSelect={handlePlayerToggle}
-              selectionCount={2}
-              variant='blue'
-            />
-          </StepSection>
-        </NarratorSetupLayout>
-      )
-    }
-
-    // Phase: Show Result - player-facing screen
     const player1 = effectiveState.players.find((p) => p.id === selectedPlayers[0])
     const player2 = effectiveState.players.find((p) => p.id === selectedPlayers[1])
+    if (!player1 || !player2) {
+      return
+    }
+
     const effectiveObserver = effectiveState.players.find((p) => p.id === player.id) ?? player
 
-    // Calculate result for display
+    // Check if either selected player registers as a Demon
     const registersDemon = (p: typeof player1) => {
-      if (!p) {
-        return false
-      }
       const perception = perceive(p, effectiveObserver, 'team', effectiveState)
       return perception.team === 'demon'
     }
 
-    const displaySawDemon = malfunctionValue ?? (registersDemon(player1) || registersDemon(player2))
+    const calculatedSawDemon = registersDemon(player1) || registersDemon(player2)
+    // Use malfunction override if set, otherwise use calculated result
+    const sawDemon = malfunctionValue ?? calculatedSawDemon
 
-    // Dynamic theme: demon background when detected, townsfolk when safe
-    const resultTeam = displaySawDemon ? 'demon' : 'townsfolk'
+    const entries: NightActionResult['entries'] = []
 
+    // Log the check result
+    entries.push({
+      type: 'night_action',
+      message: [
+        {
+          type: 'i18n',
+          key: sawDemon ? 'roles.fortune_teller.history.sawDemon' : 'roles.fortune_teller.history.sawNoDemon',
+          params: {
+            player: player.id,
+            player1: player1.id,
+            player2: player2.id,
+          },
+        },
+      ],
+      data: {
+        roleId: 'fortune_teller',
+        playerId: player.id,
+        action: 'check',
+        checkedPlayers: selectedPlayers,
+        result: sawDemon ? 'yes' : 'no',
+        ...(malfunctioning
+          ? {
+              malfunctioned: true,
+              actualResult: calculatedSawDemon ? 'yes' : 'no',
+            }
+          : {}),
+        perceptionOverrides: Object.keys(perceptionOverrides).length > 0 ? perceptionOverrides : undefined,
+      },
+    })
+
+    onComplete({ entries })
+  }
+
+  // Phase: Step List
+  if (phase === 'step_list') {
     return (
-      <PlayerFacingScreen playerName={player.name}>
-        <TeamBackground teamId={resultTeam}>
-          <OracleCard
-            icon='eye'
-            teamId={resultTeam}
-            title={roleT.fortuneTellerInfo}
-            subtitle={getRoleName('fortune_teller', language)}
-          >
-            <VisionReveal
-              players={[player1?.name ?? '???', player2?.name ?? '???']}
-              verdict={displaySawDemon ? roleT.fortuneTellerDemonDetected : roleT.fortuneTellerNoDemon}
-              verdictIcon={displaySawDemon ? 'skull' : 'shield'}
-              teamId={resultTeam}
-            />
-          </OracleCard>
-          <HandbackCardLink onClick={handleComplete} isEvil={displaySawDemon}>
-            {t.common.continue}
-          </HandbackCardLink>
-        </TeamBackground>
-      </PlayerFacingScreen>
+      <NightStepListLayout
+        icon='eye'
+        roleName={getRoleName('fortune_teller', language)}
+        playerName={player.name}
+        steps={steps}
+        onSelectStep={handleSelectStep}
+      />
     )
-  },
+  }
+
+  // Phase: Configure Malfunction
+  if (phase === 'configure_malfunction') {
+    return (
+      <MalfunctionConfigStep
+        type='boolean'
+        roleIcon='eye'
+        roleName={getRoleName('fortune_teller', language)}
+        playerName={player.name}
+        trueLabel={roleT.yesOneIsDemon}
+        falseLabel={roleT.noNeitherIsDemon}
+        onComplete={handleMalfunctionComplete}
+      />
+    )
+  }
+
+  // Phase: Configure Perceptions
+  if (phase === 'configure_perceptions') {
+    return (
+      <PerceptionConfigStep
+        ambiguousPlayers={ambiguousPlayers}
+        context='team'
+        state={state}
+        roleIcon='eye'
+        roleName={getRoleName('fortune_teller', language)}
+        playerName={player.name}
+        onComplete={handlePerceptionComplete}
+      />
+    )
+  }
+
+  // Phase: Select players - narrator picks 2 players to check
+  if (phase === 'select_players') {
+    return (
+      <NarratorSetupLayout
+        icon='eye'
+        roleName={getRoleName('fortune_teller', language)}
+        audience='player_choice'
+        playerName={getPlayerName(player.id)}
+        onShowToPlayer={handleSelectPlayersDone}
+        showToPlayerDisabled={selectedPlayers.length !== 2}
+        showToPlayerLabel={t.common.confirm}
+      >
+        <StepSection
+          step={1}
+          label={interpolate(roleT.selectTwoPlayersToCheck, { player: getPlayerName(player.id) })}
+          count={{ current: selectedPlayers.length, max: 2 }}
+        >
+          <PlayerPickerList
+            players={selectablePlayers}
+            selected={selectedPlayers}
+            onSelect={handlePlayerToggle}
+            selectionCount={2}
+            variant='blue'
+          />
+        </StepSection>
+      </NarratorSetupLayout>
+    )
+  }
+
+  // Phase: Show Result - player-facing screen
+  const player1 = effectiveState.players.find((p) => p.id === selectedPlayers[0])
+  const player2 = effectiveState.players.find((p) => p.id === selectedPlayers[1])
+  const effectiveObserver = effectiveState.players.find((p) => p.id === player.id) ?? player
+
+  // Calculate result for display
+  const registersDemon = (p: typeof player1) => {
+    if (!p) {
+      return false
+    }
+    const perception = perceive(p, effectiveObserver, 'team', effectiveState)
+    return perception.team === 'demon'
+  }
+
+  const displaySawDemon = malfunctionValue ?? (registersDemon(player1) || registersDemon(player2))
+
+  // Dynamic theme: demon background when detected, townsfolk when safe
+  const resultTeam = displaySawDemon ? 'demon' : 'townsfolk'
+
+  return (
+    <PlayerFacingScreen playerName={player.name}>
+      <TeamBackground teamId={resultTeam}>
+        <OracleCard
+          icon='eye'
+          teamId={resultTeam}
+          title={roleT.fortuneTellerInfo}
+          subtitle={getRoleName('fortune_teller', language)}
+        >
+          <VisionReveal
+            players={[player1?.name ?? '???', player2?.name ?? '???']}
+            verdict={displaySawDemon ? roleT.fortuneTellerDemonDetected : roleT.fortuneTellerNoDemon}
+            verdictIcon={displaySawDemon ? 'skull' : 'shield'}
+            teamId={resultTeam}
+          />
+        </OracleCard>
+        <HandbackCardLink onClick={handleComplete} isEvil={displaySawDemon}>
+          {t.common.continue}
+        </HandbackCardLink>
+      </TeamBackground>
+    </PlayerFacingScreen>
+  )
 }
 
-export default definition
+export default defineRole({
+  id: 'fortune_teller',
+  category: 'custom',
+  team: 'townsfolk',
+  icon: 'eye',
+  nightOrder: 15,
+  wakeCondition: 'always',
+  nightSteps: fortuneTellerNightSteps,
+  NightAction: FortuneTellerNightAction,
+  SetupAction: FortuneTellerSetupAction,
+})

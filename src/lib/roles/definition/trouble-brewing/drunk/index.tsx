@@ -2,10 +2,10 @@ import { useState } from 'react'
 
 import { Button, Icon } from '../../../../../components/atoms'
 import { RolePickerGrid } from '../../../../../components/inputs'
-import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
 import { getRoleTranslations, registerRoleTranslations, useI18n } from '../../../../i18n'
+import { defineRole } from '../../../defineRole'
 import { getAllRoles } from '../../../registry'
-import type { RoleDefinition, SetupActionProps } from '../../../types'
+import type { SetupActionProps } from '../../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 
@@ -113,17 +113,12 @@ function DrunkSetupAction({ player, state, onComplete }: SetupActionProps) {
   )
 }
 
-const definition: RoleDefinition = {
+export default defineRole({
   id: 'drunk',
+  category: 'custom',
   team: 'outsider',
   icon: 'beer',
-  nightOrder: null, // Never wakes as "Drunk"
-
-  RoleReveal: DefaultRoleReveal, // Never shown — player sees their believed role
-
-  NightAction: null, // The believed role's NightAction runs instead
-
+  nightOrder: null,
+  NightAction: null,
   SetupAction: DrunkSetupAction,
-}
-
-export default definition
+})

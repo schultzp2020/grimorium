@@ -3,7 +3,6 @@ import { useMemo, useState } from 'react'
 import { Button, Icon } from '../../../../components/atoms'
 import { PlayerPickerList, RolePickerGrid } from '../../../../components/inputs'
 import { EvilTeamReveal, MysticDivider, RoleCard, StepSection } from '../../../../components/items'
-import { DefaultRoleReveal } from '../../../../components/items/DefaultRoleReveal'
 import {
   HandbackButton,
   NarratorSetupLayout,
@@ -23,8 +22,9 @@ import {
 } from '../../../i18n'
 import { getTeam, isGoodTeam } from '../../../teams'
 import { hasEffect, isAlive } from '../../../types'
+import { defineRole } from '../../defineRole'
 import { getAllRoles, getRole } from '../../registry'
-import type { RoleDefinition } from '../../types'
+import type { NightActionProps, NightStepDefinition } from '../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 
@@ -62,167 +62,206 @@ type Phase =
  * by the pipeline through effect handlers. The Imp has zero knowledge
  * of other roles.
  */
-const definition: RoleDefinition = {
-  id: 'imp',
-  team: 'demon',
-  icon: 'flameKindling',
-  nightOrder: 30,
-  shouldWake: (_game, player) => isAlive(player),
+const impNightSteps: NightStepDefinition[] = [
+  {
+    id: 'show_minions',
+    icon: 'users',
+    getLabel: (t) => t.game.stepShowMinions,
+    condition: (_game, _player, state) => state.round === 1,
+    audience: 'player_reveal',
+  },
+  {
+    id: 'select_bluffs',
+    icon: 'shuffle',
+    getLabel: (t) => t.game.stepSelectBluffs,
+    condition: (_game, _player, state) => state.round === 1,
+    audience: 'narrator',
+  },
+  {
+    id: 'show_bluffs',
+    icon: 'eye',
+    getLabel: (t) => t.game.stepShowBluffs,
+    condition: (_game, _player, state) => state.round === 1,
+    audience: 'player_reveal',
+  },
+  {
+    id: 'choose_victim',
+    icon: 'flameKindling',
+    getLabel: (t) => t.game.stepChooseVictim,
+    condition: (_game, _player, state) => state.round > 1,
+    audience: 'player_choice',
+  },
+  // Self-kill starpass: handled by the imp_starpass_pending effect
+  // handler via request_ui in the pipeline, not as a nightStep.
+]
 
-  nightSteps: [
-    {
-      id: 'show_minions',
-      icon: 'users',
-      getLabel: (t) => t.game.stepShowMinions,
-      condition: (_game, _player, state) => state.round === 1,
-      audience: 'player_reveal',
-    },
-    {
-      id: 'select_bluffs',
-      icon: 'shuffle',
-      getLabel: (t) => t.game.stepSelectBluffs,
-      condition: (_game, _player, state) => state.round === 1,
-      audience: 'narrator',
-    },
-    {
-      id: 'show_bluffs',
-      icon: 'eye',
-      getLabel: (t) => t.game.stepShowBluffs,
-      condition: (_game, _player, state) => state.round === 1,
-      audience: 'player_reveal',
-    },
-    {
-      id: 'choose_victim',
-      icon: 'flameKindling',
-      getLabel: (t) => t.game.stepChooseVictim,
-      condition: (_game, _player, state) => state.round > 1,
-      audience: 'player_choice',
-    },
-    // Self-kill starpass: handled by the imp_starpass_pending effect
-    // handler via request_ui in the pipeline, not as a nightStep.
-  ],
+function ImpNightAction({ state, player, onComplete }: NightActionProps) {
+  const { t, language } = useI18n()
+  const roleT = getRoleTranslations('imp', language)
+  const isFirstNight = state.round === 1
 
-  RoleReveal: DefaultRoleReveal,
+  // Detect if this player just became the Imp (has pending_role_reveal)
+  const isPendingRoleReveal = hasEffect(player, 'pending_role_reveal')
 
-  NightAction: ({ state, player, onComplete }) => {
-    const { t, language } = useI18n()
-    const roleT = getRoleTranslations('imp', language)
-    const isFirstNight = state.round === 1
+  const [phase, setPhase] = useState<Phase>('step_list')
+  const [showMinionsDone, setShowMinionsDone] = useState(false)
+  const [selectedBluffs, setSelectedBluffs] = useState<string[]>([])
+  const [selectBluffsDone, setSelectBluffsDone] = useState(false)
+  const [selectedTarget, setSelectedTarget] = useState<string | null>(null)
 
-    // Detect if this player just became the Imp (has pending_role_reveal)
-    const isPendingRoleReveal = hasEffect(player, 'pending_role_reveal')
+  const alivePlayers = state.players.filter((p) => isAlive(p))
 
-    const [phase, setPhase] = useState<Phase>('step_list')
-    const [showMinionsDone, setShowMinionsDone] = useState(false)
-    const [selectedBluffs, setSelectedBluffs] = useState<string[]>([])
-    const [selectBluffsDone, setSelectBluffsDone] = useState(false)
-    const [selectedTarget, setSelectedTarget] = useState<string | null>(null)
+  const malfunctioning = isMalfunctioning(player)
 
-    const alivePlayers = state.players.filter((p) => isAlive(p))
+  // ================================================================
+  // First Night Helpers
+  // ================================================================
 
-    const malfunctioning = isMalfunctioning(player)
+  // Find minion players in the game
+  const minionPlayers = useMemo(
+    () =>
+      state.players.filter((p) => {
+        const role = getRole(p.roleId)
+        return role?.team === 'minion'
+      }),
+    [state.players],
+  )
 
-    // ================================================================
-    // First Night Helpers
-    // ================================================================
+  // Find good roles NOT in play (candidates for bluffs)
+  const goodRolesNotInPlay = useMemo(() => {
+    const rolesInPlay = new Set(state.players.map((p) => p.roleId))
+    return getAllRoles().filter((role) => isGoodTeam(role.team) && !rolesInPlay.has(role.id))
+  }, [state.players])
 
-    // Find minion players in the game
-    const minionPlayers = useMemo(
-      () =>
-        state.players.filter((p) => {
-          const role = getRole(p.roleId)
-          return role?.team === 'minion'
-        }),
-      [state.players],
-    )
+  // ================================================================
+  // Self-Kill Helpers
+  // ================================================================
 
-    // Find good roles NOT in play (candidates for bluffs)
-    const goodRolesNotInPlay = useMemo(() => {
-      const rolesInPlay = new Set(state.players.map((p) => p.roleId))
-      return getAllRoles().filter((role) => isGoodTeam(role.team) && !rolesInPlay.has(role.id))
-    }, [state.players])
+  // Check if there are alive minions (for self-kill starpass detection)
+  const hasAliveMinions = useMemo(
+    () =>
+      state.players.some((p) => {
+        if (!isAlive(p)) {
+          return false
+        }
+        const role = getRole(p.roleId)
+        return role?.team === 'minion'
+      }),
+    [state.players],
+  )
 
-    // ================================================================
-    // Self-Kill Helpers
-    // ================================================================
+  // ================================================================
+  // Step List
+  // ================================================================
 
-    // Check if there are alive minions (for self-kill starpass detection)
-    const hasAliveMinions = useMemo(
-      () =>
-        state.players.some((p) => {
-          if (!isAlive(p)) {
-            return false
-          }
-          const role = getRole(p.roleId)
-          return role?.team === 'minion'
-        }),
-      [state.players],
-    )
-
-    // ================================================================
-    // Step List
-    // ================================================================
-
-    const steps: NightStep[] = useMemo(() => {
-      // Role change reveal: single step to show the new role
-      if (isPendingRoleReveal) {
-        return [
-          {
-            id: 'show_new_role',
-            icon: 'sparkles',
-            label: t.game.yourRoleHasChanged,
-            status: 'pending',
-            audience: 'player_reveal' as const,
-          },
-        ]
-      }
-
-      if (isFirstNight) {
-        return [
-          {
-            id: 'show_minions',
-            icon: 'users',
-            label: t.game.stepShowMinions,
-            status: showMinionsDone ? 'done' : 'pending',
-            audience: 'player_reveal' as const,
-          },
-          {
-            id: 'select_bluffs',
-            icon: 'shuffle',
-            label: t.game.stepSelectBluffs,
-            status: selectBluffsDone ? 'done' : 'pending',
-            audience: 'narrator' as const,
-          },
-          {
-            id: 'show_bluffs',
-            icon: 'eye',
-            label: t.game.stepShowBluffs,
-            status: 'pending',
-            audience: 'player_reveal' as const,
-          },
-        ]
-      }
-
+  const steps: NightStep[] = useMemo(() => {
+    // Role change reveal: single step to show the new role
+    if (isPendingRoleReveal) {
       return [
         {
-          id: 'choose_victim',
-          icon: 'flameKindling',
-          label: t.game.stepChooseVictim,
+          id: 'show_new_role',
+          icon: 'sparkles',
+          label: t.game.yourRoleHasChanged,
           status: 'pending',
-          audience: 'player_choice' as const,
+          audience: 'player_reveal' as const,
         },
       ]
-    }, [isPendingRoleReveal, isFirstNight, showMinionsDone, selectBluffsDone, t])
-
-    const handleSelectStep = (stepId: string) => {
-      setPhase(stepId as Phase)
     }
 
-    // ================================================================
-    // First Night: Complete handler
-    // ================================================================
+    if (isFirstNight) {
+      return [
+        {
+          id: 'show_minions',
+          icon: 'users',
+          label: t.game.stepShowMinions,
+          status: showMinionsDone ? 'done' : 'pending',
+          audience: 'player_reveal' as const,
+        },
+        {
+          id: 'select_bluffs',
+          icon: 'shuffle',
+          label: t.game.stepSelectBluffs,
+          status: selectBluffsDone ? 'done' : 'pending',
+          audience: 'narrator' as const,
+        },
+        {
+          id: 'show_bluffs',
+          icon: 'eye',
+          label: t.game.stepShowBluffs,
+          status: 'pending',
+          audience: 'player_reveal' as const,
+        },
+      ]
+    }
 
-    const handleFirstNightComplete = () => {
+    return [
+      {
+        id: 'choose_victim',
+        icon: 'flameKindling',
+        label: t.game.stepChooseVictim,
+        status: 'pending',
+        audience: 'player_choice' as const,
+      },
+    ]
+  }, [isPendingRoleReveal, isFirstNight, showMinionsDone, selectBluffsDone, t])
+
+  const handleSelectStep = (stepId: string) => {
+    setPhase(stepId as Phase)
+  }
+
+  // ================================================================
+  // First Night: Complete handler
+  // ================================================================
+
+  const handleFirstNightComplete = () => {
+    onComplete({
+      entries: [
+        {
+          type: 'night_action',
+          message: [
+            {
+              type: 'i18n',
+              key: 'roles.imp.history.shownMinionsAndBluffs',
+              params: {
+                player: player.id,
+              },
+            },
+            ...selectedBluffs.flatMap((id, i) => [
+              ...(i > 0 ? [{ type: 'text' as const, content: ', ' }] : []),
+              { type: 'role' as const, roleId: id },
+            ]),
+          ],
+          data: {
+            roleId: 'imp',
+            playerId: player.id,
+            action: 'first_night_info',
+            minionIds: minionPlayers.map((p) => p.id),
+            bluffRoleIds: selectedBluffs,
+          },
+        },
+      ],
+    })
+  }
+
+  // ================================================================
+  // Kill confirm handler (subsequent nights)
+  // ================================================================
+
+  const handleConfirmKill = () => {
+    if (!selectedTarget) {
+      return
+    }
+
+    const target = state.players.find((p) => p.id === selectedTarget)
+    if (!target) {
+      return
+    }
+
+    // Self-kill with alive minions: route through pipeline with
+    // imp_starpass_pending effect. Protection (Safe/Monk) can prevent
+    // the kill, blocking the starpass. If allowed, the effect handler
+    // requests UI for the narrator to select the new Imp.
+    if (selectedTarget === player.id && hasAliveMinions && !malfunctioning) {
       onComplete({
         entries: [
           {
@@ -230,371 +269,323 @@ const definition: RoleDefinition = {
             message: [
               {
                 type: 'i18n',
-                key: 'roles.imp.history.shownMinionsAndBluffs',
-                params: {
-                  player: player.id,
-                },
+                key: 'roles.imp.history.selfKilled',
+                params: { player: player.id },
               },
-              ...selectedBluffs.flatMap((id, i) => [
-                ...(i > 0 ? [{ type: 'text' as const, content: ', ' }] : []),
-                { type: 'role' as const, roleId: id },
-              ]),
             ],
             data: {
               roleId: 'imp',
               playerId: player.id,
-              action: 'first_night_info',
-              minionIds: minionPlayers.map((p) => p.id),
-              bluffRoleIds: selectedBluffs,
+              action: 'self_kill',
             },
           },
         ],
+        addEffects: {
+          [player.id]: [{ type: 'imp_starpass_pending', expiresAt: 'end_of_night' }],
+        },
+        intent: {
+          type: 'kill' as const,
+          sourceId: player.id,
+          targetId: player.id,
+          cause: 'imp_self_kill',
+        },
       })
+      return
     }
 
-    // ================================================================
-    // Kill confirm handler (subsequent nights)
-    // ================================================================
-
-    const handleConfirmKill = () => {
-      if (!selectedTarget) {
-        return
-      }
-
-      const target = state.players.find((p) => p.id === selectedTarget)
-      if (!target) {
-        return
-      }
-
-      // Self-kill with alive minions: route through pipeline with
-      // imp_starpass_pending effect. Protection (Safe/Monk) can prevent
-      // the kill, blocking the starpass. If allowed, the effect handler
-      // requests UI for the narrator to select the new Imp.
-      if (selectedTarget === player.id && hasAliveMinions && !malfunctioning) {
-        onComplete({
-          entries: [
+    // Normal kill (or self-kill with no alive minions, or malfunctioning)
+    onComplete({
+      entries: [
+        {
+          type: 'night_action',
+          message: [
             {
-              type: 'night_action',
-              message: [
-                {
-                  type: 'i18n',
-                  key: 'roles.imp.history.selfKilled',
-                  params: { player: player.id },
-                },
-              ],
-              data: {
-                roleId: 'imp',
-                playerId: player.id,
-                action: 'self_kill',
+              type: 'i18n',
+              key: 'roles.imp.history.choseToKill',
+              params: {
+                player: player.id,
+                target: target.id,
               },
             },
           ],
-          addEffects: {
-            [player.id]: [{ type: 'imp_starpass_pending', expiresAt: 'end_of_night' }],
-          },
-          intent: {
-            type: 'kill' as const,
-            sourceId: player.id,
-            targetId: player.id,
-            cause: 'imp_self_kill',
-          },
-        })
-        return
-      }
-
-      // Normal kill (or self-kill with no alive minions, or malfunctioning)
-      onComplete({
-        entries: [
-          {
-            type: 'night_action',
-            message: [
-              {
-                type: 'i18n',
-                key: 'roles.imp.history.choseToKill',
-                params: {
-                  player: player.id,
-                  target: target.id,
-                },
-              },
-            ],
-            data: {
-              roleId: 'imp',
-              playerId: player.id,
-              action: 'kill',
-              targetId: target.id,
-              ...(malfunctioning ? { malfunctioned: true } : {}),
-            },
-          },
-        ],
-        // When malfunctioning, the kill intent is NOT emitted
-        ...(!malfunctioning && {
-          intent: {
-            type: 'kill' as const,
-            sourceId: player.id,
+          data: {
+            roleId: 'imp',
+            playerId: player.id,
+            action: 'kill',
             targetId: target.id,
-            cause: 'demon',
+            ...(malfunctioning ? { malfunctioned: true } : {}),
           },
-        }),
-      })
-    }
+        },
+      ],
+      // When malfunctioning, the kill intent is NOT emitted
+      ...(!malfunctioning && {
+        intent: {
+          type: 'kill' as const,
+          sourceId: player.id,
+          targetId: target.id,
+          cause: 'demon',
+        },
+      }),
+    })
+  }
 
-    // ================================================================
-    // Role change reveal handler (when this player just became the Imp)
-    // ================================================================
+  // ================================================================
+  // Role change reveal handler (when this player just became the Imp)
+  // ================================================================
 
-    const handleRoleRevealComplete = () => {
-      onComplete({
-        entries: [
-          {
-            type: 'night_action',
-            message: [
-              {
-                type: 'i18n',
-                key: 'history.roleChanged',
-                params: {
-                  player: player.id,
-                  role: player.roleId,
-                },
+  const handleRoleRevealComplete = () => {
+    onComplete({
+      entries: [
+        {
+          type: 'night_action',
+          message: [
+            {
+              type: 'i18n',
+              key: 'history.roleChanged',
+              params: {
+                player: player.id,
+                role: player.roleId,
               },
-            ],
-            data: {
-              roleId: 'imp',
-              playerId: player.id,
-              action: 'role_change_revealed',
             },
+          ],
+          data: {
+            roleId: 'imp',
+            playerId: player.id,
+            action: 'role_change_revealed',
           },
-        ],
-        removeEffects: { [player.id]: ['pending_role_reveal'] },
-      })
-    }
+        },
+      ],
+      removeEffects: { [player.id]: ['pending_role_reveal'] },
+    })
+  }
 
-    // ================================================================
-    // Bluff toggle handler
-    // ================================================================
+  // ================================================================
+  // Bluff toggle handler
+  // ================================================================
 
-    const handleBluffToggle = (roleId: string) => {
-      setSelectedBluffs((prev) => {
-        if (prev.includes(roleId)) {
-          return prev.filter((id) => id !== roleId)
-        } else if (prev.length < 3) {
-          return [...prev, roleId]
-        }
-        return prev
-      })
-    }
+  const handleBluffToggle = (roleId: string) => {
+    setSelectedBluffs((prev) => {
+      if (prev.includes(roleId)) {
+        return prev.filter((id) => id !== roleId)
+      } else if (prev.length < 3) {
+        return [...prev, roleId]
+      }
+      return prev
+    })
+  }
 
-    // ================================================================
-    // RENDER: Step List
-    // ================================================================
+  // ================================================================
+  // RENDER: Step List
+  // ================================================================
 
-    if (phase === 'step_list') {
-      return (
-        <NightStepListLayout
-          icon='flameKindling'
-          roleName={getRoleName('imp', language)}
-          playerName={player.name}
-          isEvil
-          steps={steps}
-          onSelectStep={handleSelectStep}
-        />
-      )
-    }
+  if (phase === 'step_list') {
+    return (
+      <NightStepListLayout
+        icon='flameKindling'
+        roleName={getRoleName('imp', language)}
+        playerName={player.name}
+        isEvil
+        steps={steps}
+        onSelectStep={handleSelectStep}
+      />
+    )
+  }
 
-    // ================================================================
-    // RENDER: Show New Role (player-facing role change reveal)
-    // ================================================================
+  // ================================================================
+  // RENDER: Show New Role (player-facing role change reveal)
+  // ================================================================
 
-    if (phase === 'show_new_role') {
-      const role = getRole(player.roleId)
-      const teamId = role?.team ?? 'demon'
-      const team = getTeam(teamId)
-
-      return (
-        <PlayerFacingScreen playerName={player.name}>
-          <NightActionLayout
-            player={player}
-            title={t.game.yourRoleHasChanged}
-            description={roleT.roleChangedDescription}
-          >
-            <div className='mb-6 flex justify-center'>
-              <RoleCard roleId={player.roleId} />
-            </div>
-
-            <HandbackButton
-              onClick={handleRoleRevealComplete}
-              fullWidth
-              size='lg'
-              variant={team.isEvil ? 'evil' : 'default'}
-            >
-              <Icon name='check' size='md' className='mr-2' />
-              {t.common.continue}
-            </HandbackButton>
-          </NightActionLayout>
-        </PlayerFacingScreen>
-      )
-    }
-
-    // ================================================================
-    // RENDER: Show Minions (player-facing)
-    // ================================================================
-
-    if (phase === 'show_minions') {
-      return (
-        <PlayerFacingScreen playerName={player.name}>
-          <NightActionLayout
-            player={player}
-            title={roleT.demonMinionsTitle}
-            description={roleT.demonMinionsDescription}
-          >
-            <div className='mb-6'>
-              <p className='mb-3 text-center text-sm font-medium text-red-300/70'>{roleT.theseAreYourMinions}</p>
-              <EvilTeamReveal state={state} viewer={player} viewerType='demon' />
-            </div>
-
-            <HandbackButton
-              onClick={() => {
-                setShowMinionsDone(true)
-                setPhase('step_list')
-              }}
-              fullWidth
-              size='lg'
-              variant='evil'
-            >
-              <Icon name='check' size='md' className='mr-2' />
-              {t.common.continue}
-            </HandbackButton>
-          </NightActionLayout>
-        </PlayerFacingScreen>
-      )
-    }
-
-    // ================================================================
-    // RENDER: Select Bluffs (narrator-facing)
-    // ================================================================
-
-    if (phase === 'select_bluffs') {
-      return (
-        <NarratorSetupLayout
-          icon='flameKindling'
-          roleName={getRoleName('imp', language)}
-          playerName={player.name}
-          audience='narrator'
-          onShowToPlayer={() => {
-            setSelectBluffsDone(true)
-            setPhase('step_list')
-          }}
-          showToPlayerDisabled={selectedBluffs.length !== 3}
-          showToPlayerLabel={t.common.confirm}
-        >
-          <div className='mb-4 text-center'>
-            <h3 className='text-lg font-semibold text-amber-200'>{roleT.selectBluffsTitle}</h3>
-            <p className='mt-1 text-sm text-stone-400'>{roleT.selectBluffsDescription}</p>
-          </div>
-
-          <StepSection
-            step={1}
-            label={roleT.selectThreeBluffs}
-            count={{
-              current: selectedBluffs.length,
-              max: 3,
-            }}
-          >
-            <RolePickerGrid
-              roles={goodRolesNotInPlay}
-              state={state}
-              selected={selectedBluffs}
-              onSelect={handleBluffToggle}
-              selectionCount={3}
-              colorMode='team'
-            />
-          </StepSection>
-        </NarratorSetupLayout>
-      )
-    }
-
-    // ================================================================
-    // RENDER: Show Bluffs (player-facing)
-    // ================================================================
-
-    if (phase === 'show_bluffs') {
-      const bluffRoles = selectedBluffs.map((id) => getRole(id)).filter(Boolean)
-
-      return (
-        <PlayerFacingScreen playerName={player.name}>
-          <NightActionLayout player={player} title={roleT.demonBluffsTitle} description={roleT.demonBluffsDescription}>
-            <div className='mb-6'>
-              <p className='mb-3 text-center text-sm font-medium text-red-300/70'>{roleT.theseAreYourBluffs}</p>
-              <div className='grid grid-cols-1 gap-3'>
-                {bluffRoles.map((role) => {
-                  if (!role) {
-                    return null
-                  }
-                  const desc = getRoleDescription(role.id, language)
-                  return (
-                    <div
-                      key={role.id}
-                      className='rounded-xl border-2 border-indigo-500/30 bg-linear-to-b from-indigo-900/30 to-blue-900/20 p-4'
-                      style={{
-                        boxShadow: '0 0 16px rgba(99,102,241,0.15), inset 0 1px 0 rgba(255,255,255,0.06)',
-                      }}
-                    >
-                      <div className='flex items-start gap-3'>
-                        {/* Role icon medallion */}
-                        <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-indigo-500/30 bg-indigo-800/40'>
-                          <Icon name={role.icon} size='md' className='text-indigo-300' />
-                        </div>
-                        <div className='min-w-0 flex-1'>
-                          <div className='font-tarot text-sm tracking-wider text-parchment-100 uppercase'>
-                            {getRoleName(role.id, language)}
-                          </div>
-                          {desc && <p className='mt-1 text-xs leading-snug text-parchment-400'>{desc}</p>}
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-
-            <MysticDivider />
-
-            <HandbackButton onClick={handleFirstNightComplete} fullWidth size='lg' variant='evil' className='mt-4'>
-              <Icon name='check' size='md' className='mr-2' />
-              {t.common.continue}
-            </HandbackButton>
-          </NightActionLayout>
-        </PlayerFacingScreen>
-      )
-    }
-
-    // ================================================================
-    // RENDER: Choose Victim (subsequent nights)
-    // ================================================================
+  if (phase === 'show_new_role') {
+    const role = getRole(player.roleId)
+    const teamId = role?.team ?? 'demon'
+    const team = getTeam(teamId)
 
     return (
-      <NightActionLayout
-        player={player}
-        title={t.game.choosePlayerToKill}
-        description={interpolate(t.game.selectVictim, { player: player.name })}
-        audience='player_choice'
+      <PlayerFacingScreen playerName={player.name}>
+        <NightActionLayout player={player} title={t.game.yourRoleHasChanged} description={roleT.roleChangedDescription}>
+          <div className='mb-6 flex justify-center'>
+            <RoleCard roleId={player.roleId} />
+          </div>
+
+          <HandbackButton
+            onClick={handleRoleRevealComplete}
+            fullWidth
+            size='lg'
+            variant={team.isEvil ? 'evil' : 'default'}
+          >
+            <Icon name='check' size='md' className='mr-2' />
+            {t.common.continue}
+          </HandbackButton>
+        </NightActionLayout>
+      </PlayerFacingScreen>
+    )
+  }
+
+  // ================================================================
+  // RENDER: Show Minions (player-facing)
+  // ================================================================
+
+  if (phase === 'show_minions') {
+    return (
+      <PlayerFacingScreen playerName={player.name}>
+        <NightActionLayout player={player} title={roleT.demonMinionsTitle} description={roleT.demonMinionsDescription}>
+          <div className='mb-6'>
+            <p className='mb-3 text-center text-sm font-medium text-red-300/70'>{roleT.theseAreYourMinions}</p>
+            <EvilTeamReveal state={state} viewer={player} viewerType='demon' />
+          </div>
+
+          <HandbackButton
+            onClick={() => {
+              setShowMinionsDone(true)
+              setPhase('step_list')
+            }}
+            fullWidth
+            size='lg'
+            variant='evil'
+          >
+            <Icon name='check' size='md' className='mr-2' />
+            {t.common.continue}
+          </HandbackButton>
+        </NightActionLayout>
+      </PlayerFacingScreen>
+    )
+  }
+
+  // ================================================================
+  // RENDER: Select Bluffs (narrator-facing)
+  // ================================================================
+
+  if (phase === 'select_bluffs') {
+    return (
+      <NarratorSetupLayout
+        icon='flameKindling'
+        roleName={getRoleName('imp', language)}
+        playerName={player.name}
+        audience='narrator'
+        onShowToPlayer={() => {
+          setSelectBluffsDone(true)
+          setPhase('step_list')
+        }}
+        showToPlayerDisabled={selectedBluffs.length !== 3}
+        showToPlayerLabel={t.common.confirm}
       >
-        <div className='mb-6'>
-          <PlayerPickerList
-            players={alivePlayers}
-            selected={selectedTarget ? [selectedTarget] : []}
-            onSelect={setSelectedTarget}
-            selectionCount={1}
-            variant='red'
-          />
+        <div className='mb-4 text-center'>
+          <h3 className='text-lg font-semibold text-amber-200'>{roleT.selectBluffsTitle}</h3>
+          <p className='mt-1 text-sm text-stone-400'>{roleT.selectBluffsDescription}</p>
         </div>
 
-        <Button onClick={handleConfirmKill} disabled={!selectedTarget} fullWidth size='lg' variant='evil'>
-          <Icon name='flameKindling' size='md' className='mr-2' />
-          {t.game.confirmKill}
-        </Button>
-      </NightActionLayout>
+        <StepSection
+          step={1}
+          label={roleT.selectThreeBluffs}
+          count={{
+            current: selectedBluffs.length,
+            max: 3,
+          }}
+        >
+          <RolePickerGrid
+            roles={goodRolesNotInPlay}
+            state={state}
+            selected={selectedBluffs}
+            onSelect={handleBluffToggle}
+            selectionCount={3}
+            colorMode='team'
+          />
+        </StepSection>
+      </NarratorSetupLayout>
     )
-  },
+  }
+
+  // ================================================================
+  // RENDER: Show Bluffs (player-facing)
+  // ================================================================
+
+  if (phase === 'show_bluffs') {
+    const bluffRoles = selectedBluffs.map((id) => getRole(id)).filter(Boolean)
+
+    return (
+      <PlayerFacingScreen playerName={player.name}>
+        <NightActionLayout player={player} title={roleT.demonBluffsTitle} description={roleT.demonBluffsDescription}>
+          <div className='mb-6'>
+            <p className='mb-3 text-center text-sm font-medium text-red-300/70'>{roleT.theseAreYourBluffs}</p>
+            <div className='grid grid-cols-1 gap-3'>
+              {bluffRoles.map((role) => {
+                if (!role) {
+                  return null
+                }
+                const desc = getRoleDescription(role.id, language)
+                return (
+                  <div
+                    key={role.id}
+                    className='rounded-xl border-2 border-indigo-500/30 bg-linear-to-b from-indigo-900/30 to-blue-900/20 p-4'
+                    style={{
+                      boxShadow: '0 0 16px rgba(99,102,241,0.15), inset 0 1px 0 rgba(255,255,255,0.06)',
+                    }}
+                  >
+                    <div className='flex items-start gap-3'>
+                      {/* Role icon medallion */}
+                      <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-indigo-500/30 bg-indigo-800/40'>
+                        <Icon name={role.icon} size='md' className='text-indigo-300' />
+                      </div>
+                      <div className='min-w-0 flex-1'>
+                        <div className='font-tarot text-sm tracking-wider text-parchment-100 uppercase'>
+                          {getRoleName(role.id, language)}
+                        </div>
+                        {desc && <p className='mt-1 text-xs leading-snug text-parchment-400'>{desc}</p>}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          <MysticDivider />
+
+          <HandbackButton onClick={handleFirstNightComplete} fullWidth size='lg' variant='evil' className='mt-4'>
+            <Icon name='check' size='md' className='mr-2' />
+            {t.common.continue}
+          </HandbackButton>
+        </NightActionLayout>
+      </PlayerFacingScreen>
+    )
+  }
+
+  // ================================================================
+  // RENDER: Choose Victim (subsequent nights)
+  // ================================================================
+
+  return (
+    <NightActionLayout
+      player={player}
+      title={t.game.choosePlayerToKill}
+      description={interpolate(t.game.selectVictim, { player: player.name })}
+      audience='player_choice'
+    >
+      <div className='mb-6'>
+        <PlayerPickerList
+          players={alivePlayers}
+          selected={selectedTarget ? [selectedTarget] : []}
+          onSelect={setSelectedTarget}
+          selectionCount={1}
+          variant='red'
+        />
+      </div>
+
+      <Button onClick={handleConfirmKill} disabled={!selectedTarget} fullWidth size='lg' variant='evil'>
+        <Icon name='flameKindling' size='md' className='mr-2' />
+        {t.game.confirmKill}
+      </Button>
+    </NightActionLayout>
+  )
 }
 
-export default definition
+export default defineRole({
+  id: 'imp',
+  category: 'custom',
+  team: 'demon',
+  icon: 'flameKindling',
+  nightOrder: 30,
+  wakeCondition: 'always',
+  nightSteps: impNightSteps,
+  NightAction: ImpNightAction,
+})

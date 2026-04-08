@@ -1,36 +1,36 @@
+import { candleHolderLit, flowerLotus, hatTop, starNorth } from '@lucide/lab'
 import {
-  Icon as IconRootComponent,
   AlertTriangleIcon,
   ArrowLeftIcon,
   ArrowRightIcon,
   BeerIcon,
-  BookMarkedIcon,
-  BookUserIcon,
   BirdhouseIcon,
   BombIcon,
-  CrownIcon,
-  CheckIcon,
+  BookMarkedIcon,
+  BookUserIcon,
   CheckCircleIcon,
+  CheckIcon,
   ChefHatIcon,
   ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   ChevronUpIcon,
   ChurchIcon,
-  CircleIcon,
   CircleDotIcon,
+  CircleIcon,
   CloudMoonIcon,
   ConciergeBellIcon,
   CrosshairIcon,
-  DramaIcon,
+  CrownIcon,
   DiamondIcon,
   DicesIcon,
+  DramaIcon,
   EyeIcon,
   FingerprintPatternIcon,
   FishIcon,
-  FlaskConicalIcon,
   FlameIcon,
   FlameKindlingIcon,
+  FlaskConicalIcon,
   FlowerIcon,
   Gamepad2Icon,
   GhostIcon,
@@ -40,6 +40,7 @@ import {
   HatGlassesIcon,
   HeartIcon,
   HistoryIcon,
+  Icon as IconRootComponent,
   InfoIcon,
   LandmarkIcon,
   ListOrderedIcon,
@@ -61,8 +62,8 @@ import {
   SkullIcon,
   SmartphoneIcon,
   SparklesIcon,
-  SquareIcon,
   SquareCheckIcon,
+  SquareIcon,
   StarIcon,
   SunIcon,
   SunriseIcon,
@@ -81,8 +82,8 @@ import {
   XIcon,
   ZapOffIcon,
 } from 'lucide-react'
+
 import { cn } from '../../lib/utils'
-import { candleHolderLit, flowerLotus, hatTop, starNorth } from '@lucide/lab'
 
 const Icons = {
   alertTriangle: AlertTriangleIcon,
@@ -176,7 +177,7 @@ const LabIcons = {
 
 export type IconName = keyof typeof Icons | keyof typeof LabIcons
 
-export type IconProps = {
+export interface IconProps {
   name: IconName
   size?: Size
   className?: string

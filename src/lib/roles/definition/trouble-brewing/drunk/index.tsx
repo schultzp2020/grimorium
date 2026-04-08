@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import type { RoleDefinition, SetupActionProps } from '../../../types'
-import { getAllRoles } from '../../../index'
-import { useI18n, registerRoleTranslations, getRoleTranslations } from '../../../../i18n'
-import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
+
 import { Button, Icon } from '../../../../../components/atoms'
 import { RolePickerGrid } from '../../../../../components/inputs'
-
+import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
+import { getRoleTranslations, registerRoleTranslations, useI18n } from '../../../../i18n'
+import { getAllRoles } from '../../../registry'
+import type { RoleDefinition, SetupActionProps } from '../../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 
@@ -45,7 +45,9 @@ function DrunkSetupAction({ player, state, onComplete }: SetupActionProps) {
   }
 
   const handleConfirm = () => {
-    if (!selectedRole) return
+    if (!selectedRole) {
+      return
+    }
 
     onComplete({
       changeRole: selectedRole,

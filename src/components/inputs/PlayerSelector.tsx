@@ -1,12 +1,12 @@
+import type { EffectId } from '../../lib/effects/types'
+import { getRoleName as getRegistryRoleName, useI18n } from '../../lib/i18n'
+import { getRole } from '../../lib/roles/registry'
 import { type PlayerState, hasEffect } from '../../lib/types'
-import { getRole } from '../../lib/roles'
-import { useI18n, getRoleName as getRegistryRoleName } from '../../lib/i18n'
+import { cn } from '../../lib/utils'
 import { Icon } from '../atoms'
 import type { IconName } from '../atoms/icon'
-import { cn } from '../../lib/utils'
-import type { EffectId } from '../../lib/effects'
 
-type PlayerSelectorProps = {
+interface PlayerSelectorProps {
   /** Full list of players to display */
   players: PlayerState[]
   /** Currently selected player ID */
@@ -63,8 +63,12 @@ export function PlayerSelector({
   const getRoleName = (roleId: string) => getRegistryRoleName(roleId, language)
 
   const filteredPlayers = players.filter((p) => {
-    if (excludeEffects?.some((e) => hasEffect(p, e))) return false
-    if (requireEffects && !requireEffects.every((e) => hasEffect(p, e))) return false
+    if (excludeEffects?.some((e) => hasEffect(p, e))) {
+      return false
+    }
+    if (requireEffects && !requireEffects.every((e) => hasEffect(p, e))) {
+      return false
+    }
     return true
   })
 

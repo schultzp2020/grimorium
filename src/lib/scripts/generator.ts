@@ -1,8 +1,8 @@
+import { getRole } from '../roles'
 import type { RoleId } from '../roles/types'
 import type { TeamId } from '../teams/types'
-import { getRole } from '../roles'
-import { type ScriptDefinition, type RoleDistribution, type GeneratedPool, type GeneratorPreset } from './types'
-import { getRecommendedDistribution, applyDistributionModifiers } from './index'
+import { applyDistributionModifiers, getRecommendedDistribution } from './index'
+import { type GeneratedPool, type GeneratorPreset, type RoleDistribution, type ScriptDefinition } from './types'
 
 // ============================================================================
 // POOL GENERATION
@@ -15,7 +15,9 @@ import { getRecommendedDistribution, applyDistributionModifiers } from './index'
  */
 export function generateRolePools(script: ScriptDefinition, playerCount: number, count: number = 30): GeneratedPool[] {
   const baseDistribution = getRecommendedDistribution(playerCount)
-  if (!baseDistribution) return []
+  if (!baseDistribution) {
+    return []
+  }
 
   const pools: GeneratedPool[] = []
   const seen = new Set<string>()
@@ -41,7 +43,9 @@ export function generateRolePools(script: ScriptDefinition, playerCount: number,
  * Simple, Interesting, and Chaotic presets.
  */
 export function selectPresetPools(pools: GeneratedPool[]): Record<GeneratorPreset, GeneratedPool> | null {
-  if (pools.length < 3) return null
+  if (pools.length < 3) {
+    return null
+  }
 
   const sorted = [...pools].sort((a, b) => a.totalChaos - b.totalChaos)
 
@@ -78,11 +82,15 @@ function tryGenerateValidPool(
 
   // Step 1: Pick demon(s) first — always need exactly 1 demon
   const demons = pickRandom(rolesByTeam.demon, baseDistribution.demon)
-  if (!demons) return null
+  if (!demons) {
+    return null
+  }
 
   // Step 2: Pick minions
   const minions = pickRandom(rolesByTeam.minion, baseDistribution.minion)
-  if (!minions) return null
+  if (!minions) {
+    return null
+  }
 
   // Step 3: Apply distribution modifiers from selected demons + minions
   const selectedSoFar: RoleId[] = [...demons, ...minions]
@@ -91,19 +99,27 @@ function tryGenerateValidPool(
 
   // Step 4: Pick outsiders with adjusted count
   const outsiders = pickRandom(rolesByTeam.outsider, adjustedDistribution.outsider)
-  if (!outsiders) return null
+  if (!outsiders) {
+    return null
+  }
 
   // Step 5: Fill townsfolk to reach player count
   const townsfolkNeeded = playerCount - demons.length - minions.length - outsiders.length
-  if (townsfolkNeeded < 0) return null
+  if (townsfolkNeeded < 0) {
+    return null
+  }
 
   const townsfolk = pickRandom(rolesByTeam.townsfolk, townsfolkNeeded)
-  if (!townsfolk) return null
+  if (!townsfolk) {
+    return null
+  }
 
   const roles: RoleId[] = [...townsfolk, ...outsiders, ...minions, ...demons]
 
   // Sanity check
-  if (roles.length !== playerCount) return null
+  if (roles.length !== playerCount) {
+    return null
+  }
 
   // Compute chaos
   const totalChaos = roles.reduce((sum, roleId) => {
@@ -128,8 +144,12 @@ function tryGenerateValidPool(
  * Returns null if not enough items available.
  */
 function pickRandom(available: RoleId[], count: number): RoleId[] | null {
-  if (count === 0) return []
-  if (available.length < count) return null
+  if (count === 0) {
+    return []
+  }
+  if (available.length < count) {
+    return null
+  }
 
   const shuffled = [...available].sort(() => Math.random() - 0.5)
   return shuffled.slice(0, count)

@@ -1,7 +1,8 @@
-import { assert, describe, it, expect, beforeEach } from 'vitest'
+import { assert, beforeEach, describe, expect, it } from 'vitest'
+
 import definition from '.'
+import { addEffectTo, makeGame, makePlayer, makeState, resetPlayerCounter } from '../../../__tests__/helpers'
 import type { KillIntent } from '../../../pipeline/types'
-import { makePlayer, makeState, addEffectTo, makeGame, resetPlayerCounter } from '../../../__tests__/helpers'
 
 beforeEach(() => resetPlayerCounter())
 
@@ -23,7 +24,7 @@ describe('Deflect effect', () => {
         cause: 'demon',
       }
 
-      expect(handler.appliesTo(intent, mayor, state)).toBe(true)
+      expect(handler.appliesTo(intent, mayor, state)).toBeTruthy()
     })
 
     it('does not apply when a different player is targeted', () => {
@@ -36,7 +37,7 @@ describe('Deflect effect', () => {
         cause: 'demon',
       }
 
-      expect(handler.appliesTo(intent, mayor, state)).toBe(false)
+      expect(handler.appliesTo(intent, mayor, state)).toBeFalsy()
     })
   })
 
@@ -96,7 +97,7 @@ describe('Deflect effect', () => {
 
       const result = handler.handle(intent, mayor, state, game)
       assert(result.action === 'request_ui')
-      const resumed = result.resume!('p3') // narrator chose p3
+      const resumed = result.resume('p3') // narrator chose p3
       expect(resumed.action).toBe('redirect')
       assert(resumed.action === 'redirect')
       expect((resumed.newIntent as KillIntent).targetId).toBe('p3')
@@ -115,12 +116,12 @@ describe('Deflect effect', () => {
 
       const result = handler.handle(intent, mayor, state, game)
       assert(result.action === 'request_ui')
-      const resumed = result.resume!('p3')
+      const resumed = result.resume('p3')
       assert(resumed.action === 'redirect')
       expect(resumed.stateChanges?.entries).toHaveLength(1)
-      expect(resumed.stateChanges!.entries![0].data.action).toBe('kill_redirected')
-      expect(resumed.stateChanges!.entries![0].data.originalTargetId).toBe('p2')
-      expect(resumed.stateChanges!.entries![0].data.redirectTargetId).toBe('p3')
+      expect(resumed.stateChanges!.entries[0].data.action).toBe('kill_redirected')
+      expect(resumed.stateChanges!.entries[0].data.originalTargetId).toBe('p2')
+      expect(resumed.stateChanges!.entries[0].data.redirectTargetId).toBe('p3')
     })
   })
 
@@ -142,7 +143,7 @@ describe('Deflect effect', () => {
 
       const result = handler.handle(intent, mayor, state, game)
       assert(result.action === 'request_ui')
-      const resumed = result.resume!('p2') // same target
+      const resumed = result.resume('p2') // same target
       expect(resumed.action).toBe('allow')
     })
   })

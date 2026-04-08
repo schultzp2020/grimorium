@@ -1,62 +1,63 @@
-import { useState, useCallback, useMemo } from 'react'
-import { type Game, getCurrentState, getPlayer, type PlayerState } from '../../lib/types'
-import { getRole } from '../../lib/roles'
-import { getTeam } from '../../lib/teams'
-import { RoleCard } from '../items/RoleCard'
-import { TeamBackground, CardLink } from '../items/TeamBackground'
+import { useCallback, useMemo, useState } from 'react'
+import type { FC } from 'react'
+
 import {
-  markRoleRevealed,
-  startNight,
-  startDay,
-  applyNightAction,
-  skipNightAction,
-  nominate,
-  resolveVote,
-  executeAtEndOfDay,
-  endGame,
-  checkWinCondition,
-  checkEndOfDayWinConditions,
   addEffectToPlayer,
-  removeEffectFromPlayer,
-  updateEffectData,
-  processAutoSkips,
+  applyNightAction,
   applySetupAction,
+  checkEndOfDayWinConditions,
+  checkWinCondition,
+  endGame,
+  executeAtEndOfDay,
+  getBlockStatus,
   getLastNightDeaths,
   getNominatorsToday,
   getNomineesToday,
-  getBlockStatus,
   hasVirginExecutionToday,
+  markRoleRevealed,
+  nominate,
+  processAutoSkips,
+  removeEffectFromPlayer,
+  resolveVote,
+  skipNightAction,
+  startDay,
+  startNight,
+  updateEffectData,
 } from '../../lib/game'
-import { isAlive } from '../../lib/types'
-import { resolveIntent, applyPipelineChanges, getAvailableDayActions } from '../../lib/pipeline'
+import { useI18n } from '../../lib/i18n'
+import { applyPipelineChanges, getAvailableDayActions, resolveIntent } from '../../lib/pipeline'
 import {
-  type PipelineResult,
-  type PipelineInputProps,
   type AvailableDayAction,
   type AvailableNightFollowUp,
-  type NightFollowUpResult,
   type DayActionResult,
+  type NightFollowUpResult,
+  type PipelineInputProps,
+  type PipelineResult,
 } from '../../lib/pipeline/types'
+import { getRole } from '../../lib/roles/registry'
+import type { NightActionResult, SetupActionResult } from '../../lib/roles/types'
 import { saveGame } from '../../lib/storage'
-import { useI18n } from '../../lib/i18n'
-import { RoleRevelationScreen } from './RoleRevelationScreen'
-import { NightDashboard } from './NightDashboard'
+import { getTeam } from '../../lib/teams'
+import { type Game, type PlayerState, getCurrentState, getPlayer } from '../../lib/types'
+import { isAlive } from '../../lib/types'
+import { Icon, LanguagePicker } from '../atoms'
+import { PlayerFacingContext } from '../context/PlayerFacingContext'
+import { type GrimoireIntent, GrimoireModal } from '../items/GrimoireModal'
+import { RoleCard } from '../items/RoleCard'
+import { CardLink, TeamBackground } from '../items/TeamBackground'
+import { PlayerFacingScreen } from '../layouts/PlayerFacingScreen'
+import { DawnScreen } from './DawnScreen'
 import { DayPhase } from './DayPhase'
-import { NominationScreen } from './NominationScreen'
-import { VotingPhase } from './VotingPhase'
+import { type DeathRevealEntry, DeathRevealScreen } from './DeathRevealScreen'
 import { GameOver } from './GameOver'
 import { HistoryView } from './HistoryView'
-import { GrimoireModal, type GrimoireIntent } from '../items/GrimoireModal'
-import { Icon, LanguagePicker } from '../atoms'
-import type { NightActionResult, SetupActionResult } from '../../lib/roles/types'
-import type { FC } from 'react'
+import { NightDashboard } from './NightDashboard'
+import { NominationScreen } from './NominationScreen'
+import { RoleRevelationScreen } from './RoleRevelationScreen'
 import { SetupActionsScreen } from './SetupActionsScreen'
-import { DawnScreen } from './DawnScreen'
-import { DeathRevealScreen, type DeathRevealEntry } from './DeathRevealScreen'
-import { PlayerFacingContext } from '../context/PlayerFacingContext'
-import { PlayerFacingScreen } from '../layouts/PlayerFacingScreen'
+import { VotingPhase } from './VotingPhase'
 
-type Props = {
+interface Props {
   initialGame: Game
   onMainMenu: () => void
 }
@@ -148,7 +149,9 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
   }
 
   const handleRoleRevealDismiss = () => {
-    if (screen.type !== 'showing_role') return
+    if (screen.type !== 'showing_role') {
+      return
+    }
 
     const newGame = markRoleRevealed(game, screen.playerId)
     updateGame(newGame)
@@ -172,7 +175,9 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
   }
 
   const handleSetupActionComplete = (result: SetupActionResult) => {
-    if (screen.type !== 'setup_action') return
+    if (screen.type !== 'setup_action') {
+      return
+    }
 
     const newGame = applySetupAction(game, screen.playerId, result)
     updateGame(newGame)
@@ -189,10 +194,12 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
 
   const handleOpenNightAction = (playerId: string, roleId: string) => {
     const player = getPlayer(state, playerId)
-    if (!player) return
+    if (!player) {
+      return
+    }
 
     const role = getRole(roleId)
-    if (!role || !role.NightAction) {
+    if (!role?.NightAction) {
       // Role has no night action component — auto-skip
       const newGame = skipNightAction(game, roleId, playerId)
       const readyGame = processAutoSkips(newGame)
@@ -209,7 +216,9 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
   }
 
   const handleNightActionComplete = (result: NightActionResult) => {
-    if (screen.type !== 'night_action') return
+    if (screen.type !== 'night_action') {
+      return
+    }
 
     // Apply direct entries/effects (not the intent)
     const newGame = applyNightAction(game, result)
@@ -249,7 +258,9 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
   }
 
   const handleNightActionSkip = () => {
-    if (screen.type !== 'night_action') return
+    if (screen.type !== 'night_action') {
+      return
+    }
 
     const newGame = skipNightAction(game, screen.roleId, screen.playerId)
     const readyGame = processAutoSkips(newGame)
@@ -310,7 +321,7 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
       // Check if the virgin killed someone
       const oldPlayerSet = new Set(state.players.filter(isAlive).map((p) => p.id))
       const newPlayerSet = new Set(newState.players.filter(isAlive).map((p) => p.id))
-      const deaths = Array.from(oldPlayerSet).filter((id) => !newPlayerSet.has(id))
+      const deaths = [...oldPlayerSet].filter((id) => !newPlayerSet.has(id))
 
       if (deaths.length > 0) {
         // Virgin triggered — skip voting, go back to day (no further nominations)
@@ -327,7 +338,9 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
   }
 
   const handleVoteComplete = (voteCount: number, votedIds?: string[]) => {
-    if (screen.type !== 'voting') return
+    if (screen.type !== 'voting') {
+      return
+    }
 
     const newGame = resolveVote(game, screen.nomineeId, voteCount, votedIds)
     updateGame(newGame)
@@ -343,14 +356,14 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
     )
 
     // Execute whoever is on the block (deferred execution)
-    let currentGame = executeAtEndOfDay(game)
+    const currentGame = executeAtEndOfDay(game)
 
     // Check who is alive after
     const postState = getCurrentState(currentGame)
     const postExecAliveIds = new Set(
       postState.players.filter((p) => !p.effects.some((e) => e.type === 'dead')).map((p) => p.id),
     )
-    const deaths = Array.from(preExecAliveIds).filter((id) => !postExecAliveIds.has(id))
+    const deaths = [...preExecAliveIds].filter((id) => !postExecAliveIds.has(id))
 
     // Check win conditions after execution
     const postExecWinner = checkWinCondition(postState, currentGame)
@@ -423,7 +436,7 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
       // Check if action caused any deaths
       const oldPlayerSet = new Set(state.players.filter(isAlive).map((p) => p.id))
       const newPlayerSet = new Set(newState.players.filter(isAlive).map((p) => p.id))
-      const deaths = Array.from(oldPlayerSet).filter((id) => !newPlayerSet.has(id))
+      const deaths = [...oldPlayerSet].filter((id) => !newPlayerSet.has(id))
 
       const nextScreen: Screen = { type: 'day' }
 
@@ -514,7 +527,7 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
 
   const renderScreen = () => {
     switch (screen.type) {
-      case 'setup_actions':
+      case 'setup_actions': {
         return (
           <SetupActionsScreen
             game={game}
@@ -525,17 +538,22 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
             onEditEffects={handleOpenEditEffects}
           />
         )
+      }
 
       case 'setup_action': {
         const setupPlayer = getPlayer(state, screen.playerId)
-        if (!setupPlayer) return null
+        if (!setupPlayer) {
+          return null
+        }
         const setupRole = getRole(screen.roleId)
-        if (!setupRole?.SetupAction) return null
+        if (!setupRole?.SetupAction) {
+          return null
+        }
 
         return <setupRole.SetupAction player={setupPlayer} state={state} onComplete={handleSetupActionComplete} />
       }
 
-      case 'role_revelation':
+      case 'role_revelation': {
         return (
           <RoleRevelationScreen
             game={game}
@@ -545,12 +563,17 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
             onMainMenu={onMainMenu}
           />
         )
+      }
 
       case 'showing_role': {
         const player = getPlayer(state, screen.playerId)
-        if (!player) return null
+        if (!player) {
+          return null
+        }
         const role = getRole(player.roleId)
-        if (!role) return null
+        if (!role) {
+          return null
+        }
 
         return (
           <PlayerFacingScreen playerName={player.name}>
@@ -559,7 +582,7 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
         )
       }
 
-      case 'night_dashboard':
+      case 'night_dashboard': {
         return (
           <NightDashboard
             game={game}
@@ -576,6 +599,7 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
             }}
           />
         )
+      }
 
       case 'night_follow_up': {
         const FollowUpComponent = screen.followUp.ActionComponent
@@ -591,9 +615,13 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
 
       case 'night_action': {
         const player = getPlayer(state, screen.playerId)
-        if (!player) return null
+        if (!player) {
+          return null
+        }
         const role = getRole(screen.roleId)
-        if (!role) return null
+        if (!role) {
+          return null
+        }
 
         if (!role.NightAction) {
           handleNightActionSkip()
@@ -614,11 +642,13 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
         )
       }
 
-      case 'dawn':
+      case 'dawn': {
         return <DawnScreen state={state} deaths={screen.deaths} round={screen.round} onContinue={handleDawnContinue} />
+      }
 
-      case 'death_reveal':
+      case 'death_reveal': {
         return <DeathRevealScreen deaths={screen.deaths} onContinue={() => setScreen(screen.next)} />
+      }
 
       case 'day': {
         // Collect available day actions from active effects
@@ -647,7 +677,7 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
       }
 
       case 'day_action': {
-        const ActionComponent = screen.action.ActionComponent
+        const { ActionComponent } = screen.action
         return (
           <ActionComponent
             state={state}
@@ -659,14 +689,18 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
       }
 
       case 'pipeline_input': {
-        if (!pipelineUI) return null
+        if (!pipelineUI) {
+          return null
+        }
         const PipelineComponent = pipelineUI.Component
         return <PipelineComponent state={state} intent={pipelineUI.intent} onComplete={pipelineUI.onResult} />
       }
 
       case 'grimoire_role_card': {
         const player = getPlayer(state, screen.playerId)
-        if (!player) return null
+        if (!player) {
+          return null
+        }
         const cardRole = getRole(player.roleId)
         const cardTeamId = cardRole?.team ?? 'townsfolk'
         const cardTeam = getTeam(cardTeamId)
@@ -680,7 +714,7 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
         )
       }
 
-      case 'nomination':
+      case 'nomination': {
         return (
           <NominationScreen
             state={state}
@@ -690,8 +724,9 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
             onBack={handleBackFromNomination}
           />
         )
+      }
 
-      case 'voting':
+      case 'voting': {
         return (
           <VotingPhase
             state={state}
@@ -701,12 +736,15 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
             onCancel={handleCancelVote}
           />
         )
+      }
 
-      case 'game_over':
+      case 'game_over': {
         return <GameOver state={state} onMainMenu={onMainMenu} onShowHistory={() => setShowHistory(true)} />
+      }
 
-      default:
+      default: {
         return null
+      }
     }
   }
 
@@ -772,7 +810,9 @@ function hasSetupActions(game: Game): boolean {
   )
 
   return state.players.some((p) => {
-    if (completedSetupPlayerIds.has(p.id)) return false
+    if (completedSetupPlayerIds.has(p.id)) {
+      return false
+    }
     const role = getRole(p.roleId)
     return role?.SetupAction != null
   })
@@ -794,17 +834,21 @@ function getInitialScreen(game: Game): Screen {
   }
 
   switch (state.phase) {
-    case 'setup':
+    case 'setup': {
       // Check if there are pending setup actions (e.g., Drunk choosing believed role)
       if (hasSetupActions(game)) {
         return { type: 'setup_actions' }
       }
       return { type: 'role_revelation' }
-    case 'night':
+    }
+    case 'night': {
       return { type: 'night_dashboard' }
-    case 'day':
+    }
+    case 'day': {
       return { type: 'day' }
-    default:
+    }
+    default: {
       return { type: 'day' }
+    }
   }
 }

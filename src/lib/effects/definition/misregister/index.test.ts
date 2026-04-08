@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { addEffectTo, makePlayer, makeState, resetPlayerCounter } from '../../../__tests__/helpers'
 import { perceive } from '../../../pipeline/perception'
-import { makePlayer, makeState, addEffectTo, resetPlayerCounter } from '../../../__tests__/helpers'
 
 beforeEach(() => {
   resetPlayerCounter()

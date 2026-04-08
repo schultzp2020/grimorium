@@ -1,9 +1,9 @@
 import { useI18n } from '../../lib/i18n'
-import { Icon, BackButton } from '../atoms'
-import { RoleCard } from '../items/RoleCard'
+import { BackButton, Icon } from '../atoms'
 import { MysticDivider } from '../items'
+import { RoleCard } from '../items/RoleCard'
 
-type Props = {
+interface Props {
   onBack: () => void
 }
 

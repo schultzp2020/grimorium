@@ -1,32 +1,45 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+
 import definition from '.'
-import { perceive } from '../../../../pipeline/perception'
-import { getAliveNeighbors } from '../../../../types'
-import type { EffectDefinition, EffectId } from '../../../../effects/types'
 import {
-  makePlayer,
-  makeState,
   addEffectTo,
   makeGameWithHistory,
+  makePlayer,
+  makeState,
   resetPlayerCounter,
 } from '../../../../__tests__/helpers'
+import { getEffect, registerEffect, unregisterEffect } from '../../../../effects/registry'
+import type { EffectDefinition, EffectId } from '../../../../effects/types'
+import { perceive } from '../../../../pipeline/perception'
+import { getAliveNeighbors } from '../../../../types'
 
-vi.mock('../../../../effects', async (importOriginal) => {
-  const actual = (await importOriginal()) as Record<string, unknown>
-  return {
-    ...actual,
-    getEffect: (effectId: string) => {
-      if (testEffects[effectId]) return testEffects[effectId]
-      return (actual.getEffect as (id: string) => EffectDefinition | undefined)(effectId)
-    },
+// Track registered test effects so we can restore originals after each test
+const originalEffects: Map<EffectId, EffectDefinition | undefined> = new Map()
+
+function registerTestEffect(def: EffectDefinition) {
+  if (!originalEffects.has(def.id)) {
+    originalEffects.set(def.id, getEffect(def.id))
   }
-})
+  registerEffect(def)
+}
 
-const testEffects: Record<string, EffectDefinition> = {}
+function clearTestEffects() {
+  for (const [id, original] of originalEffects) {
+    if (original) {
+      registerEffect(original)
+    } else {
+      unregisterEffect(id)
+    }
+  }
+  originalEffects.clear()
+}
 
 beforeEach(() => {
   resetPlayerCounter()
-  for (const key of Object.keys(testEffects)) delete testEffects[key]
+})
+
+afterEach(() => {
+  clearTestEffects()
 })
 
 describe('Empath', () => {
@@ -58,8 +71,8 @@ describe('Empath', () => {
         makeState({ round: 3, players: [player] }),
       )
 
-      expect(definition.shouldWake!(round1, player)).toBe(true)
-      expect(definition.shouldWake!(round3, player)).toBe(true)
+      expect(definition.shouldWake!(round1, player)).toBeTruthy()
+      expect(definition.shouldWake!(round3, player)).toBeTruthy()
     })
 
     it('does not wake when dead', () => {
@@ -74,7 +87,7 @@ describe('Empath', () => {
         ],
         makeState({ round: 2, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBe(false)
+      expect(definition.shouldWake!(game, player)).toBeFalsy()
     })
   })
 
@@ -131,7 +144,7 @@ describe('Empath', () => {
 
   describe('perception deception', () => {
     it('evil neighbor appearing good → Empath sees 0', () => {
-      testEffects['appears_good'] = {
+      registerTestEffect({
         id: 'appears_good' as EffectId,
         icon: 'user',
         perceptionModifiers: [
@@ -140,7 +153,7 @@ describe('Empath', () => {
             modify: (p) => ({ ...p, alignment: 'good' }),
           },
         ],
-      }
+      })
 
       const empath = makePlayer({ id: 'p2', roleId: 'empath' })
       const evilNeighbor = addEffectTo(makePlayer({ id: 'p3', roleId: 'imp' }), 'appears_good')
@@ -155,7 +168,7 @@ describe('Empath', () => {
     })
 
     it('good neighbor appearing evil → Empath sees 1', () => {
-      testEffects['appears_evil'] = {
+      registerTestEffect({
         id: 'appears_evil' as EffectId,
         icon: 'user',
         perceptionModifiers: [
@@ -164,7 +177,7 @@ describe('Empath', () => {
             modify: (p) => ({ ...p, alignment: 'evil' }),
           },
         ],
-      }
+      })
 
       const empath = makePlayer({ id: 'p2', roleId: 'empath' })
       const deceivedNeighbor = addEffectTo(makePlayer({ id: 'p3', roleId: 'villager' }), 'appears_evil')

@@ -1,9 +1,9 @@
+import { interpolate, useI18n } from '../../lib/i18n'
 import type { GameState } from '../../lib/types'
-import { useI18n, interpolate } from '../../lib/i18n'
 import { Button, Icon } from '../atoms'
 import { ScreenFooter } from '../layouts/ScreenFooter'
 
-type Props = {
+interface Props {
   state: GameState
   deaths: string[]
   round: number

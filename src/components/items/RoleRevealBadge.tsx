@@ -1,7 +1,7 @@
 import { Icon } from '../atoms'
 import type { IconName } from '../atoms/icon'
 
-type RoleRevealBadgeProps = {
+interface RoleRevealBadgeProps {
   icon: IconName
   roleName: string
   label?: string

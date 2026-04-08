@@ -16,7 +16,9 @@ export function useBackButton(onBack: (() => void) | null): void {
   const isActive = onBack !== null
 
   useEffect(() => {
-    if (!isActive) return
+    if (!isActive) {
+      return
+    }
 
     // Push a sentinel history entry to intercept the back button,
     // but only if one isn't already on top (avoids stacking sentinels

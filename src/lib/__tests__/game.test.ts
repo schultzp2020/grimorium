@@ -1,25 +1,26 @@
-import { assert, describe, it, expect, beforeEach } from 'vitest'
+import { assert, beforeEach, describe, expect, it } from 'vitest'
+
 import {
-  createGame,
-  addHistoryEntry,
-  startNight,
-  startDay,
-  getNextStep,
-  applyNightAction,
-  skipNightAction,
-  nominate,
-  resolveVote,
   addEffectToPlayer,
+  addHistoryEntry,
+  applyNightAction,
+  createGame,
+  getNextStep,
+  nominate,
   removeEffectFromPlayer,
+  resolveVote,
+  skipNightAction,
+  startDay,
+  startNight,
 } from '../game'
-import { getCurrentState, hasEffect, type PlayerState } from '../types'
+import { type PlayerState, getCurrentState, hasEffect } from '../types'
 import {
-  makePlayer,
-  makeGame,
-  makeState,
-  makeGameWithHistory,
-  makeStandardPlayers,
   addEffectTo,
+  makeGame,
+  makeGameWithHistory,
+  makePlayer,
+  makeStandardPlayers,
+  makeState,
   resetPlayerCounter,
 } from './helpers'
 
@@ -70,8 +71,8 @@ describe('createGame', () => {
     ])
 
     const state = getCurrentState(game)
-    expect(state.players[0].effects.some((e) => e.type === 'safe')).toBe(true)
-    expect(state.players[1].effects.some((e) => e.type === 'pure')).toBe(true)
+    expect(state.players[0].effects.some((e) => e.type === 'safe')).toBeTruthy()
+    expect(state.players[1].effects.some((e) => e.type === 'pure')).toBeTruthy()
     expect(state.players[2].effects).toHaveLength(0)
   })
 })
@@ -133,7 +134,7 @@ describe('addHistoryEntry', () => {
 
     const state = getCurrentState(updated)
     const p1 = state.players.find((p) => p.id === 'p1')!
-    expect(hasEffect(p1, 'safe')).toBe(true)
+    expect(hasEffect(p1, 'safe')).toBeTruthy()
   })
 
   it('applies removeEffects from players', () => {
@@ -155,7 +156,7 @@ describe('addHistoryEntry', () => {
 
     const state = getCurrentState(updated)
     const p1 = state.players.find((p) => p.id === 'p1')!
-    expect(hasEffect(p1, 'safe')).toBe(false)
+    expect(hasEffect(p1, 'safe')).toBeFalsy()
   })
 })
 
@@ -215,7 +216,7 @@ describe('startDay', () => {
     const updated = startDay(withNight)
     const state = getCurrentState(updated)
     const p1 = state.players.find((p) => p.id === 'p1')!
-    expect(hasEffect(p1, 'safe')).toBe(false)
+    expect(hasEffect(p1, 'safe')).toBeFalsy()
   })
 
   it('preserves permanent effects', () => {
@@ -232,7 +233,7 @@ describe('startDay', () => {
     const updated = startDay(withNight)
     const state = getCurrentState(updated)
     const p1 = state.players.find((p) => p.id === 'p1')!
-    expect(hasEffect(p1, 'safe')).toBe(true)
+    expect(hasEffect(p1, 'safe')).toBeTruthy()
   })
 })
 
@@ -328,7 +329,7 @@ describe('applyNightAction', () => {
 
     const state = getCurrentState(updated)
     const p1 = state.players.find((p) => p.id === 'p1')!
-    expect(hasEffect(p1, 'safe')).toBe(true)
+    expect(hasEffect(p1, 'safe')).toBeTruthy()
   })
 })
 
@@ -394,12 +395,12 @@ describe('resolveVote', () => {
 
     // Player is NOT dead yet — execution deferred to end of day
     const p5 = state.players.find((p) => p.id === 'p5')!
-    expect(hasEffect(p5, 'dead')).toBe(false)
+    expect(hasEffect(p5, 'dead')).toBeFalsy()
 
     // Vote entry should show replacesBlock = true
     const voteEntry = updated.history.find((e) => e.type === 'vote')
-    expect(voteEntry?.data.replacesBlock).toBe(true)
-    expect(voteEntry?.data.meetsThreshold).toBe(true)
+    expect(voteEntry?.data.replacesBlock).toBeTruthy()
+    expect(voteEntry?.data.meetsThreshold).toBeTruthy()
     expect(voteEntry?.data.voteCount).toBe(3)
   })
 
@@ -413,8 +414,8 @@ describe('resolveVote', () => {
     expect(state.phase).toBe('day')
 
     const voteEntry = updated.history.find((e) => e.type === 'vote')
-    expect(voteEntry?.data.replacesBlock).toBe(false)
-    expect(voteEntry?.data.meetsThreshold).toBe(false)
+    expect(voteEntry?.data.replacesBlock).toBeFalsy()
+    expect(voteEntry?.data.meetsThreshold).toBeFalsy()
   })
 
   it('replaces block when new vote is strictly higher', () => {
@@ -428,8 +429,8 @@ describe('resolveVote', () => {
     const afterSecond = resolveVote(afterFirst, 'p4', 4, ['p1', 'p2', 'p3', 'p5'])
 
     const voteEntries = afterSecond.history.filter((e) => e.type === 'vote')
-    const lastVote = voteEntries[voteEntries.length - 1]
-    expect(lastVote?.data.replacesBlock).toBe(true)
+    const lastVote = voteEntries.at(-1)
+    expect(lastVote?.data.replacesBlock).toBeTruthy()
     expect(lastVote?.data.nomineeId).toBe('p4')
   })
 
@@ -455,8 +456,8 @@ describe('resolveVote', () => {
 
     const updated = resolveVote(game, 'p5', 0)
     const voteEntry = updated.history.find((e) => e.type === 'vote')
-    expect(voteEntry?.data.meetsThreshold).toBe(false)
-    expect(voteEntry?.data.replacesBlock).toBe(false)
+    expect(voteEntry?.data.meetsThreshold).toBeFalsy()
+    expect(voteEntry?.data.replacesBlock).toBeFalsy()
   })
 
   it("tracks dead voter's used vote", () => {
@@ -470,7 +471,7 @@ describe('resolveVote', () => {
     const state = getCurrentState(updated)
 
     const p1 = state.players.find((p) => p.id === 'p1')!
-    expect(hasEffect(p1, 'used_dead_vote')).toBe(true)
+    expect(hasEffect(p1, 'used_dead_vote')).toBeTruthy()
   })
 
   it("does not track dead voter if they don't vote", () => {
@@ -483,7 +484,7 @@ describe('resolveVote', () => {
     const state = getCurrentState(updated)
 
     const p1 = state.players.find((p) => p.id === 'p1')!
-    expect(hasEffect(p1, 'used_dead_vote')).toBe(false)
+    expect(hasEffect(p1, 'used_dead_vote')).toBeFalsy()
   })
 })
 
@@ -499,7 +500,7 @@ describe('manual effect management', () => {
     const updated = addEffectToPlayer(game, 'p1', 'safe')
     const state = getCurrentState(updated)
     const p1 = state.players.find((p) => p.id === 'p1')!
-    expect(hasEffect(p1, 'safe')).toBe(true)
+    expect(hasEffect(p1, 'safe')).toBeTruthy()
   })
 
   it('removeEffectFromPlayer removes an effect', () => {
@@ -510,6 +511,6 @@ describe('manual effect management', () => {
     const updated = removeEffectFromPlayer(game, 'p1', 'safe')
     const state = getCurrentState(updated)
     const p1 = state.players.find((p) => p.id === 'p1')!
-    expect(hasEffect(p1, 'safe')).toBe(false)
+    expect(hasEffect(p1, 'safe')).toBeFalsy()
   })
 })

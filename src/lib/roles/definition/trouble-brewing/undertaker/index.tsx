@@ -1,21 +1,21 @@
-import { useState, useMemo } from 'react'
-import type { RoleDefinition } from '../../../types'
-import { getRole } from '../../../index'
-import { getTeam } from '../../../../teams'
-import { isAlive } from '../../../../types'
-import { useI18n, registerRoleTranslations, getRoleName, getRoleTranslations } from '../../../../i18n'
+import { useMemo, useState } from 'react'
+
+import { PerceptionConfigStep } from '../../../../../components/items'
+import { MalfunctionConfigStep } from '../../../../../components/items'
 import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
 import { RoleCard } from '../../../../../components/items/RoleCard'
-import { PerceptionConfigStep } from '../../../../../components/items'
 import { TeamBackground } from '../../../../../components/items/TeamBackground'
-import { NightStepListLayout, PlayerFacingScreen, HandbackCardLink } from '../../../../../components/layouts'
+import { HandbackCardLink, NightStepListLayout, PlayerFacingScreen } from '../../../../../components/layouts'
 import type { NightStep } from '../../../../../components/layouts'
-import { perceive, getAmbiguousPlayers, applyPerceptionOverrides } from '../../../../pipeline'
-import { isMalfunctioning } from '../../../../effects'
-import { MalfunctionConfigStep } from '../../../../../components/items'
-import type { Perception } from '../../../../pipeline/types'
 import { cn } from '../../../../../lib/utils'
-
+import { isMalfunctioning } from '../../../../effects/registry'
+import { getRoleName, getRoleTranslations, registerRoleTranslations, useI18n } from '../../../../i18n'
+import { applyPerceptionOverrides, getAmbiguousPlayers, perceive } from '../../../../pipeline'
+import type { Perception } from '../../../../pipeline/types'
+import { getTeam } from '../../../../teams'
+import { isAlive } from '../../../../types'
+import { getRole } from '../../../registry'
+import type { RoleDefinition } from '../../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 
@@ -23,9 +23,7 @@ registerRoleTranslations('undertaker', 'en', en)
 registerRoleTranslations('undertaker', 'es', es)
 
 // Helper to find execution from the previous day
-function findExecutedPlayerId(game: {
-  history: Array<{ type: string; data: Record<string, unknown> }>
-}): string | null {
+function findExecutedPlayerId(game: { history: { type: string; data: Record<string, unknown> }[] }): string | null {
   let lastDayStartIndex = -1
 
   for (let i = game.history.length - 1; i >= 0; i--) {
@@ -59,9 +57,13 @@ const definition: RoleDefinition = {
 
   // Only wake if alive, not first night, AND there was an execution during the day
   shouldWake: (game, player) => {
-    if (!isAlive(player)) return false
+    if (!isAlive(player)) {
+      return false
+    }
     const round = game.history.at(-1)?.stateAfter.round ?? 0
-    if (round <= 1) return false // Skip first night
+    if (round <= 1) {
+      return false
+    } // Skip first night
     return findExecutedPlayerId(game) !== null
   },
 
@@ -78,11 +80,17 @@ const definition: RoleDefinition = {
       icon: 'hatGlasses',
       getLabel: (t) => t.game.stepConfigurePerceptions,
       condition: (game, player, state) => {
-        if (isMalfunctioning(player)) return false
+        if (isMalfunctioning(player)) {
+          return false
+        }
         const executedPlayerId = findExecutedPlayerId(game)
-        if (!executedPlayerId) return false
+        if (!executedPlayerId) {
+          return false
+        }
         const executedPlayer = state.players.find((p) => p.id === executedPlayerId)
-        if (!executedPlayer) return false
+        if (!executedPlayer) {
+          return false
+        }
         return getAmbiguousPlayers([executedPlayer], 'role').length > 0
       },
       audience: 'narrator',
@@ -186,7 +194,9 @@ const definition: RoleDefinition = {
 
     // Get perceived role of executed player
     const executedPerception = useMemo(() => {
-      if (!executedPlayer) return null
+      if (!executedPlayer) {
+        return null
+      }
       const effectiveExecuted = effectiveState.players.find((p) => p.id === executedPlayer.id) ?? executedPlayer
       const effectiveObserver = effectiveState.players.find((p) => p.id === player.id) ?? player
       return perceive(effectiveExecuted, effectiveObserver, 'role', effectiveState)
@@ -274,7 +284,9 @@ const definition: RoleDefinition = {
     }
 
     // Phase: Show Role
-    if (!displayedRoleId) return null
+    if (!displayedRoleId) {
+      return null
+    }
 
     const shownRole = getRole(displayedRoleId)
     const shownTeamId = shownRole?.team ?? 'townsfolk'

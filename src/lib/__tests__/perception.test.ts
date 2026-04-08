@@ -1,47 +1,44 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import {
-  perceive,
-  canRegisterAsTeam,
-  canRegisterAsAlignment,
-  getAmbiguousPlayers,
-  applyPerceptionOverrides,
-} from '../pipeline/perception'
-import { makePlayer, makeState, addEffectTo, resetPlayerCounter } from './helpers'
-import type { PerceptionModifier, Perception } from '../pipeline/types'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+
+import { getEffect, registerEffect, unregisterEffect } from '../effects/registry'
 import type { EffectDefinition, EffectId } from '../effects/types'
+import {
+  applyPerceptionOverrides,
+  canRegisterAsAlignment,
+  canRegisterAsTeam,
+  getAmbiguousPlayers,
+  perceive,
+} from '../pipeline/perception'
+import type { Perception, PerceptionModifier } from '../pipeline/types'
+import { addEffectTo, makePlayer, makeState, resetPlayerCounter } from './helpers'
 
-// We need to mock getEffect to inject test perception modifiers
-// since we can't register arbitrary effects in the real registry.
-vi.mock('../effects', async (importOriginal) => {
-  const actual = (await importOriginal()) as Record<string, unknown>
-  return {
-    ...actual,
-    getEffect: (effectId: string) => {
-      // Check test registry first
-      if (testEffectRegistry[effectId]) {
-        return testEffectRegistry[effectId]
-      }
-      // Fall back to real registry
-      return (actual.getEffect as (id: string) => EffectDefinition | undefined)(effectId)
-    },
-  }
-})
-
-// Test effect registry for injecting mock effects
-const testEffectRegistry: Record<string, EffectDefinition> = {}
+// Track registered test effects so we can restore originals after each test
+const originalEffects: Map<EffectId, EffectDefinition | undefined> = new Map()
 
 function registerTestEffect(def: EffectDefinition) {
-  testEffectRegistry[def.id] = def
+  // Save original before overwriting
+  if (!originalEffects.has(def.id)) {
+    originalEffects.set(def.id, getEffect(def.id))
+  }
+  registerEffect(def)
 }
 
 function clearTestEffects() {
-  for (const key of Object.keys(testEffectRegistry)) {
-    delete testEffectRegistry[key]
+  for (const [id, original] of originalEffects) {
+    if (original) {
+      registerEffect(original)
+    } else {
+      unregisterEffect(id)
+    }
   }
+  originalEffects.clear()
 }
 
 beforeEach(() => {
   resetPlayerCounter()
+})
+
+afterEach(() => {
   clearTestEffects()
 })
 
@@ -262,7 +259,9 @@ describe('perception modifiers', () => {
       context: ['alignment', 'team', 'role'],
       modify: (perception, _target, _observer, _state, effectData) => {
         const overrides = effectData?.perceiveAs as Partial<Perception> | undefined
-        if (!overrides) return perception
+        if (!overrides) {
+          return perception
+        }
         return { ...perception, ...overrides }
       },
     }
@@ -293,33 +292,33 @@ describe('perception modifiers', () => {
 describe('canRegisterAsTeam', () => {
   it('returns false for a player with no effects', () => {
     const player = makePlayer({ id: 'p1', roleId: 'villager' })
-    expect(canRegisterAsTeam(player, 'minion')).toBe(false)
+    expect(canRegisterAsTeam(player, 'minion')).toBeFalsy()
   })
 
   it("returns false for a player with effects that don't declare canRegisterAs", () => {
     const player = addEffectTo(makePlayer({ id: 'p1', roleId: 'soldier' }), 'safe')
-    expect(canRegisterAsTeam(player, 'minion')).toBe(false)
+    expect(canRegisterAsTeam(player, 'minion')).toBeFalsy()
   })
 
   it('returns true for a player with misregister for minion team (via instance data)', () => {
     const player = addEffectTo(makePlayer({ id: 'p1', roleId: 'recluse' }), 'misregister', {
       canRegisterAs: { teams: ['minion', 'demon'], alignments: ['evil'] },
     })
-    expect(canRegisterAsTeam(player, 'minion')).toBe(true)
+    expect(canRegisterAsTeam(player, 'minion')).toBeTruthy()
   })
 
   it('returns true for a player with misregister for demon team (via instance data)', () => {
     const player = addEffectTo(makePlayer({ id: 'p1', roleId: 'recluse' }), 'misregister', {
       canRegisterAs: { teams: ['minion', 'demon'], alignments: ['evil'] },
     })
-    expect(canRegisterAsTeam(player, 'demon')).toBe(true)
+    expect(canRegisterAsTeam(player, 'demon')).toBeTruthy()
   })
 
   it('returns false for a team not declared in canRegisterAs', () => {
     const player = addEffectTo(makePlayer({ id: 'p1', roleId: 'recluse' }), 'misregister', {
       canRegisterAs: { teams: ['minion', 'demon'], alignments: ['evil'] },
     })
-    expect(canRegisterAsTeam(player, 'townsfolk')).toBe(false)
+    expect(canRegisterAsTeam(player, 'townsfolk')).toBeFalsy()
   })
 
   it('returns true for custom effects with canRegisterAs', () => {
@@ -330,8 +329,8 @@ describe('canRegisterAsTeam', () => {
     })
 
     const player = addEffectTo(makePlayer({ id: 'p1', roleId: 'imp' }), 'custom_misregister')
-    expect(canRegisterAsTeam(player, 'townsfolk')).toBe(true)
-    expect(canRegisterAsTeam(player, 'minion')).toBe(false)
+    expect(canRegisterAsTeam(player, 'townsfolk')).toBeTruthy()
+    expect(canRegisterAsTeam(player, 'minion')).toBeFalsy()
   })
 })
 
@@ -342,26 +341,26 @@ describe('canRegisterAsTeam', () => {
 describe('canRegisterAsAlignment', () => {
   it('returns false for a player with no effects', () => {
     const player = makePlayer({ id: 'p1', roleId: 'villager' })
-    expect(canRegisterAsAlignment(player, 'evil')).toBe(false)
+    expect(canRegisterAsAlignment(player, 'evil')).toBeFalsy()
   })
 
   it("returns false for a player with effects that don't declare canRegisterAs", () => {
     const player = addEffectTo(makePlayer({ id: 'p1', roleId: 'soldier' }), 'safe')
-    expect(canRegisterAsAlignment(player, 'evil')).toBe(false)
+    expect(canRegisterAsAlignment(player, 'evil')).toBeFalsy()
   })
 
   it('returns true for a player with misregister for evil alignment (via instance data)', () => {
     const player = addEffectTo(makePlayer({ id: 'p1', roleId: 'recluse' }), 'misregister', {
       canRegisterAs: { teams: ['minion', 'demon'], alignments: ['evil'] },
     })
-    expect(canRegisterAsAlignment(player, 'evil')).toBe(true)
+    expect(canRegisterAsAlignment(player, 'evil')).toBeTruthy()
   })
 
   it('returns false for an alignment not declared in canRegisterAs', () => {
     const player = addEffectTo(makePlayer({ id: 'p1', roleId: 'recluse' }), 'misregister', {
       canRegisterAs: { teams: ['minion', 'demon'], alignments: ['evil'] },
     })
-    expect(canRegisterAsAlignment(player, 'good')).toBe(false)
+    expect(canRegisterAsAlignment(player, 'good')).toBeFalsy()
   })
 
   it('returns true for custom effects with canRegisterAs alignments', () => {
@@ -372,8 +371,8 @@ describe('canRegisterAsAlignment', () => {
     })
 
     const player = addEffectTo(makePlayer({ id: 'p1', roleId: 'imp' }), 'custom_misregister')
-    expect(canRegisterAsAlignment(player, 'good')).toBe(true)
-    expect(canRegisterAsAlignment(player, 'evil')).toBe(false)
+    expect(canRegisterAsAlignment(player, 'good')).toBeTruthy()
+    expect(canRegisterAsAlignment(player, 'evil')).toBeFalsy()
   })
 })
 

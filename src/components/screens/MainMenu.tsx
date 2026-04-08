@@ -1,10 +1,11 @@
 import { useCallback, useRef, useState } from 'react'
-import { getGameSummaries, getCurrentGameId, type GameSummary } from '../../lib/storage'
+
+import { useShaderBackground } from '../../hooks/useShaderBackground'
 import { useI18n } from '../../lib/i18n'
+import { type GameSummary, getCurrentGameId, getGameSummaries } from '../../lib/storage'
+import { cn } from '../../lib/utils'
 import { Icon } from '../atoms'
 import { MysticDivider } from '../items'
-import { useShaderBackground } from '../../hooks/useShaderBackground'
-import { cn } from '../../lib/utils'
 
 // =============================================================================
 // GRIMOIRE BACKGROUND SHADER
@@ -142,7 +143,7 @@ let hasOpenedGrimoire = false
 // TYPES
 // =============================================================================
 
-type Props = {
+interface Props {
   onNewGame: () => void
   onContinue: (gameId: string) => void
   onLoadGame: (gameId: string) => void
@@ -187,7 +188,9 @@ export function MainMenu({ onNewGame, onContinue, onLoadGame, onRolesLibrary, on
   // ── Handlers ────────────────────────────────────────────────────────────
 
   const handleBreakSeal = useCallback(() => {
-    if (phase !== 'sealed') return
+    if (phase !== 'sealed') {
+      return
+    }
     setPhase('breaking')
     setTimeout(() => {
       hasOpenedGrimoire = true
@@ -219,8 +222,12 @@ export function MainMenu({ onNewGame, onContinue, onLoadGame, onRolesLibrary, on
   }
 
   const formatPhase = (game: GameSummary) => {
-    if (game.phase === 'ended') return t.mainMenu.completed
-    if (game.phase === 'setup') return t.mainMenu.settingUp
+    if (game.phase === 'ended') {
+      return t.mainMenu.completed
+    }
+    if (game.phase === 'setup') {
+      return t.mainMenu.settingUp
+    }
     return `${t.mainMenu.round} ${game.round} - ${game.phase}`
   }
 

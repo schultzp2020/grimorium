@@ -1,6 +1,5 @@
-import type { EffectDefinition } from '../../types'
 import { registerEffectTranslations } from '../../../i18n'
-
+import type { EffectDefinition } from '../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 

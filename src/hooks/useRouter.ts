@@ -1,4 +1,5 @@
-import { useSyncExternalStore, useCallback } from 'react'
+import { useCallback, useSyncExternalStore } from 'react'
+
 import { router } from '../lib/router'
 
 /**

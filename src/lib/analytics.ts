@@ -10,7 +10,9 @@ const BOT_PATTERN =
   /bot|crawler|spider|crawling|googlebot|bingbot|yandexbot|duckduckbot|slurp|baiduspider|facebookexternalhit|linkedinbot|twitterbot|applebot|semrushbot|ahrefsbot|mj12bot|dotbot|petalbot|bytespider|headlesschrome|phantomjs|prerender/i
 
 function isBot(): boolean {
-  if (typeof navigator === 'undefined') return true
+  if (typeof navigator === 'undefined') {
+    return true
+  }
   return BOT_PATTERN.test(navigator.userAgent)
 }
 
@@ -26,8 +28,12 @@ declare global {
  * visitor looks like a bot.
  */
 export function trackEvent(eventName: string, params?: Record<string, string | number | boolean>): void {
-  if (isBot()) return
-  if (typeof window === 'undefined' || !window.gtag) return
+  if (isBot()) {
+    return
+  }
+  if (typeof window === 'undefined' || !window.gtag) {
+    return
+  }
 
   window.gtag('event', eventName, params)
 }

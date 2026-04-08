@@ -1,12 +1,13 @@
-import { useState, useMemo } from 'react'
-import { type GameState, getAlivePlayers } from '../../lib/types'
-import { useI18n } from '../../lib/i18n'
-import { Button, Icon, BackButton } from '../atoms'
-import { ScreenFooter } from '../layouts/ScreenFooter'
-import { MysticDivider } from '../items'
-import { PlayerPickerList } from '../inputs'
+import { useMemo, useState } from 'react'
 
-type Props = {
+import { useI18n } from '../../lib/i18n'
+import { type GameState, getAlivePlayers } from '../../lib/types'
+import { BackButton, Button, Icon } from '../atoms'
+import { PlayerPickerList } from '../inputs'
+import { MysticDivider } from '../items'
+import { ScreenFooter } from '../layouts/ScreenFooter'
+
+interface Props {
   state: GameState
   nominatorsToday?: Set<string>
   nomineesToday?: Set<string>
@@ -37,7 +38,9 @@ export function NominationScreen({ state, nominatorsToday, nomineesToday, onNomi
 
   // Build annotations for players who already nominated today
   const nominatorAnnotations = useMemo(() => {
-    if (!nominatorsToday || nominatorsToday.size === 0) return undefined
+    if (!nominatorsToday || nominatorsToday.size === 0) {
+      return undefined
+    }
     const annotations: Record<string, string> = {}
     for (const player of alivePlayers) {
       if (nominatorsToday.has(player.id)) {
@@ -49,7 +52,9 @@ export function NominationScreen({ state, nominatorsToday, nomineesToday, onNomi
 
   // Build disabled set + annotations for players who have already been nominated
   const nomineeAnnotations = useMemo(() => {
-    if (!nomineesToday || nomineesToday.size === 0) return undefined
+    if (!nomineesToday || nomineesToday.size === 0) {
+      return undefined
+    }
     const annotations: Record<string, string> = {}
     for (const player of alivePlayers) {
       if (nomineesToday.has(player.id)) {
@@ -61,12 +66,16 @@ export function NominationScreen({ state, nominatorsToday, nomineesToday, onNomi
 
   // Build disabled sets for enforcement
   const disabledNominators = useMemo(() => {
-    if (!nominatorsToday || nominatorsToday.size === 0) return undefined
+    if (!nominatorsToday || nominatorsToday.size === 0) {
+      return undefined
+    }
     return nominatorsToday
   }, [nominatorsToday])
 
   const disabledNominees = useMemo(() => {
-    if (!nomineesToday || nomineesToday.size === 0) return undefined
+    if (!nomineesToday || nomineesToday.size === 0) {
+      return undefined
+    }
     return nomineesToday
   }, [nomineesToday])
 

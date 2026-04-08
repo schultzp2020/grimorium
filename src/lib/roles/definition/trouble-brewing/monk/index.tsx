@@ -1,14 +1,14 @@
 import { useState } from 'react'
-import type { RoleDefinition } from '../../../types'
-import { useI18n, interpolate, registerRoleTranslations, getRoleName, getRoleTranslations } from '../../../../i18n'
+
+import { Button, Icon } from '../../../../../components/atoms'
+import { PlayerPickerList } from '../../../../../components/inputs'
 import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
 import { NightActionLayout, NightStepListLayout } from '../../../../../components/layouts'
 import type { NightStep } from '../../../../../components/layouts'
-import { PlayerPickerList } from '../../../../../components/inputs'
-import { Button, Icon } from '../../../../../components/atoms'
+import { isMalfunctioning } from '../../../../effects/registry'
+import { getRoleName, getRoleTranslations, interpolate, registerRoleTranslations, useI18n } from '../../../../i18n'
 import { isAlive } from '../../../../types'
-import { isMalfunctioning } from '../../../../effects'
-
+import type { RoleDefinition } from '../../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 
@@ -47,10 +47,14 @@ const definition: RoleDefinition = {
     const malfunctioning = isMalfunctioning(player)
 
     const handleConfirm = () => {
-      if (!selectedTarget) return
+      if (!selectedTarget) {
+        return
+      }
 
       const target = state.players.find((p) => p.id === selectedTarget)
-      if (!target) return
+      if (!target) {
+        return
+      }
 
       onComplete({
         entries: [

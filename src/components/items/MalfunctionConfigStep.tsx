@@ -1,14 +1,15 @@
 import { useState } from 'react'
-import { getAllRoles } from '../../lib/roles'
-import type { GameState } from '../../lib/types'
-import { useI18n } from '../../lib/i18n'
-import { Icon, Button } from '../atoms'
-import type { IconName } from '../atoms/icon'
-import { NarratorSetupLayout } from '../layouts'
-import { RolePickerGrid } from '../inputs/RolePickerGrid'
-import { cn } from '../../lib/utils'
 
-type NumberProps = {
+import { useI18n } from '../../lib/i18n'
+import { getAllRoles } from '../../lib/roles/registry'
+import type { GameState } from '../../lib/types'
+import { cn } from '../../lib/utils'
+import { Button, Icon } from '../atoms'
+import type { IconName } from '../atoms/icon'
+import { RolePickerGrid } from '../inputs/RolePickerGrid'
+import { NarratorSetupLayout } from '../layouts'
+
+interface NumberProps {
   type: 'number'
   roleIcon: IconName
   roleName: string
@@ -17,7 +18,7 @@ type NumberProps = {
   onComplete: (result: number) => void
 }
 
-type BooleanProps = {
+interface BooleanProps {
   type: 'boolean'
   roleIcon: IconName
   roleName: string
@@ -27,7 +28,7 @@ type BooleanProps = {
   onComplete: (result: boolean) => void
 }
 
-type RoleProps = {
+interface RoleProps {
   type: 'role'
   roleIcon: IconName
   roleName: string

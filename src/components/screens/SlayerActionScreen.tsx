@@ -1,12 +1,13 @@
 import { useState } from 'react'
-import { isAlive } from '../../lib/types'
-import { getRole } from '../../lib/roles'
-import { isMalfunctioning } from '../../lib/effects'
+
+import { isMalfunctioning } from '../../lib/effects/registry'
 import { useI18n } from '../../lib/i18n'
 import type { DayActionProps } from '../../lib/pipeline/types'
-import { Button, Icon, BackButton } from '../atoms'
-import { MysticDivider } from '../items'
+import { getRole } from '../../lib/roles/registry'
+import { isAlive } from '../../lib/types'
+import { BackButton, Button, Icon } from '../atoms'
 import { PlayerPickerList } from '../inputs'
+import { MysticDivider } from '../items'
 import { ScreenFooter } from '../layouts/ScreenFooter'
 
 /**
@@ -21,10 +22,14 @@ export function SlayerActionScreen({ state, playerId, onComplete, onBack }: DayA
   const alivePlayers = state.players.filter((p) => isAlive(p))
 
   const handleConfirm = () => {
-    if (!selectedTarget || !slayer) return
+    if (!selectedTarget || !slayer) {
+      return
+    }
 
     const target = state.players.find((p) => p.id === selectedTarget)
-    if (!target) return
+    if (!target) {
+      return
+    }
 
     const targetRole = getRole(target.roleId)
     // When malfunctioning, the shot always misses

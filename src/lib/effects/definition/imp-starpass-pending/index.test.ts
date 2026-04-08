@@ -1,7 +1,8 @@
-import { assert, describe, it, expect, beforeEach } from 'vitest'
+import { assert, beforeEach, describe, expect, it } from 'vitest'
+
 import definition from '.'
+import { addEffectTo, makeGame, makePlayer, makeState, resetPlayerCounter } from '../../../__tests__/helpers'
 import type { KillIntent } from '../../../pipeline/types'
-import { makePlayer, makeState, addEffectTo, makeGame, resetPlayerCounter } from '../../../__tests__/helpers'
 
 beforeEach(() => resetPlayerCounter())
 
@@ -36,7 +37,7 @@ describe('ImpStarpassPending effect', () => {
     if (poisonerSourcedEffects) {
       villager = addEffectTo(villager, 'poisoned', undefined, 'end_of_day')
       // Manually set sourcePlayerId for the last effect
-      const lastEffect = villager.effects[villager.effects.length - 1]
+      const lastEffect = villager.effects.at(-1)
       villager = {
         ...villager,
         effects: villager.effects.map((e) => (e === lastEffect ? { ...e, sourcePlayerId: 'minion0' } : e)),
@@ -73,7 +74,7 @@ describe('ImpStarpassPending effect', () => {
         cause: 'imp_self_kill',
       }
 
-      expect(handler.appliesTo(intent, imp, state)).toBe(true)
+      expect(handler.appliesTo(intent, imp, state)).toBeTruthy()
     })
 
     it('does not apply for normal demon kills', () => {
@@ -85,7 +86,7 @@ describe('ImpStarpassPending effect', () => {
         cause: 'demon',
       }
 
-      expect(handler.appliesTo(intent, imp, state)).toBe(false)
+      expect(handler.appliesTo(intent, imp, state)).toBeFalsy()
     })
 
     it('does not apply when cause is not imp_self_kill', () => {
@@ -97,7 +98,7 @@ describe('ImpStarpassPending effect', () => {
         cause: 'demon',
       }
 
-      expect(handler.appliesTo(intent, imp, state)).toBe(false)
+      expect(handler.appliesTo(intent, imp, state)).toBeFalsy()
     })
 
     it('does not apply to a different player (not the effect holder)', () => {
@@ -110,7 +111,7 @@ describe('ImpStarpassPending effect', () => {
       }
 
       // The handler is checked against the minion, not the imp
-      expect(handler.appliesTo(intent, minions[0], state)).toBe(false)
+      expect(handler.appliesTo(intent, minions[0], state)).toBeFalsy()
     })
   })
 

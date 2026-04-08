@@ -1,15 +1,16 @@
 import type { ReactNode } from 'react'
-import { getTeam, type TeamId } from '../../lib/teams'
+
+import { type TeamId, getTeam } from '../../lib/teams'
 import { cn } from '../../lib/utils'
 import { Icon } from '../atoms'
 import type { IconName } from '../atoms/icon'
 import { MysticDivider } from './MysticDivider'
-import { CardShell } from './RoleCard/CardShell'
 import { CardIcon } from './RoleCard/CardIcon'
+import { CardShell } from './RoleCard/CardShell'
 
 // ─── OracleCard ──────────────────────────────────────────────────────────────
 
-type OracleCardProps = {
+interface OracleCardProps {
   icon: IconName
   teamId: TeamId
   title: string
@@ -65,7 +66,7 @@ export function OracleCard({ icon, teamId, title, subtitle, children }: OracleCa
 
 // ─── NumberReveal ────────────────────────────────────────────────────────────
 
-type NumberRevealProps = {
+interface NumberRevealProps {
   value: number
   label: string
   teamId: TeamId
@@ -103,7 +104,7 @@ export function NumberReveal({ value, label, teamId }: NumberRevealProps) {
 
 // ─── VisionReveal ────────────────────────────────────────────────────────────
 
-type VisionRevealProps = {
+interface VisionRevealProps {
   players: [string, string]
   verdict: string
   verdictIcon: IconName

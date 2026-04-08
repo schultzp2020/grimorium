@@ -1,4 +1,4 @@
-import { getTeam, type TeamId, type TeamDefinition } from '../../../lib/teams'
+import { type TeamDefinition, type TeamId, getTeam } from '../../../lib/teams'
 import { cn } from '../../../lib/utils'
 import { Icon } from '../../atoms'
 import type { IconName } from '../../atoms/icon'
@@ -76,7 +76,7 @@ function ArcaneSeal({ team }: { team: TeamDefinition }) {
   )
 }
 
-type CardIconProps = {
+interface CardIconProps {
   icon: IconName
   teamId: TeamId
 }

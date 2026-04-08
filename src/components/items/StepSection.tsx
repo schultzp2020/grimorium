@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-type StepSectionProps = {
+interface StepSectionProps {
   step: number
   label: string
   count?: { current: number; max: number }

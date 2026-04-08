@@ -1,21 +1,21 @@
-import { useState, useMemo } from 'react'
-import type { RoleDefinition } from '../../../types'
-import { useI18n, registerRoleTranslations, getRoleName, getRoleTranslations } from '../../../../i18n'
-import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
-import { NightStepListLayout, PlayerFacingScreen, HandbackCardLink } from '../../../../../components/layouts'
-import type { NightStep } from '../../../../../components/layouts'
+import { useMemo, useState } from 'react'
+
 import {
-  PerceptionConfigStep,
   MalfunctionConfigStep,
-  OracleCard,
   NumberReveal,
+  OracleCard,
+  PerceptionConfigStep,
   TeamBackground,
 } from '../../../../../components/items'
-import { getAliveNeighbors, isAlive } from '../../../../types'
-import { perceive, getAmbiguousPlayers, applyPerceptionOverrides } from '../../../../pipeline'
-import { isMalfunctioning } from '../../../../effects'
+import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
+import { HandbackCardLink, NightStepListLayout, PlayerFacingScreen } from '../../../../../components/layouts'
+import type { NightStep } from '../../../../../components/layouts'
+import { isMalfunctioning } from '../../../../effects/registry'
+import { getRoleName, getRoleTranslations, registerRoleTranslations, useI18n } from '../../../../i18n'
+import { applyPerceptionOverrides, getAmbiguousPlayers, perceive } from '../../../../pipeline'
 import type { Perception } from '../../../../pipeline/types'
-
+import { getAliveNeighbors, isAlive } from '../../../../types'
+import type { RoleDefinition } from '../../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 
@@ -45,7 +45,9 @@ const definition: RoleDefinition = {
       icon: 'hatGlasses',
       getLabel: (t) => t.game.stepConfigurePerceptions,
       condition: (_game, player, state) => {
-        if (isMalfunctioning(player)) return false
+        if (isMalfunctioning(player)) {
+          return false
+        }
         const [left, right] = getAliveNeighbors(state, player.id)
         const neighbors = [left, right].filter(
           (n): n is NonNullable<typeof n> => (n != null && n.id !== left?.id) || n === left,
@@ -80,10 +82,16 @@ const definition: RoleDefinition = {
 
     // Collect unique neighbors for ambiguity check (only when NOT malfunctioning)
     const neighbors = useMemo(() => {
-      if (malfunctioning) return []
+      if (malfunctioning) {
+        return []
+      }
       const result = []
-      if (leftNeighbor) result.push(leftNeighbor)
-      if (rightNeighbor && rightNeighbor.id !== leftNeighbor?.id) result.push(rightNeighbor)
+      if (leftNeighbor) {
+        result.push(leftNeighbor)
+      }
+      if (rightNeighbor && rightNeighbor.id !== leftNeighbor?.id) {
+        result.push(rightNeighbor)
+      }
       return result
     }, [leftNeighbor, rightNeighbor, malfunctioning])
 
@@ -163,11 +171,15 @@ const definition: RoleDefinition = {
       let count = 0
       if (effLeft) {
         const perception = perceive(effLeft, effectiveObserver, 'alignment', effectiveState)
-        if (perception.alignment === 'evil') count++
+        if (perception.alignment === 'evil') {
+          count++
+        }
       }
       if (effRight && effRight.id !== effLeft?.id) {
         const perception = perceive(effRight, effectiveObserver, 'alignment', effectiveState)
-        if (perception.alignment === 'evil') count++
+        if (perception.alignment === 'evil') {
+          count++
+        }
       }
       return count
     }, [effectiveState, player])

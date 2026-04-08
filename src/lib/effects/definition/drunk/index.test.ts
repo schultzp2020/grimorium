@@ -1,13 +1,14 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import definition from '.'
+import { addEffectTo, makePlayer, makeState, resetPlayerCounter } from '../../../__tests__/helpers'
 import { perceive } from '../../../pipeline'
-import { makePlayer, makeState, addEffectTo, resetPlayerCounter } from '../../../__tests__/helpers'
 
 beforeEach(() => resetPlayerCounter())
 
 describe('Drunk effect', () => {
   it('has poisonsAbility set to true', () => {
-    expect(definition.poisonsAbility).toBe(true)
+    expect(definition.poisonsAbility).toBeTruthy()
   })
 
   it('has no handlers', () => {

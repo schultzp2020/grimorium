@@ -1,9 +1,8 @@
-import type { EffectDefinition } from '../../types'
-import type { DayActionDefinition } from '../../../pipeline/types'
-import { isAlive, hasEffect } from '../../../types'
 import { SlayerActionScreen } from '../../../../components/screens/SlayerActionScreen'
 import { registerEffectTranslations } from '../../../i18n'
-
+import type { DayActionDefinition } from '../../../pipeline/types'
+import { hasEffect, isAlive } from '../../../types'
+import type { EffectDefinition } from '../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 

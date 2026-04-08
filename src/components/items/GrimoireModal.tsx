@@ -1,21 +1,22 @@
-import { useState, useCallback, useEffect } from 'react'
-import { type GameState, type PlayerState, hasEffect, type EffectInstance, getPlayer } from '../../lib/types'
-import { getRole } from '../../lib/roles'
-import { getTeam, type TeamId } from '../../lib/teams'
-import { getEffect, getAllEffects, getEffectType, EFFECT_TYPE_BADGE_VARIANT } from '../../lib/effects'
+import { useCallback, useEffect, useState } from 'react'
+
+import { EFFECT_TYPE_BADGE_VARIANT, getAllEffects, getEffect, getEffectType } from '../../lib/effects/registry'
 import type { EffectDefinition } from '../../lib/effects/types'
 import {
-  useI18n,
-  getRoleName as getRegistryRoleName,
-  getRoleDescription as getRegistryRoleDescription,
-  getEffectName as getRegistryEffectName,
   getEffectDescription as getRegistryEffectDescription,
+  getEffectName as getRegistryEffectName,
+  getRoleDescription as getRegistryRoleDescription,
+  getRoleName as getRegistryRoleName,
+  useI18n,
 } from '../../lib/i18n'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, Icon, Badge, Button } from '../atoms'
+import { getRole } from '../../lib/roles/registry'
+import { getTeam } from '../../lib/teams'
+import { type EffectInstance, type GameState, type PlayerState, getPlayer, hasEffect } from '../../lib/types'
+import { cn } from '../../lib/utils'
+import { Badge, Button, Dialog, DialogBody, DialogContent, DialogHeader, DialogTitle, Icon } from '../atoms'
 import { BackButton } from '../atoms'
 import { Grimoire } from './Grimoire'
 import { PlayerRoleIcon, filterVisibleEffects } from './PlayerRoleIcon'
-import { cn } from '../../lib/utils'
 
 type GrimoireView =
   | { type: 'list' }
@@ -34,7 +35,7 @@ export type GrimoireIntent =
   | { view: 'player_detail'; player: PlayerState; readOnly?: boolean }
   | { view: 'edit_effects'; player: PlayerState }
 
-type Props = {
+interface Props {
   state: GameState
   open: boolean
   onClose: () => void
@@ -65,7 +66,9 @@ export function GrimoireModal({
 
   // Sync view when modal first opens (respect initial intent)
   useEffect(() => {
-    if (!open) return
+    if (!open) {
+      return
+    }
     if (intent.view === 'edit_effects') {
       const latestPlayer = state.players.find((p) => p.id === intent.player.id)
       setView({
@@ -115,14 +118,18 @@ export function GrimoireModal({
 
   const getHeaderTitle = () => {
     switch (view.type) {
-      case 'list':
+      case 'list': {
         return t.game.grimoire
-      case 'player_detail':
+      }
+      case 'player_detail': {
         return view.player.name
-      case 'edit_effects':
+      }
+      case 'edit_effects': {
         return t.ui.editEffects
-      case 'effect_config':
+      }
+      case 'effect_config': {
         return view.mode === 'add' ? t.ui.addEffect : t.ui.editEffectConfig
+      }
     }
   }
 
@@ -229,7 +236,7 @@ function PlayerDetailContent({
   const isDrunk = hasEffect(player, 'drunk')
   const isEvil = team?.isEvil ?? false
 
-  const teamId = role?.team as TeamId | undefined
+  const teamId = role?.team
   const roleName = role ? getRegistryRoleName(role.id, language) : t.ui.unknown
   const roleDescription = role ? getRegistryRoleDescription(role.id, language) : ''
   const teamName = teamId ? t.teams[teamId]?.name : ''
@@ -396,7 +403,9 @@ function EditEffectsContent({
 
   const handleEditEffect = (effectInstance: EffectInstance) => {
     const effectDef = getEffect(effectInstance.type)
-    if (!effectDef?.ConfigEditor) return
+    if (!effectDef?.ConfigEditor) {
+      return
+    }
     onOpenConfig(effectDef, 'edit', effectInstance)
   }
 

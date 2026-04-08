@@ -1,8 +1,9 @@
 import * as Popover from '@radix-ui/react-popover'
-import { useI18n, LANGUAGES } from '../../lib/i18n'
+
+import { LANGUAGES, useI18n } from '../../lib/i18n'
 import { Icon } from './icon'
 
-type Props = {
+interface Props {
   variant?: 'button' | 'floating'
   className?: string
 }

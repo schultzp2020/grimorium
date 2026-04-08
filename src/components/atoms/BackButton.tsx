@@ -1,7 +1,7 @@
-import { Icon } from './icon'
 import { cn } from '../../lib/utils'
+import { Icon } from './icon'
 
-type BackButtonProps = {
+interface BackButtonProps {
   onClick: () => void
   label?: string
 }

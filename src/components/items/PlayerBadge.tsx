@@ -1,9 +1,9 @@
+import { getRole } from '../../lib/roles/registry'
 import { type PlayerState, hasEffect } from '../../lib/types'
-import { getRole } from '../../lib/roles'
-import { Badge, Icon } from '../atoms'
 import { cn } from '../../lib/utils'
+import { Badge, Icon } from '../atoms'
 
-type Props = {
+interface Props {
   player: PlayerState
   showRole?: boolean
   showDeadIndicator?: boolean

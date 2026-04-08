@@ -1,28 +1,28 @@
-import { useState, useMemo } from 'react'
-import type { RoleDefinition } from '../../../types'
-import { getRole } from '../../../index'
-import { getTeam } from '../../../../teams'
-import { useI18n, interpolate, registerRoleTranslations, getRoleName, getRoleTranslations } from '../../../../i18n'
-import type { Game, PlayerState } from '../../../../types'
+import { useMemo, useState } from 'react'
+
+import { Button, Icon } from '../../../../../components/atoms'
+import { PlayerPickerList } from '../../../../../components/inputs'
+import { PerceptionConfigStep } from '../../../../../components/items'
+import { MalfunctionConfigStep } from '../../../../../components/items'
 import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
 import { RoleCard } from '../../../../../components/items/RoleCard'
-import { PerceptionConfigStep } from '../../../../../components/items'
 import { TeamBackground } from '../../../../../components/items/TeamBackground'
 import {
+  HandbackCardLink,
   NightActionLayout,
   NightStepListLayout,
   PlayerFacingScreen,
-  HandbackCardLink,
 } from '../../../../../components/layouts'
 import type { NightStep } from '../../../../../components/layouts'
-import { PlayerPickerList } from '../../../../../components/inputs'
-import { Button, Icon } from '../../../../../components/atoms'
-import { perceive, getAmbiguousPlayers, applyPerceptionOverrides } from '../../../../pipeline'
-import { isMalfunctioning } from '../../../../effects'
-import { MalfunctionConfigStep } from '../../../../../components/items'
-import type { Perception } from '../../../../pipeline/types'
 import { cn } from '../../../../../lib/utils'
-
+import { isMalfunctioning } from '../../../../effects/registry'
+import { getRoleName, getRoleTranslations, interpolate, registerRoleTranslations, useI18n } from '../../../../i18n'
+import { applyPerceptionOverrides, getAmbiguousPlayers, perceive } from '../../../../pipeline'
+import type { Perception } from '../../../../pipeline/types'
+import { getTeam } from '../../../../teams'
+import type { Game, PlayerState } from '../../../../types'
+import { getRole } from '../../../registry'
+import type { RoleDefinition } from '../../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 
@@ -42,19 +42,29 @@ function wasKilledThisNight(game: Game, playerId: string): boolean {
       break
     }
   }
-  if (!nightStartEntry) return false
+  if (!nightStartEntry) {
+    return false
+  }
 
   // Check if player was alive at night start
   const playerAtNightStart = nightStartEntry.stateAfter.players.find((p) => p.id === playerId)
-  if (!playerAtNightStart) return false
+  if (!playerAtNightStart) {
+    return false
+  }
   const wasAlive = !playerAtNightStart.effects.some((e) => e.type === 'dead')
-  if (!wasAlive) return false
+  if (!wasAlive) {
+    return false
+  }
 
   // Check if player is dead now
   const currentState = game.history.at(-1)?.stateAfter
-  if (!currentState) return false
+  if (!currentState) {
+    return false
+  }
   const playerNow = currentState.players.find((p) => p.id === playerId)
-  if (!playerNow) return false
+  if (!playerNow) {
+    return false
+  }
 
   return playerNow.effects.some((e) => e.type === 'dead')
 }
@@ -70,7 +80,9 @@ const definition: RoleDefinition = {
 
   shouldWake: (game: Game, player: PlayerState) => {
     const round = game.history.at(-1)?.stateAfter.round ?? 0
-    if (round <= 1) return false
+    if (round <= 1) {
+      return false
+    }
     return wasKilledThisNight(game, player.id)
   },
 
@@ -178,7 +190,9 @@ const definition: RoleDefinition = {
     }
 
     const handleConfirmPlayer = () => {
-      if (!selectedPlayer) return
+      if (!selectedPlayer) {
+        return
+      }
       setSelectPlayerDone(true)
       setPhase('step_list')
     }
@@ -196,7 +210,9 @@ const definition: RoleDefinition = {
     )
 
     const targetPerception = useMemo(() => {
-      if (!selectedTargetPlayer) return null
+      if (!selectedTargetPlayer) {
+        return null
+      }
       const effectiveTarget =
         effectiveState.players.find((p) => p.id === selectedTargetPlayer.id) ?? selectedTargetPlayer
       const effectiveObserver = effectiveState.players.find((p) => p.id === player.id) ?? player
@@ -207,7 +223,9 @@ const definition: RoleDefinition = {
     const displayedRoleId = malfunctionRoleId ?? targetPerception?.roleId
 
     const handleComplete = () => {
-      if (!selectedPlayer || !displayedRoleId) return
+      if (!selectedPlayer || !displayedRoleId) {
+        return
+      }
 
       onComplete({
         entries: [
@@ -313,7 +331,9 @@ const definition: RoleDefinition = {
     }
 
     // Phase: Show Role
-    if (!displayedRoleId) return null
+    if (!displayedRoleId) {
+      return null
+    }
 
     const shownRole = getRole(displayedRoleId)
     const shownTeamId = shownRole?.team ?? 'townsfolk'

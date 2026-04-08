@@ -1,6 +1,6 @@
-import type { ScriptDefinition, ScriptId, RoleDistribution } from './types'
 import type { RoleId } from '../roles/types'
 import type { TeamId } from '../teams/types'
+import type { RoleDistribution, ScriptDefinition, ScriptId } from './types'
 
 export type { ScriptId, ScriptDefinition, RoleDistribution } from './types'
 export type { GeneratorPreset, GeneratedPool } from './types'
@@ -101,7 +101,9 @@ export function getAllScripts(): ScriptDefinition[] {
  * 10: 7/0/2/1, 11: 7/1/2/1, 12: 7/2/2/1, 13: 9/0/3/1, etc.
  */
 export function getRecommendedDistribution(playerCount: number): RoleDistribution | null {
-  if (playerCount < 5) return null
+  if (playerCount < 5) {
+    return null
+  }
 
   const demon = 1
   let minion: number
@@ -135,7 +137,9 @@ export function applyDistributionModifiers(
   const result = { ...base }
 
   for (const modifier of modifiers) {
-    if (!modifier) continue
+    if (!modifier) {
+      continue
+    }
     for (const [teamId, delta] of Object.entries(modifier)) {
       result[teamId as TeamId] = Math.max(0, result[teamId as TeamId] + delta)
     }

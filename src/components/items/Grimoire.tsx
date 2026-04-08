@@ -1,15 +1,16 @@
 import { useMemo, useState } from 'react'
-import { type GameState, type PlayerState, hasEffect } from '../../lib/types'
-import { getRole } from '../../lib/roles'
+
+import { EFFECT_TYPE_BADGE_VARIANT, getEffect, getEffectType } from '../../lib/effects/registry'
+import { getRoleName, useI18n } from '../../lib/i18n'
+import { getRole } from '../../lib/roles/registry'
 import { getTeam } from '../../lib/teams'
-import { useI18n, getRoleName } from '../../lib/i18n'
-import { Icon, Badge, type IconName } from '../atoms'
+import { type GameState, type PlayerState, hasEffect } from '../../lib/types'
+import { cn } from '../../lib/utils'
+import { Badge, Icon } from '../atoms'
 import { PlayerDetailModal } from './PlayerDetailModal'
 import { PlayerRoleIcon, filterVisibleEffects } from './PlayerRoleIcon'
-import { cn } from '../../lib/utils'
-import { getEffect, getEffectType, EFFECT_TYPE_BADGE_VARIANT } from '../../lib/effects'
 
-type Props = {
+interface Props {
   state: GameState
   compact?: boolean
   /** When provided, tapping a player calls this instead of opening PlayerDetailModal */
@@ -25,19 +26,19 @@ function PlayerRow({ player, onClick }: { player: PlayerState; onClick: () => vo
 
   const { language } = useI18n()
 
-  const roleName = useMemo(() => {
-    return getRoleName(player.roleId, language)
-  }, [player.roleId, language])
+  const roleName = useMemo(() => getRoleName(player.roleId, language), [player.roleId, language])
 
-  const effectBadges = useMemo(() => {
-    return filterVisibleEffects(player.effects).map((e) => {
-      const effect = getEffect(e.type)
-      const icon = effect ? effect.icon : 'x'
-      const effectType = getEffectType(e, effect)
-      const variant = EFFECT_TYPE_BADGE_VARIANT[effectType]
-      return { id: e.id, icon: icon as IconName, variant }
-    })
-  }, [player.effects])
+  const effectBadges = useMemo(
+    () =>
+      filterVisibleEffects(player.effects).map((e) => {
+        const effect = getEffect(e.type)
+        const icon = effect ? effect.icon : 'x'
+        const effectType = getEffectType(e, effect)
+        const variant = EFFECT_TYPE_BADGE_VARIANT[effectType]
+        return { id: e.id, icon: icon, variant }
+      }),
+    [player.effects],
+  )
 
   return (
     <button

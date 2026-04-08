@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { addEffectTo, makeGameWithHistory, makePlayer, makeState, resetPlayerCounter } from '../../../__tests__/helpers'
 import definition from './index'
-import { makePlayer, makeState, addEffectTo, makeGameWithHistory, resetPlayerCounter } from '../../../__tests__/helpers'
 
 beforeEach(() => resetPlayerCounter())
 
@@ -22,7 +23,7 @@ describe('Imp', () => {
         ],
         makeState({ round: 1, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBe(true)
+      expect(definition.shouldWake!(game, player)).toBeTruthy()
     })
 
     it('wakes when alive on later rounds', () => {
@@ -37,7 +38,7 @@ describe('Imp', () => {
         ],
         makeState({ round: 2, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBe(true)
+      expect(definition.shouldWake!(game, player)).toBeTruthy()
     })
 
     it('does not wake when dead', () => {
@@ -52,7 +53,7 @@ describe('Imp', () => {
         ],
         makeState({ round: 2, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBe(false)
+      expect(definition.shouldWake!(game, player)).toBeFalsy()
     })
   })
 
@@ -92,21 +93,21 @@ describe('Imp', () => {
       const showMinions = steps.find((s) => s.id === 'show_minions')
       const selectBluffs = steps.find((s) => s.id === 'select_bluffs')
       const showBluffs = steps.find((s) => s.id === 'show_bluffs')
-      expect(showMinions?.condition!(game, player, firstNightState)).toBe(true)
-      expect(selectBluffs?.condition!(game, player, firstNightState)).toBe(true)
-      expect(showBluffs?.condition!(game, player, firstNightState)).toBe(true)
+      expect(showMinions?.condition!(game, player, firstNightState)).toBeTruthy()
+      expect(selectBluffs?.condition!(game, player, firstNightState)).toBeTruthy()
+      expect(showBluffs?.condition!(game, player, firstNightState)).toBeTruthy()
 
       // First night: choose_victim should NOT be active
       const chooseVictim = steps.find((s) => s.id === 'choose_victim')
-      expect(chooseVictim?.condition!(game, player, firstNightState)).toBe(false)
+      expect(chooseVictim?.condition!(game, player, firstNightState)).toBeFalsy()
 
       // Later nights: first-night steps should NOT be active
-      expect(showMinions?.condition!(laterGame, player, laterNightState)).toBe(false)
-      expect(selectBluffs?.condition!(laterGame, player, laterNightState)).toBe(false)
-      expect(showBluffs?.condition!(laterGame, player, laterNightState)).toBe(false)
+      expect(showMinions?.condition!(laterGame, player, laterNightState)).toBeFalsy()
+      expect(selectBluffs?.condition!(laterGame, player, laterNightState)).toBeFalsy()
+      expect(showBluffs?.condition!(laterGame, player, laterNightState)).toBeFalsy()
 
       // Later nights: choose_victim should be active
-      expect(chooseVictim?.condition!(laterGame, player, laterNightState)).toBe(true)
+      expect(chooseVictim?.condition!(laterGame, player, laterNightState)).toBeTruthy()
     })
 
     it('does not declare select_new_imp in nightSteps (handled by imp_starpass_pending effect via pipeline)', () => {

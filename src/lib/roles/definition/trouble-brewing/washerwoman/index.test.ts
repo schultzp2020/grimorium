@@ -1,31 +1,44 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+
 import definition from '.'
-import { perceive } from '../../../../pipeline/perception'
-import type { EffectDefinition, EffectId } from '../../../../effects/types'
 import {
-  makePlayer,
-  makeState,
   addEffectTo,
   makeGameWithHistory,
+  makePlayer,
+  makeState,
   resetPlayerCounter,
 } from '../../../../__tests__/helpers'
+import { getEffect, registerEffect, unregisterEffect } from '../../../../effects/registry'
+import type { EffectDefinition, EffectId } from '../../../../effects/types'
+import { perceive } from '../../../../pipeline/perception'
 
-vi.mock('../../../../effects', async (importOriginal) => {
-  const actual = (await importOriginal()) as Record<string, unknown>
-  return {
-    ...actual,
-    getEffect: (effectId: string) => {
-      if (testEffects[effectId]) return testEffects[effectId]
-      return (actual.getEffect as (id: string) => EffectDefinition | undefined)(effectId)
-    },
+// Track registered test effects so we can restore originals after each test
+const originalEffects: Map<EffectId, EffectDefinition | undefined> = new Map()
+
+function registerTestEffect(def: EffectDefinition) {
+  if (!originalEffects.has(def.id)) {
+    originalEffects.set(def.id, getEffect(def.id))
   }
-})
+  registerEffect(def)
+}
 
-const testEffects: Record<string, EffectDefinition> = {}
+function clearTestEffects() {
+  for (const [id, original] of originalEffects) {
+    if (original) {
+      registerEffect(original)
+    } else {
+      unregisterEffect(id)
+    }
+  }
+  originalEffects.clear()
+}
 
 beforeEach(() => {
   resetPlayerCounter()
-  for (const key of Object.keys(testEffects)) delete testEffects[key]
+})
+
+afterEach(() => {
+  clearTestEffects()
 })
 
 describe('Washerwoman', () => {
@@ -57,8 +70,8 @@ describe('Washerwoman', () => {
         makeState({ round: 2, players: [player] }),
       )
 
-      expect(definition.shouldWake!(round1, player)).toBe(true)
-      expect(definition.shouldWake!(round2, player)).toBe(false)
+      expect(definition.shouldWake!(round1, player)).toBeTruthy()
+      expect(definition.shouldWake!(round2, player)).toBeFalsy()
     })
 
     it('does not wake when dead', () => {
@@ -73,7 +86,7 @@ describe('Washerwoman', () => {
         ],
         makeState({ round: 1, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBe(false)
+      expect(definition.shouldWake!(game, player)).toBeFalsy()
     })
   })
 
@@ -101,7 +114,7 @@ describe('Washerwoman', () => {
     })
 
     it('deceiving player appearing as townsfolk creates false positive', () => {
-      testEffects['appears_townsfolk'] = {
+      registerTestEffect({
         id: 'appears_townsfolk' as EffectId,
         icon: 'user',
         perceptionModifiers: [
@@ -110,7 +123,7 @@ describe('Washerwoman', () => {
             modify: (p) => ({ ...p, team: 'townsfolk' }),
           },
         ],
-      }
+      })
 
       const washerwoman = makePlayer({ id: 'p1', roleId: 'washerwoman' })
       const imp = addEffectTo(makePlayer({ id: 'p2', roleId: 'imp' }), 'appears_townsfolk')
@@ -121,7 +134,7 @@ describe('Washerwoman', () => {
     })
 
     it('townsfolk appearing as another team creates false negative', () => {
-      testEffects['appears_outsider'] = {
+      registerTestEffect({
         id: 'appears_outsider' as EffectId,
         icon: 'user',
         perceptionModifiers: [
@@ -130,7 +143,7 @@ describe('Washerwoman', () => {
             modify: (p) => ({ ...p, team: 'outsider' }),
           },
         ],
-      }
+      })
 
       const washerwoman = makePlayer({ id: 'p1', roleId: 'washerwoman' })
       const villager = addEffectTo(makePlayer({ id: 'p2', roleId: 'villager' }), 'appears_outsider')
@@ -141,7 +154,7 @@ describe('Washerwoman', () => {
     })
 
     it('role shown is affected by role perception modifiers', () => {
-      testEffects['appears_as_monk'] = {
+      registerTestEffect({
         id: 'appears_as_monk' as EffectId,
         icon: 'user',
         perceptionModifiers: [
@@ -150,7 +163,7 @@ describe('Washerwoman', () => {
             modify: (p) => ({ ...p, roleId: 'monk' }),
           },
         ],
-      }
+      })
 
       const washerwoman = makePlayer({ id: 'p1', roleId: 'washerwoman' })
       const chef = addEffectTo(makePlayer({ id: 'p2', roleId: 'chef' }), 'appears_as_monk')

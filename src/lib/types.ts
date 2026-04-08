@@ -10,7 +10,7 @@ export type Phase = 'setup' | 'night' | 'day' | 'ended'
 // EFFECTS
 // ============================================================================
 
-export type EffectInstance = {
+export interface EffectInstance {
   id: string
   type: string
   data?: Record<string, unknown>
@@ -22,7 +22,7 @@ export type EffectInstance = {
 // PLAYERS
 // ============================================================================
 
-export type PlayerState = {
+export interface PlayerState {
   id: string
   name: string
   roleId: string
@@ -33,7 +33,7 @@ export type PlayerState = {
 // GAME STATE
 // ============================================================================
 
-export type GameState = {
+export interface GameState {
   phase: Phase
   round: number // 0 = setup, 1+ = actual rounds
   players: PlayerState[]
@@ -78,7 +78,7 @@ export type EventType =
   | 'setup_action'
   | 'game_ended'
 
-export type HistoryEntry = {
+export interface HistoryEntry {
   id: string
   timestamp: number
   type: EventType
@@ -91,7 +91,7 @@ export type HistoryEntry = {
 // GAME
 // ============================================================================
 
-export type Game = {
+export interface Game {
   id: string
   name: string
   scriptId: string
@@ -121,7 +121,7 @@ export function createInitialState(): GameState {
 }
 
 export function generateId(): string {
-  return Math.random().toString(36).substring(2, 11)
+  return Math.random().toString(36).slice(2, 11)
 }
 
 // ============================================================================
@@ -155,10 +155,14 @@ export function getDeadPlayers(state: GameState): PlayerState[] {
  */
 export function getAliveNeighbors(state: GameState, playerId: string): [PlayerState | null, PlayerState | null] {
   const playerIndex = state.players.findIndex((p) => p.id === playerId)
-  if (playerIndex === -1) return [null, null]
+  if (playerIndex === -1) {
+    return [null, null]
+  }
 
   const alivePlayers = getAlivePlayers(state)
-  if (alivePlayers.length <= 1) return [null, null]
+  if (alivePlayers.length <= 1) {
+    return [null, null]
+  }
 
   // Find left neighbor (going backwards in array, wrapping around)
   let leftNeighbor: PlayerState | null = null

@@ -1,10 +1,9 @@
-import type { EffectDefinition } from '../../types'
-import type { IntentHandler, KillIntent } from '../../../pipeline/types'
 import { StarpassSelectUI } from '../../../../components/items/StarpassSelectUI'
-import { isAlive } from '../../../types'
-import { getRole } from '../../../roles'
 import { registerEffectTranslations } from '../../../i18n'
-
+import type { IntentHandler } from '../../../pipeline/types'
+import { getRole } from '../../../roles/registry'
+import { isAlive } from '../../../types'
+import type { EffectDefinition } from '../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 
@@ -29,14 +28,18 @@ const starpassHandler: IntentHandler = {
   intentType: 'kill',
   priority: 20,
   appliesTo: (intent, effectPlayer) => {
-    if (intent.type !== 'kill') return false
-    const kill = intent as KillIntent
+    if (intent.type !== 'kill') {
+      return false
+    }
+    const kill = intent
     return kill.cause === 'imp_self_kill' && kill.targetId === effectPlayer.id
   },
   handle: (_intent, effectPlayer, state) => {
     // Find alive minions
     const aliveMinions = state.players.filter((p) => {
-      if (!isAlive(p)) return false
+      if (!isAlive(p)) {
+        return false
+      }
       const role = getRole(p.roleId)
       return role?.team === 'minion'
     })

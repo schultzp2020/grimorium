@@ -1,13 +1,14 @@
 import { useMemo, useState } from 'react'
-import { type GameState, type PlayerState, hasEffect } from '../../lib/types'
-import { getEffect } from '../../lib/effects'
-import { useI18n, interpolate, getRoleTranslations } from '../../lib/i18n'
-import { Button, Icon, BackButton } from '../atoms'
-import { ScreenFooter } from '../layouts/ScreenFooter'
-import { cn } from '../../lib/utils'
-import { type BlockStatus, getVoteThreshold } from '../../lib/game'
 
-type Props = {
+import { getEffect } from '../../lib/effects/registry'
+import { type BlockStatus, getVoteThreshold } from '../../lib/game'
+import { getRoleTranslations, interpolate, useI18n } from '../../lib/i18n'
+import { type GameState, type PlayerState, hasEffect } from '../../lib/types'
+import { cn } from '../../lib/utils'
+import { BackButton, Button, Icon } from '../atoms'
+import { ScreenFooter } from '../layouts/ScreenFooter'
+
+interface Props {
   state: GameState
   nomineeId: string
   blockStatus: BlockStatus
@@ -21,7 +22,9 @@ type Props = {
  */
 function getButlerMaster(player: PlayerState, state: GameState): PlayerState | null {
   const butlerEffect = player.effects.find((e) => e.type === 'butler_master')
-  if (!butlerEffect?.data?.masterId) return null
+  if (!butlerEffect?.data?.masterId) {
+    return null
+  }
   return state.players.find((p) => p.id === butlerEffect.data!.masterId) ?? null
 }
 
@@ -34,7 +37,9 @@ export function VotingPhase({ state, nomineeId, blockStatus, onVoteComplete, onC
     // Check all effects for voting restrictions
     for (const effect of player.effects) {
       const def = getEffect(effect.type)
-      if (!def) continue
+      if (!def) {
+        continue
+      }
       if (def.preventsVoting) {
         // If the effect has a canVote function, defer to it (e.g., dead players get one vote)
         if (def.canVote) {
@@ -48,7 +53,9 @@ export function VotingPhase({ state, nomineeId, blockStatus, onVoteComplete, onC
 
   const sortedPlayers = useMemo(() => {
     const idx = state.players.findIndex((p) => p.id === nomineeId)
-    if (idx === -1) return state.players
+    if (idx === -1) {
+      return state.players
+    }
     // Start with the player after the nominee, then wrap around to end with the nominee
     return [...state.players.slice(idx + 1), ...state.players.slice(0, idx + 1)]
   }, [state.players, nomineeId])
@@ -72,7 +79,9 @@ export function VotingPhase({ state, nomineeId, blockStatus, onVoteComplete, onC
   const handleToggleVote = (playerId: string) => {
     const player = state.players.find((p) => p.id === playerId)
     // We pass the current votes to check if the toggle is valid
-    if (!player || !canPlayerVote(player, votes)) return
+    if (!player || !canPlayerVote(player, votes)) {
+      return
+    }
 
     setVotes({ ...votes, [playerId]: !votes[playerId] })
   }
@@ -83,10 +92,18 @@ export function VotingPhase({ state, nomineeId, blockStatus, onVoteComplete, onC
   // Determine execution preview
   type VoteOutcome = 'goes_on_block' | 'replaces_block' | 'tied' | 'not_enough' | 'below_block'
   const getOutcome = (): VoteOutcome => {
-    if (!meetsThreshold) return 'not_enough'
-    if (!blockStatus) return 'goes_on_block'
-    if (voteCount > blockStatus.voteCount) return 'replaces_block'
-    if (voteCount === blockStatus.voteCount) return 'tied'
+    if (!meetsThreshold) {
+      return 'not_enough'
+    }
+    if (!blockStatus) {
+      return 'goes_on_block'
+    }
+    if (voteCount > blockStatus.voteCount) {
+      return 'replaces_block'
+    }
+    if (voteCount === blockStatus.voteCount) {
+      return 'tied'
+    }
     return 'below_block'
   }
   const outcome = getOutcome()
@@ -98,7 +115,9 @@ export function VotingPhase({ state, nomineeId, blockStatus, onVoteComplete, onC
     onVoteComplete(votedIds.length, votedIds)
   }
 
-  if (!nominee) return null
+  if (!nominee) {
+    return null
+  }
 
   return (
     <div className='flex min-h-app flex-col bg-gradient-to-b from-red-950 via-grimoire-blood to-grimoire-darker'>

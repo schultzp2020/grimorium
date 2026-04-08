@@ -1,16 +1,17 @@
-import { useState, useCallback } from 'react'
-import { type PlayerState, type GameState, hasEffect, type EffectInstance } from '../../lib/types'
-import { getEffect, getAllEffects, getEffectType, EFFECT_TYPE_BADGE_VARIANT } from '../../lib/effects'
+import { useCallback, useState } from 'react'
+
+import { EFFECT_TYPE_BADGE_VARIANT, getAllEffects, getEffect, getEffectType } from '../../lib/effects/registry'
 import type { EffectDefinition } from '../../lib/effects/types'
-import { useI18n, getEffectName as getRegistryEffectName } from '../../lib/i18n'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, Icon, Badge, Button } from '../atoms'
+import { getEffectName as getRegistryEffectName, useI18n } from '../../lib/i18n'
+import { type EffectInstance, type GameState, type PlayerState, hasEffect } from '../../lib/types'
+import { Badge, Button, Dialog, DialogBody, DialogContent, DialogHeader, DialogTitle, Icon } from '../atoms'
 
 type ModalMode =
   | { type: 'list' }
   | { type: 'add_config'; effectDef: EffectDefinition }
   | { type: 'edit_config'; effectInstance: EffectInstance; effectDef: EffectDefinition }
 
-type Props = {
+interface Props {
   player: PlayerState | null
   state: GameState
   open: boolean
@@ -32,7 +33,9 @@ export function EditEffectsModal({ player, state, open, onClose, onAddEffect, on
     onClose()
   }, [onClose, resetMode])
 
-  if (!player) return null
+  if (!player) {
+    return null
+  }
 
   const allEffects = getAllEffects()
   const currentEffectTypes = player.effects.map((e) => e.type)
@@ -51,7 +54,9 @@ export function EditEffectsModal({ player, state, open, onClose, onAddEffect, on
   }
 
   const handleAddWithConfig = (data: Record<string, unknown>) => {
-    if (mode.type !== 'add_config') return
+    if (mode.type !== 'add_config') {
+      return
+    }
     onAddEffect(player.id, mode.effectDef.id, data)
     resetMode()
   }
@@ -59,12 +64,16 @@ export function EditEffectsModal({ player, state, open, onClose, onAddEffect, on
   // ── Edit effect flow ──
   const handleEditEffect = (effectInstance: EffectInstance) => {
     const effectDef = getEffect(effectInstance.type)
-    if (!effectDef?.ConfigEditor) return
+    if (!effectDef?.ConfigEditor) {
+      return
+    }
     setMode({ type: 'edit_config', effectInstance, effectDef })
   }
 
   const handleSaveEdit = (data: Record<string, unknown>) => {
-    if (mode.type !== 'edit_config') return
+    if (mode.type !== 'edit_config') {
+      return
+    }
     onUpdateEffect(player.id, mode.effectInstance.type, data)
     resetMode()
   }
@@ -78,7 +87,7 @@ export function EditEffectsModal({ player, state, open, onClose, onAddEffect, on
 
   // Config editor screen (add or edit)
   if (mode.type === 'add_config' || mode.type === 'edit_config') {
-    const effectDef = mode.effectDef
+    const { effectDef } = mode
     const ConfigEditor = effectDef.ConfigEditor!
     const existingData = mode.type === 'edit_config' ? mode.effectInstance.data : undefined
     const isEditing = mode.type === 'edit_config'

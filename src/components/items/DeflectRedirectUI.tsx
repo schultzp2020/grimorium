@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import type { PipelineInputProps, KillIntent } from '../../lib/pipeline/types'
-import { isAlive, hasEffect } from '../../lib/types'
-import { useI18n, getRoleTranslations, interpolate } from '../../lib/i18n'
-import { PlayerPickerList } from '../inputs'
+
+import { getRoleTranslations, interpolate, useI18n } from '../../lib/i18n'
+import type { KillIntent, PipelineInputProps } from '../../lib/pipeline/types'
+import { hasEffect, isAlive } from '../../lib/types'
 import { Button, Icon } from '../atoms'
+import { PlayerPickerList } from '../inputs'
 
 /**
  * Pipeline UI component shown when a kill is redirected by the Deflect effect.

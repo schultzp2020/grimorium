@@ -1,13 +1,13 @@
-import type { PlayerState } from '../../lib/types'
-import { getRole } from '../../lib/roles'
-import { getTeam } from '../../lib/teams'
-import { useI18n, getRoleName, interpolate } from '../../lib/i18n'
-import { Icon } from '../atoms'
-import { MysticDivider } from '../items'
-import { cn } from '../../lib/utils'
+import { getRoleName, interpolate, useI18n } from '../../lib/i18n'
+import { getRole } from '../../lib/roles/registry'
 import type { NightStepAudience } from '../../lib/roles/types'
+import { getTeam } from '../../lib/teams'
+import type { PlayerState } from '../../lib/types'
+import { cn } from '../../lib/utils'
+import { Icon } from '../atoms'
+import { MysticDivider } from '../items/MysticDivider'
 
-type Props = {
+interface Props {
   player: PlayerState
   title?: string
   description?: string
@@ -105,7 +105,7 @@ export function NightActionLayout({ player, title, description, children, audien
           </p>
         )}
 
-        {(title || description) && (
+        {(title ?? description) && (
           <div className='mx-auto mt-6 max-w-sm'>
             <MysticDivider
               icon={audience === 'player_choice' ? 'userRound' : isEvil ? 'skull' : 'moon'}

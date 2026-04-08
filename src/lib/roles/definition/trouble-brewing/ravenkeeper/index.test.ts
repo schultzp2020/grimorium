@@ -1,31 +1,44 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+
 import definition from '.'
-import { perceive } from '../../../../pipeline/perception'
-import type { EffectDefinition, EffectId } from '../../../../effects/types'
 import {
-  makePlayer,
-  makeState,
   addEffectTo,
   makeGameWithHistory,
+  makePlayer,
+  makeState,
   resetPlayerCounter,
 } from '../../../../__tests__/helpers'
+import { getEffect, registerEffect, unregisterEffect } from '../../../../effects/registry'
+import type { EffectDefinition, EffectId } from '../../../../effects/types'
+import { perceive } from '../../../../pipeline/perception'
 
-vi.mock('../../../../effects', async (importOriginal) => {
-  const actual = (await importOriginal()) as Record<string, unknown>
-  return {
-    ...actual,
-    getEffect: (effectId: string) => {
-      if (testEffects[effectId]) return testEffects[effectId]
-      return (actual.getEffect as (id: string) => EffectDefinition | undefined)(effectId)
-    },
+// Track registered test effects so we can restore originals after each test
+const originalEffects: Map<EffectId, EffectDefinition | undefined> = new Map()
+
+function registerTestEffect(def: EffectDefinition) {
+  if (!originalEffects.has(def.id)) {
+    originalEffects.set(def.id, getEffect(def.id))
   }
-})
+  registerEffect(def)
+}
 
-const testEffects: Record<string, EffectDefinition> = {}
+function clearTestEffects() {
+  for (const [id, original] of originalEffects) {
+    if (original) {
+      registerEffect(original)
+    } else {
+      unregisterEffect(id)
+    }
+  }
+  originalEffects.clear()
+}
 
 beforeEach(() => {
   resetPlayerCounter()
-  for (const key of Object.keys(testEffects)) delete testEffects[key]
+})
+
+afterEach(() => {
+  clearTestEffects()
 })
 
 describe('Ravenkeeper', () => {
@@ -46,7 +59,7 @@ describe('Ravenkeeper', () => {
         ],
         makeState({ round: 1, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBe(false)
+      expect(definition.shouldWake!(game, player)).toBeFalsy()
     })
 
     it('does not wake if not killed this night', () => {
@@ -61,7 +74,7 @@ describe('Ravenkeeper', () => {
         ],
         makeState({ round: 2, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBe(false)
+      expect(definition.shouldWake!(game, player)).toBeFalsy()
     })
 
     it('wakes when killed this night (after round 1)', () => {
@@ -87,7 +100,7 @@ describe('Ravenkeeper', () => {
         ],
         makeState({ round: 2, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBe(true)
+      expect(definition.shouldWake!(game, player)).toBeTruthy()
     })
 
     it('does not wake if a different player was killed', () => {
@@ -114,7 +127,7 @@ describe('Ravenkeeper', () => {
         ],
         makeState({ round: 2, players: [player, other] }),
       )
-      expect(definition.shouldWake!(game, player)).toBe(false)
+      expect(definition.shouldWake!(game, player)).toBeFalsy()
     })
 
     it('does not wake when kill was prevented (e.g., Monk protection)', () => {
@@ -140,7 +153,7 @@ describe('Ravenkeeper', () => {
         ],
         makeState({ round: 2, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBe(false)
+      expect(definition.shouldWake!(game, player)).toBeFalsy()
     })
 
     it('does not wake if already dead at the start of the night', () => {
@@ -156,7 +169,7 @@ describe('Ravenkeeper', () => {
         ],
         makeState({ round: 3, players: [deadPlayer] }),
       )
-      expect(definition.shouldWake!(game, deadPlayer)).toBe(false)
+      expect(definition.shouldWake!(game, deadPlayer)).toBeFalsy()
     })
   })
 
@@ -176,7 +189,7 @@ describe('Ravenkeeper', () => {
     })
 
     it('sees deceived role when target has role perception modifier', () => {
-      testEffects['appears_as_chef'] = {
+      registerTestEffect({
         id: 'appears_as_chef' as EffectId,
         icon: 'user',
         perceptionModifiers: [
@@ -185,7 +198,7 @@ describe('Ravenkeeper', () => {
             modify: (p) => ({ ...p, roleId: 'chef', team: 'townsfolk' }),
           },
         ],
-      }
+      })
 
       const rk = makePlayer({ id: 'p1', roleId: 'ravenkeeper' })
       const target = addEffectTo(makePlayer({ id: 'p2', roleId: 'imp' }), 'appears_as_chef')
@@ -197,7 +210,7 @@ describe('Ravenkeeper', () => {
     })
 
     it('good player with demon-like role modifier appears as demon', () => {
-      testEffects['appears_as_imp'] = {
+      registerTestEffect({
         id: 'appears_as_imp' as EffectId,
         icon: 'user',
         perceptionModifiers: [
@@ -206,7 +219,7 @@ describe('Ravenkeeper', () => {
             modify: (p) => ({ ...p, roleId: 'imp', team: 'demon' }),
           },
         ],
-      }
+      })
 
       const rk = makePlayer({ id: 'p1', roleId: 'ravenkeeper' })
       const recluse = addEffectTo(makePlayer({ id: 'p2', roleId: 'villager' }), 'appears_as_imp')

@@ -1,7 +1,7 @@
 import { useI18n } from '../../lib/i18n'
 import { Button, Icon } from '../atoms'
 
-type Props = {
+interface Props {
   onReady: () => void
 }
 

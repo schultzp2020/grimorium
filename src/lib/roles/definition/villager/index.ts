@@ -1,7 +1,6 @@
-import type { RoleDefinition } from '../../types'
 import { DefaultRoleReveal } from '../../../../components/items/DefaultRoleReveal'
 import { registerRoleTranslations } from '../../../i18n'
-
+import type { RoleDefinition } from '../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 

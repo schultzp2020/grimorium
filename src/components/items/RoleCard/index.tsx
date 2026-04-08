@@ -1,18 +1,18 @@
-import { getRole } from '../../../lib/roles'
-import { getTeam, type TeamId } from '../../../lib/teams'
 import {
-  useI18n,
-  interpolate,
+  getRoleLines as getRegistryRoleLines,
   getRoleName as getRegistryRoleName,
   getRoleQuote as getRegistryRoleQuote,
-  getRoleLines as getRegistryRoleLines,
+  interpolate,
+  useI18n,
 } from '../../../lib/i18n'
-import { Icon, type IconName } from '../../atoms'
+import { getRole } from '../../../lib/roles/registry'
+import { getTeam } from '../../../lib/teams'
 import { cn } from '../../../lib/utils'
-import { CardShell } from './CardShell'
+import { Icon, type IconName } from '../../atoms'
 import { CardIcon } from './CardIcon'
+import { CardShell } from './CardShell'
 
-type Props = {
+interface Props {
   roleId: string
 }
 
@@ -66,7 +66,7 @@ export function RoleCard({ roleId }: Props) {
   }
 
   const team = getTeam(role.team)
-  const teamId = role.team as TeamId
+  const teamId = role.team
 
   const teamTranslation = t.teams[teamId]
 

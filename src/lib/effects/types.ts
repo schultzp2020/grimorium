@@ -1,14 +1,15 @@
 import type { FC } from 'react'
+
 import type { IconName } from '../../components/atoms/icon'
-import type { EffectInstance, GameState, PlayerState } from '../types'
-import type { TeamId } from '../teams'
 import {
-  type IntentHandler,
   type DayActionDefinition,
+  type IntentHandler,
   type NightFollowUpDefinition,
-  type WinConditionCheck,
   type PerceptionModifier,
+  type WinConditionCheck,
 } from '../pipeline/types'
+import type { TeamId } from '../teams'
+import type { EffectInstance, GameState, PlayerState } from '../types'
 
 export type EffectId =
   | 'dead'
@@ -39,7 +40,7 @@ export type EffectId =
  */
 export type EffectType = 'buff' | 'nerf' | 'marker' | 'passive' | 'perception' | 'pending'
 
-export type EffectDefinition = {
+export interface EffectDefinition {
   id: EffectId
   icon: IconName
 
@@ -121,7 +122,7 @@ export type EffectDefinition = {
   ConfigEditor?: FC<EffectConfigEditorProps>
 }
 
-export type EffectDescriptionProps = {
+export interface EffectDescriptionProps {
   /** The effect instance with its data */
   instance: EffectInstance
   /** Current language code */
@@ -133,7 +134,7 @@ export type EffectDescriptionProps = {
  * Rendered inside `EditEffectsModal` when adding a new effect that needs
  * configuration, or when editing an existing effect's data.
  */
-export type EffectConfigEditorProps = {
+export interface EffectConfigEditorProps {
   /** Current data (undefined when creating a new effect, populated when editing) */
   data: Record<string, unknown> | undefined
   /** Current game state — for player lists, role lists, etc. */

@@ -1,15 +1,16 @@
 import type { ReactNode } from 'react'
-import { Icon } from '../atoms'
-import type { IconName } from '../atoms/icon'
-import { cn } from '../../lib/utils'
+
 import { useI18n } from '../../lib/i18n'
 import type { NightStepAudience } from '../../lib/roles/types'
+import { cn } from '../../lib/utils'
+import { Icon } from '../atoms'
+import type { IconName } from '../atoms/icon'
 
 // ============================================================================
 // STEP TYPE
 // ============================================================================
 
-export type NightStep = {
+export interface NightStep {
   id: string
   icon: IconName
   label: string
@@ -21,7 +22,7 @@ export type NightStep = {
 // LAYOUT PROPS
 // ============================================================================
 
-type Props = {
+interface Props {
   icon: IconName
   roleName: string
   playerName: string
@@ -37,23 +38,29 @@ type Props = {
 
 function getAudienceIcon(audience: NightStepAudience): IconName {
   switch (audience) {
-    case 'narrator':
+    case 'narrator': {
       return 'eye'
-    case 'player_choice':
+    }
+    case 'player_choice': {
       return 'userRound'
-    case 'player_reveal':
+    }
+    case 'player_reveal': {
       return 'smartphone'
+    }
   }
 }
 
 function getAudienceColor(audience: NightStepAudience, isActive: boolean) {
   switch (audience) {
-    case 'narrator':
+    case 'narrator': {
       return isActive ? 'text-blue-400/80' : 'text-blue-400/50'
-    case 'player_choice':
+    }
+    case 'player_choice': {
       return isActive ? 'text-amber-400/90' : 'text-amber-400/50'
-    case 'player_reveal':
+    }
+    case 'player_reveal': {
       return isActive ? 'text-emerald-400/80' : 'text-emerald-400/50'
+    }
   }
 }
 

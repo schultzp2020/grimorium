@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import type { EffectDefinition, EffectConfigEditorProps } from '../../types'
-import { registerEffectTranslations, getEffectTranslations } from '../../../i18n'
-import type { Language } from '../../../i18n'
-import { Button, Icon } from '../../../../components/atoms'
 
+import { Button, Icon } from '../../../../components/atoms'
+import { getEffectTranslations, registerEffectTranslations } from '../../../i18n'
+import type { Language } from '../../../i18n'
+import type { EffectConfigEditorProps, EffectDefinition } from '../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 
@@ -15,10 +15,12 @@ function RedHerringConfigEditor({ data, state, language, onSave, onCancel }: Eff
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>((data?.fortuneTellerId as string) ?? null)
 
   // Show all players as potential Fortune Tellers (narrator picks the right one)
-  const players = state.players
+  const { players } = state
 
   const handleSave = () => {
-    if (!selectedPlayerId) return
+    if (!selectedPlayerId) {
+      return
+    }
     onSave({ ...data, fortuneTellerId: selectedPlayerId })
   }
 
@@ -73,7 +75,9 @@ const definition: EffectDefinition = {
       observerRoles: ['fortune_teller'],
       modify: (perception, _target, observer, _state, effectData) => {
         // Only affect the specific Fortune Teller this Red Herring was assigned to
-        if (effectData?.fortuneTellerId !== observer.id) return perception
+        if (effectData?.fortuneTellerId !== observer.id) {
+          return perception
+        }
         return { ...perception, team: 'demon' }
       },
     },

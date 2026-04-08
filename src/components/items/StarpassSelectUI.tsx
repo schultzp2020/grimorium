@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
+
+import { getRoleTranslations, useI18n } from '../../lib/i18n'
 import type { PipelineInputProps } from '../../lib/pipeline/types'
+import { getRole } from '../../lib/roles/registry'
 import { isAlive } from '../../lib/types'
-import { useI18n, getRoleTranslations } from '../../lib/i18n'
-import { getRole } from '../../lib/roles'
-import { PlayerPickerList } from '../inputs'
 import { Button, Icon } from '../atoms'
+import { PlayerPickerList } from '../inputs'
 
 /**
  * Pipeline UI component shown when the Imp self-kills with alive minions.
@@ -19,7 +20,9 @@ export function StarpassSelectUI({ state, onComplete }: PipelineInputProps) {
   const aliveMinions = useMemo(
     () =>
       state.players.filter((p) => {
-        if (!isAlive(p)) return false
+        if (!isAlive(p)) {
+          return false
+        }
         const role = getRole(p.roleId)
         return role?.team === 'minion'
       }),

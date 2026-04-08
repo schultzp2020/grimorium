@@ -1,10 +1,11 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import definition from '.'
 import {
-  makePlayer,
-  makeState,
   addEffectTo,
   makeGameWithHistory,
+  makePlayer,
+  makeState,
   resetPlayerCounter,
 } from '../../../../__tests__/helpers'
 
@@ -98,7 +99,7 @@ describe('Butler', () => {
       // No shouldWake means always wakes (dead effect would prevent via preventsNightWake)
       expect(definition.shouldWake).toBeUndefined()
       // The player is alive and has no dead effect, so they'll wake
-      expect(butler.effects.some((e) => e.type === 'dead')).toBe(false)
+      expect(butler.effects.some((e) => e.type === 'dead')).toBeFalsy()
       expect(game).toBeDefined() // Game is valid
     })
   })

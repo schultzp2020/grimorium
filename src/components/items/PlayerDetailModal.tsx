@@ -1,19 +1,19 @@
-import { type PlayerState, hasEffect } from '../../lib/types'
-import { getRole } from '../../lib/roles'
-import { getTeam, type TeamId } from '../../lib/teams'
-import { getEffect, getEffectType, EFFECT_TYPE_BADGE_VARIANT } from '../../lib/effects'
+import { EFFECT_TYPE_BADGE_VARIANT, getEffect, getEffectType } from '../../lib/effects/registry'
 import {
-  useI18n,
-  getRoleName as getRegistryRoleName,
-  getRoleDescription as getRegistryRoleDescription,
-  getEffectName as getRegistryEffectName,
   getEffectDescription as getRegistryEffectDescription,
+  getEffectName as getRegistryEffectName,
+  getRoleDescription as getRegistryRoleDescription,
+  getRoleName as getRegistryRoleName,
+  useI18n,
 } from '../../lib/i18n'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, Icon, Badge, Button } from '../atoms'
-import { PlayerRoleIcon, filterVisibleEffects } from './PlayerRoleIcon'
+import { getRole } from '../../lib/roles/registry'
+import { getTeam } from '../../lib/teams'
+import { type PlayerState, hasEffect } from '../../lib/types'
 import { cn } from '../../lib/utils'
+import { Badge, Button, Dialog, DialogBody, DialogContent, DialogHeader, DialogTitle, Icon } from '../atoms'
+import { PlayerRoleIcon, filterVisibleEffects } from './PlayerRoleIcon'
 
-type Props = {
+interface Props {
   player: PlayerState | null
   open: boolean
   onClose: () => void
@@ -24,7 +24,9 @@ type Props = {
 export function PlayerDetailModal({ player, open, onClose, onShowRoleCard, onEditEffects }: Props) {
   const { t, language } = useI18n()
 
-  if (!player) return null
+  if (!player) {
+    return null
+  }
 
   const role = getRole(player.roleId)
   const team = role ? getTeam(role.team) : null
@@ -32,7 +34,7 @@ export function PlayerDetailModal({ player, open, onClose, onShowRoleCard, onEdi
   const isDrunk = hasEffect(player, 'drunk')
   const isEvil = team?.isEvil ?? false
 
-  const teamId = role?.team as TeamId | undefined
+  const teamId = role?.team
 
   const roleName = role ? getRegistryRoleName(role.id, language) : t.ui.unknown
   const roleDescription = role ? getRegistryRoleDescription(role.id, language) : ''

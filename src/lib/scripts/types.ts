@@ -1,9 +1,9 @@
-import type { RoleId } from '../roles/types'
 import type { IconName } from '../../components/atoms/icon'
+import type { RoleId } from '../roles/types'
 
 export type ScriptId = 'trouble-brewing' | 'custom'
 
-export type ScriptDefinition = {
+export interface ScriptDefinition {
   id: ScriptId
   icon: IconName
   /** Available roles for this script ('custom' includes all roles) */
@@ -12,7 +12,7 @@ export type ScriptDefinition = {
   enforceDistribution: boolean
 }
 
-export type RoleDistribution = {
+export interface RoleDistribution {
   townsfolk: number
   outsider: number
   minion: number
@@ -21,7 +21,7 @@ export type RoleDistribution = {
 
 export type GeneratorPreset = 'simple' | 'interesting' | 'chaotic'
 
-export type GeneratedPool = {
+export interface GeneratedPool {
   roles: RoleId[]
   totalChaos: number
   distribution: RoleDistribution

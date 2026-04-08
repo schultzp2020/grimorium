@@ -1,7 +1,7 @@
-import { it, expect } from 'vitest'
+import { expect, it } from 'vitest'
 
 // Soldier's only feature is the permanent "safe" effect.
 // The safe effect's behavior (preventing kills) is tested in Safe.test.ts.
 it("Soldier's protection is tested in Safe.test.ts", () => {
-  expect(true).toBe(true)
+  expect(true).toBeTruthy()
 })

@@ -1,8 +1,8 @@
+import { cn } from '../../lib/utils'
 import { Icon } from '../atoms'
 import type { IconName } from '../atoms/icon'
-import { cn } from '../../lib/utils'
 
-type AlertBoxProps = {
+interface AlertBoxProps {
   message: string
   variant?: 'error' | 'info'
   icon?: IconName
@@ -27,7 +27,7 @@ export function AlertBox({ message, variant = 'error', icon }: AlertBoxProps) {
   return (
     <div className={cn('border rounded-lg p-4 mb-6', styles.container)}>
       <div className={cn('flex items-center gap-2', styles.text)}>
-        <Icon name={styles.icon as IconName} size='md' />
+        <Icon name={styles.icon} size='md' />
         <span className='text-sm'>{message}</span>
       </div>
     </div>

@@ -1,32 +1,38 @@
-import { assert, describe, it, expect, beforeEach, vi } from 'vitest'
-import { getAvailableNightFollowUps } from '../pipeline'
-import { getNightRolesStatus } from '../game'
-import { makePlayer, makeState, makeGame, makeGameWithHistory, addEffectTo, resetPlayerCounter } from './helpers'
+import { afterEach, assert, beforeEach, describe, expect, it } from 'vitest'
+
+import { getEffect, registerEffect, unregisterEffect } from '../effects/registry'
 import type { EffectDefinition, EffectId } from '../effects/types'
+import { getNightRolesStatus } from '../game'
+import { getAvailableNightFollowUps } from '../pipeline'
+import { addEffectTo, makeGame, makeGameWithHistory, makePlayer, makeState, resetPlayerCounter } from './helpers'
 
-// ============================================================================
-// MOCK getEffect so we can inject test effects with nightFollowUps
-// ============================================================================
+// Track registered test effects so we can restore originals after each test
+const originalEffects: Map<EffectId, EffectDefinition | undefined> = new Map()
 
-vi.mock('../effects', async (importOriginal) => {
-  const actual = (await importOriginal()) as Record<string, unknown>
-  return {
-    ...actual,
-    getEffect: (effectId: string) => {
-      if (testEffects[effectId]) return testEffects[effectId]
-      return (actual.getEffect as (id: string) => EffectDefinition | undefined)(effectId)
-    },
+function registerTestEffect(def: EffectDefinition) {
+  if (!originalEffects.has(def.id)) {
+    originalEffects.set(def.id, getEffect(def.id))
   }
-})
+  registerEffect(def)
+}
 
-const testEffects: Record<string, EffectDefinition> = {}
+function clearTestEffects() {
+  for (const [id, original] of originalEffects) {
+    if (original) {
+      registerEffect(original)
+    } else {
+      unregisterEffect(id)
+    }
+  }
+  originalEffects.clear()
+}
 
 beforeEach(() => {
   resetPlayerCounter()
-  // Clear test effects between tests
-  for (const key of Object.keys(testEffects)) {
-    delete testEffects[key]
-  }
+})
+
+afterEach(() => {
+  clearTestEffects()
 })
 
 const mockT = {
@@ -93,7 +99,7 @@ describe('getAvailableNightFollowUps', () => {
   it('works with custom test effects that have nightFollowUps', () => {
     const MockComponent = () => null
 
-    testEffects['test_follow_up'] = {
+    registerTestEffect({
       id: 'test_follow_up' as EffectId,
       icon: 'user',
       nightFollowUps: [
@@ -105,7 +111,7 @@ describe('getAvailableNightFollowUps', () => {
           ActionComponent: MockComponent,
         },
       ],
-    }
+    })
 
     const player = addEffectTo(makePlayer({ id: 'p1', name: 'Alice', roleId: 'villager' }), 'test_follow_up')
     const state = makeState({ players: [player] })
@@ -120,7 +126,7 @@ describe('getAvailableNightFollowUps', () => {
   })
 
   it('respects the condition function — only returns when condition is true', () => {
-    testEffects['conditional_follow_up'] = {
+    registerTestEffect({
       id: 'conditional_follow_up' as EffectId,
       icon: 'user',
       nightFollowUps: [
@@ -133,7 +139,7 @@ describe('getAvailableNightFollowUps', () => {
           ActionComponent: () => null,
         },
       ],
-    }
+    })
 
     // Player alive → follow-up returned
     const alivePlayer = addEffectTo(makePlayer({ id: 'p1', roleId: 'villager' }), 'conditional_follow_up')
@@ -197,7 +203,7 @@ describe('getNightRolesStatus', () => {
     // and potentially the imp if it should wake.
     // NO role_change_reveal items should be present.
     const hasRoleChangeReveal = result.some((r: any) => r.actionType === 'role_change_reveal')
-    expect(hasRoleChangeReveal).toBe(false)
+    expect(hasRoleChangeReveal).toBeFalsy()
 
     // The washerwoman should be "done"
     const washerwoman = result.find((r) => r.roleId === 'washerwoman')

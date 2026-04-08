@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import definition from '.'
 import { makePlayer, makeState, resetPlayerCounter } from '../../../__tests__/helpers'
 
@@ -9,13 +10,13 @@ describe('UsedDeadVote effect', () => {
     it('always returns false (no more votes allowed)', () => {
       const player = makePlayer({ id: 'p1' })
       const state = makeState({ players: [player] })
-      expect(definition.canVote!(player, state)).toBe(false)
+      expect(definition.canVote!(player, state)).toBeFalsy()
     })
   })
 
   describe('behavior flags', () => {
     it('prevents voting', () => {
-      expect(definition.preventsVoting).toBe(true)
+      expect(definition.preventsVoting).toBeTruthy()
     })
   })
 })

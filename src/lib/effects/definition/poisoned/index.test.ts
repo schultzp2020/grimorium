@@ -1,9 +1,10 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import definition from '.'
 
 describe('Poisoned effect', () => {
   it('has poisonsAbility set to true', () => {
-    expect(definition.poisonsAbility).toBe(true)
+    expect(definition.poisonsAbility).toBeTruthy()
   })
 
   it('has no handlers (acts purely as a flag)', () => {

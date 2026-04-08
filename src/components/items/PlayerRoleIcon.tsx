@@ -1,9 +1,9 @@
-import { type PlayerState, type EffectInstance, hasEffect } from '../../lib/types'
-import { getRole } from '../../lib/roles'
+import { getRole } from '../../lib/roles/registry'
 import { getTeam } from '../../lib/teams'
+import { type EffectInstance, type PlayerState, hasEffect } from '../../lib/types'
+import { cn } from '../../lib/utils'
 import { Icon } from '../atoms'
 import type { IconName } from '../atoms/icon'
-import { cn } from '../../lib/utils'
 
 // =============================================================================
 // Effect Visibility — effects with dedicated custom UI are hidden from badges
@@ -60,7 +60,7 @@ const sizeConfig: Record<
   },
 }
 
-type PlayerRoleIconProps = {
+interface PlayerRoleIconProps {
   player: PlayerState
   /** sm = 32px, md = 40px, lg = 64px */
   size?: Size

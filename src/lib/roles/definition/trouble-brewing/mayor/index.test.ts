@@ -1,10 +1,11 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import definition from '.'
 import {
-  makePlayer,
-  makeState,
   addEffectTo,
   makeGameWithHistory,
+  makePlayer,
+  makeState,
   resetPlayerCounter,
 } from '../../../../__tests__/helpers'
 
@@ -182,7 +183,7 @@ describe('Mayor', () => {
   describe('deflect ability', () => {
     it('declares deflect as an initial effect', () => {
       expect(definition.initialEffects).toBeDefined()
-      expect(definition.initialEffects!.some((e) => e.type === 'deflect')).toBe(true)
+      expect(definition.initialEffects!.some((e) => e.type === 'deflect')).toBeTruthy()
     })
   })
 })

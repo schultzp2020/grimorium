@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { type EffectDefinition, type EffectDescriptionProps, type EffectConfigEditorProps } from '../../types'
-import type { Perception } from '../../../pipeline/types'
-import { registerEffectTranslations, getEffectTranslations } from '../../../i18n'
-import type { Language } from '../../../i18n'
-import { Badge, Button, Icon } from '../../../../components/atoms'
-import type { TeamId } from '../../../teams'
 
+import { Badge, Button, Icon } from '../../../../components/atoms'
+import { getEffectTranslations, registerEffectTranslations } from '../../../i18n'
+import type { Language } from '../../../i18n'
+import type { Perception } from '../../../pipeline/types'
+import type { TeamId } from '../../../teams'
+import { type EffectConfigEditorProps, type EffectDefinition, type EffectDescriptionProps } from '../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 
@@ -22,12 +22,16 @@ function MisregisterDescription({ instance, language }: EffectDescriptionProps) 
   const t = getEffectTranslations('misregister', language as Language)
   const canRegisterAs = instance.data?.canRegisterAs as { teams?: string[]; alignments?: string[] } | undefined
 
-  if (!canRegisterAs) return null
+  if (!canRegisterAs) {
+    return null
+  }
 
   const alignments = canRegisterAs.alignments ?? []
   const teams = canRegisterAs.teams ?? []
 
-  if (alignments.length === 0 && teams.length === 0) return null
+  if (alignments.length === 0 && teams.length === 0) {
+    return null
+  }
 
   return (
     <span className='inline-flex flex-wrap items-center gap-1'>
@@ -60,8 +64,11 @@ function MisregisterConfigEditor({ data, language, onSave, onCancel }: EffectCon
   const toggleTeam = (team: string) => {
     setSelectedTeams((prev) => {
       const next = new Set(prev)
-      if (next.has(team)) next.delete(team)
-      else next.add(team)
+      if (next.has(team)) {
+        next.delete(team)
+      } else {
+        next.add(team)
+      }
       return next
     })
   }
@@ -69,8 +76,11 @@ function MisregisterConfigEditor({ data, language, onSave, onCancel }: EffectCon
   const toggleAlignment = (alignment: string) => {
     setSelectedAlignments((prev) => {
       const next = new Set(prev)
-      if (next.has(alignment)) next.delete(alignment)
-      else next.add(alignment)
+      if (next.has(alignment)) {
+        next.delete(alignment)
+      } else {
+        next.add(alignment)
+      }
       return next
     })
   }
@@ -79,8 +89,8 @@ function MisregisterConfigEditor({ data, language, onSave, onCancel }: EffectCon
     onSave({
       ...data,
       canRegisterAs: {
-        teams: Array.from(selectedTeams),
-        alignments: Array.from(selectedAlignments),
+        teams: [...selectedTeams],
+        alignments: [...selectedAlignments],
       },
     })
   }
@@ -179,7 +189,9 @@ const definition: EffectDefinition = {
       context: ['alignment', 'team', 'role'],
       modify: (perception, _target, _observer, _state, effectData) => {
         const overrides = effectData?.perceiveAs as Partial<Perception> | undefined
-        if (!overrides) return perception
+        if (!overrides) {
+          return perception
+        }
         return { ...perception, ...overrides }
       },
     },

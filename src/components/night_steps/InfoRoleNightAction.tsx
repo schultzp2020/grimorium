@@ -1,32 +1,33 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+
+import { isMalfunctioning } from '../../lib/effects/registry'
+import { getRoleName, getRoleTranslations, useI18n } from '../../lib/i18n'
+import { canRegisterAsTeam, perceive } from '../../lib/pipeline'
+import { getAllRoles, getRole } from '../../lib/roles/registry'
+import type { NightActionResult, RoleDefinition } from '../../lib/roles/types'
+import { type TeamId, getTeam } from '../../lib/teams'
 import type { GameState, PlayerState } from '../../lib/types'
-import type { RoleDefinition, NightActionResult } from '../../lib/roles/types'
-import { getRole, getAllRoles } from '../../lib/roles/index'
-import { getTeam, type TeamId } from '../../lib/teams'
-import { useI18n, getRoleName, getRoleTranslations } from '../../lib/i18n'
+import { Icon } from '../atoms'
+import type { IconName } from '../atoms/icon'
+import { PlayerPickerList, RolePickerGrid } from '../inputs'
+import { AlertBox, InfoBox, RoleRevealBadge, StepSection } from '../items'
 import { RoleCard } from '../items/RoleCard'
 import { TeamBackground } from '../items/TeamBackground'
 import {
-  NightActionLayout,
+  HandbackButton,
+  HandbackCardLink,
   NarratorSetupLayout,
+  NightActionLayout,
   NightStepListLayout,
   PlayerFacingScreen,
-  HandbackCardLink,
-  HandbackButton,
 } from '../layouts'
 import type { NightStep } from '../layouts'
-import { StepSection, AlertBox, InfoBox, RoleRevealBadge } from '../items'
-import { PlayerPickerList, RolePickerGrid } from '../inputs'
-import { Icon } from '../atoms'
-import type { IconName } from '../atoms/icon'
-import { perceive, canRegisterAsTeam } from '../../lib/pipeline'
-import { isMalfunctioning } from '../../lib/effects'
 
 // ============================================================================
 // CONFIG TYPE
 // ============================================================================
 
-export type InfoRoleConfig = {
+export interface InfoRoleConfig {
   roleId: string
   icon: IconName
   /** The team this role looks for (townsfolk, outsider, minion) */
@@ -53,7 +54,7 @@ export type InfoRoleConfig = {
 
 type Phase = 'step_list' | 'select_players' | 'configure_malfunction' | 'show_results' | 'no_target_view'
 
-type Props = {
+interface Props {
   config: InfoRoleConfig
   state: GameState
   player: PlayerState
@@ -124,7 +125,9 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
       if (!selectedIsTarget) {
         // Selected one from "other" group — must pick from "target" group next
         for (const p of otherGroupPlayers) {
-          if (p.id !== selectedId) disabled.add(p.id)
+          if (p.id !== selectedId) {
+            disabled.add(p.id)
+          }
         }
       }
       // If selected is from target group, can pick from either — nothing disabled
@@ -139,7 +142,9 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
 
   const targetsInSelection = selectedPlayers.filter((playerId) => {
     const p = state.players.find((pl) => pl.id === playerId)
-    if (!p) return false
+    if (!p) {
+      return false
+    }
     const perception = perceive(p, player, 'team', state)
     return perception.team === config.targetTeam || canRegisterAsTeam(p, config.targetTeam)
   })
@@ -155,7 +160,9 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
 
     for (const pid of targetsInSelection) {
       const p = state.players.find((pl) => pl.id === pid)
-      if (!p) continue
+      if (!p) {
+        continue
+      }
       const pTeam = perceive(p, player, 'team', state)
 
       // If the player's actual team matches, show their perceived role
@@ -170,8 +177,12 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
           : targetTeamAllRoles
 
       for (const role of pRoles) {
-        if (!roleToPlayers.has(role.id)) roleToPlayers.set(role.id, [])
-        if (!roleToPlayers.get(role.id)!.includes(pid)) roleToPlayers.get(role.id)!.push(pid)
+        if (!roleToPlayers.has(role.id)) {
+          roleToPlayers.set(role.id, [])
+        }
+        if (!roleToPlayers.get(role.id)!.includes(pid)) {
+          roleToPlayers.get(role.id)!.push(pid)
+        }
         if (!seen.has(role.id)) {
           seen.add(role.id)
           roles.push(role)
@@ -233,18 +244,26 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
 
   const handleCompleteSelectPlayers = () => {
     if (malfunctioning) {
-      if (!canCompleteMalfunctionSelect) return
+      if (!canCompleteMalfunctionSelect) {
+        return
+      }
     } else {
-      if (!canCompleteHealthySetup) return
+      if (!canCompleteHealthySetup) {
+        return
+      }
     }
     setSelectPlayersDone(true)
     setPhase('step_list')
   }
 
   const handleCompleteMalfunctionConfig = () => {
-    if (!selectedRoleId) return
+    if (!selectedRoleId) {
+      return
+    }
     // Auto-assign target player for history (arbitrary — info is false)
-    if (!selectedTargetPlayer) setSelectedTargetPlayer(selectedPlayers[0])
+    if (!selectedTargetPlayer) {
+      setSelectedTargetPlayer(selectedPlayers[0])
+    }
     setMalfunctionConfigDone(true)
     setPhase('step_list')
   }
@@ -273,11 +292,15 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
   }
 
   const handleComplete = () => {
-    if (!selectedTargetPlayer || !selectedRoleId) return
+    if (!selectedTargetPlayer || !selectedRoleId) {
+      return
+    }
 
     const player1 = state.players.find((p) => p.id === selectedPlayers[0])
     const player2 = state.players.find((p) => p.id === selectedPlayers[1])
-    if (!player1 || !player2) return
+    if (!player1 || !player2) {
+      return
+    }
 
     onComplete({
       entries: [
@@ -311,9 +334,7 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
 
   const getLocalRoleName = (roleId: string) => getRoleName(roleId, language)
 
-  const getPlayerName = (playerId: string) => {
-    return state.players.find((p) => p.id === playerId)?.name ?? t.ui.unknown
-  }
+  const getPlayerName = (playerId: string) => state.players.find((p) => p.id === playerId)?.name ?? t.ui.unknown
 
   const targetTeamName = t.teams[config.targetTeam as keyof typeof t.teams]?.name ?? config.targetTeam
   const otherGroupLabel = t.game.otherPlayers ?? 'Other Players'
@@ -355,9 +376,13 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
   }, [selectPlayersDone, malfunctioning, malfunctionConfigDone, t, config.icon])
 
   const handleSelectStep = (stepId: string) => {
-    if (stepId === 'select_players') setPhase('select_players')
-    else if (stepId === 'configure_malfunction') setPhase('configure_malfunction')
-    else if (stepId === 'show_results') setPhase('show_results')
+    if (stepId === 'select_players') {
+      setPhase('select_players')
+    } else if (stepId === 'configure_malfunction') {
+      setPhase('configure_malfunction')
+    } else if (stepId === 'show_results') {
+      setPhase('show_results')
+    }
   }
 
   // ================================================================
@@ -433,7 +458,9 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
               selected={selectedRoleId ? [selectedRoleId] : []}
               onSelect={(roleId) => {
                 const pids = targetRoleOptions.roleToPlayers.get(roleId)
-                if (pids?.[0]) handleSelectRole(pids[0], roleId)
+                if (pids?.[0]) {
+                  handleSelectRole(pids[0], roleId)
+                }
               }}
               selectionCount={1}
               colorMode='team'
@@ -554,7 +581,9 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
   const player1 = state.players.find((p) => p.id === selectedPlayers[0])
   const player2 = state.players.find((p) => p.id === selectedPlayers[1])
 
-  if (!selectedRoleId) return null
+  if (!selectedRoleId) {
+    return null
+  }
 
   const shownRole = getRole(selectedRoleId)
   const shownTeamId = shownRole?.team ?? 'townsfolk'

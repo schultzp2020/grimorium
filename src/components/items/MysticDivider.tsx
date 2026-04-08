@@ -1,8 +1,8 @@
+import { cn } from '../../lib/utils'
 import { Icon } from '../atoms'
 import type { IconName } from '../atoms/icon'
-import { cn } from '../../lib/utils'
 
-type MysticDividerProps = {
+interface MysticDividerProps {
   icon?: IconName
   iconClassName?: string
   className?: string

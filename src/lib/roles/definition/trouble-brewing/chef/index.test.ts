@@ -1,32 +1,44 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+
 import { countEvilPairs } from '.'
 import definition from '.'
-import type { EffectDefinition, EffectId } from '../../../../effects/types'
 import {
-  makePlayer,
-  makeState,
   addEffectTo,
   makeGameWithHistory,
+  makePlayer,
+  makeState,
   resetPlayerCounter,
 } from '../../../../__tests__/helpers'
+import { getEffect, registerEffect, unregisterEffect } from '../../../../effects/registry'
+import type { EffectDefinition, EffectId } from '../../../../effects/types'
 
-// Mock getEffect to inject test perception modifiers
-vi.mock('../../../../effects', async (importOriginal) => {
-  const actual = (await importOriginal()) as Record<string, unknown>
-  return {
-    ...actual,
-    getEffect: (effectId: string) => {
-      if (testEffects[effectId]) return testEffects[effectId]
-      return (actual.getEffect as (id: string) => EffectDefinition | undefined)(effectId)
-    },
+// Track registered test effects so we can restore originals after each test
+const originalEffects: Map<EffectId, EffectDefinition | undefined> = new Map()
+
+function registerTestEffect(def: EffectDefinition) {
+  if (!originalEffects.has(def.id)) {
+    originalEffects.set(def.id, getEffect(def.id))
   }
-})
+  registerEffect(def)
+}
 
-const testEffects: Record<string, EffectDefinition> = {}
+function clearTestEffects() {
+  for (const [id, original] of originalEffects) {
+    if (original) {
+      registerEffect(original)
+    } else {
+      unregisterEffect(id)
+    }
+  }
+  originalEffects.clear()
+}
 
 beforeEach(() => {
   resetPlayerCounter()
-  for (const key of Object.keys(testEffects)) delete testEffects[key]
+})
+
+afterEach(() => {
+  clearTestEffects()
 })
 
 describe('Chef', () => {
@@ -58,8 +70,8 @@ describe('Chef', () => {
         makeState({ round: 2, players: [player] }),
       )
 
-      expect(definition.shouldWake!(round1, player)).toBe(true)
-      expect(definition.shouldWake!(round2, player)).toBe(false)
+      expect(definition.shouldWake!(round1, player)).toBeTruthy()
+      expect(definition.shouldWake!(round2, player)).toBeFalsy()
     })
 
     it('does not wake when dead', () => {
@@ -74,7 +86,7 @@ describe('Chef', () => {
         ],
         makeState({ round: 1, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBe(false)
+      expect(definition.shouldWake!(game, player)).toBeFalsy()
     })
   })
 
@@ -169,7 +181,7 @@ describe('Chef', () => {
 
   describe('perception deception', () => {
     it("good player with 'appears evil' modifier is counted as evil (false positive)", () => {
-      testEffects['appears_evil'] = {
+      registerTestEffect({
         id: 'appears_evil' as EffectId,
         icon: 'user',
         perceptionModifiers: [
@@ -178,7 +190,7 @@ describe('Chef', () => {
             modify: (p) => ({ ...p, alignment: 'evil' }),
           },
         ],
-      }
+      })
 
       const chef = makePlayer({ id: 'chef', roleId: 'chef' })
       const players = [
@@ -193,7 +205,7 @@ describe('Chef', () => {
     })
 
     it("evil player with 'appears good' modifier is NOT counted as evil (false negative)", () => {
-      testEffects['appears_good'] = {
+      registerTestEffect({
         id: 'appears_good' as EffectId,
         icon: 'user',
         perceptionModifiers: [
@@ -202,7 +214,7 @@ describe('Chef', () => {
             modify: (p) => ({ ...p, alignment: 'good' }),
           },
         ],
-      }
+      })
 
       const chef = makePlayer({ id: 'chef', roleId: 'chef' })
       const players = [
@@ -217,7 +229,7 @@ describe('Chef', () => {
     })
 
     it('two adjacent good players both appearing evil count as an evil pair', () => {
-      testEffects['appears_evil'] = {
+      registerTestEffect({
         id: 'appears_evil' as EffectId,
         icon: 'user',
         perceptionModifiers: [
@@ -226,7 +238,7 @@ describe('Chef', () => {
             modify: (p) => ({ ...p, alignment: 'evil' }),
           },
         ],
-      }
+      })
 
       const chef = makePlayer({ id: 'chef', roleId: 'chef' })
       const players = [

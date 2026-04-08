@@ -1,16 +1,17 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
 import { useDrag } from '@use-gesture/react'
-import { useI18n } from '../../lib/i18n'
-import { Button, Icon, BackButton } from '../atoms'
-import { ScreenFooter } from '../layouts/ScreenFooter'
-import { getLastGamePlayers } from '../../lib/storage'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
-type Props = {
+import { useI18n } from '../../lib/i18n'
+import { getLastGamePlayers } from '../../lib/storage'
+import { BackButton, Button, Icon } from '../atoms'
+import { ScreenFooter } from '../layouts/ScreenFooter'
+
+interface Props {
   onNext: (players: string[]) => void
   onBack: () => void
 }
 
-type PlayerItem = {
+interface PlayerItem {
   id: string
   name: string
 }
@@ -28,7 +29,9 @@ export function PlayerEntry({ onNext, onBack }: Props) {
   const [players, setPlayers] = useState<PlayerItem[]>(() => {
     _nextId = 0
     const lastPlayers = getLastGamePlayers()
-    if (lastPlayers.length >= MIN_PLAYERS) return lastPlayers.map((n) => makePlayerItem(n))
+    if (lastPlayers.length >= MIN_PLAYERS) {
+      return lastPlayers.map((n) => makePlayerItem(n))
+    }
     if (lastPlayers.length > 0) {
       return [
         ...lastPlayers.map((n) => makePlayerItem(n)),
@@ -106,7 +109,9 @@ export function PlayerEntry({ onNext, onBack }: Props) {
 
   // Visual transform for each item during drag
   const getItemStyle = (index: number): React.CSSProperties => {
-    if (!drag) return {}
+    if (!drag) {
+      return {}
+    }
 
     const { index: dragIdx, targetIndex, offsetY } = drag
     const rowH = rowHeightRef.current || 60
@@ -125,10 +130,14 @@ export function PlayerEntry({ onNext, onBack }: Props) {
     let shift = 0
     if (dragIdx < targetIndex) {
       // Dragging down: items in (dragIdx, targetIndex] shift up
-      if (index > dragIdx && index <= targetIndex) shift = -rowH
+      if (index > dragIdx && index <= targetIndex) {
+        shift = -rowH
+      }
     } else if (dragIdx > targetIndex) {
       // Dragging up: items in [targetIndex, dragIdx) shift down
-      if (index >= targetIndex && index < dragIdx) shift = rowH
+      if (index >= targetIndex && index < dragIdx) {
+        shift = rowH
+      }
     }
 
     return {
@@ -153,7 +162,9 @@ export function PlayerEntry({ onNext, onBack }: Props) {
   const maxPlayersReached = players.length >= MAX_PLAYERS
 
   const addPlayer = () => {
-    if (maxPlayersReached) return
+    if (maxPlayersReached) {
+      return
+    }
     setPlayers([...players, makePlayerItem('')])
   }
 
@@ -162,7 +173,9 @@ export function PlayerEntry({ onNext, onBack }: Props) {
   }
 
   const removePlayer = (index: number) => {
-    if (players.length <= MIN_PLAYERS) return
+    if (players.length <= MIN_PLAYERS) {
+      return
+    }
     setPlayers(players.filter((_, i) => i !== index))
   }
 

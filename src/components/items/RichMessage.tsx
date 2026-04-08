@@ -1,19 +1,20 @@
-import { type RichMessage as RichMessageType, type GameState, getPlayer } from '../../lib/types'
-import { getRole } from '../../lib/roles'
-import { getEffect, getEffectType, EFFECT_TYPE_BADGE_VARIANT } from '../../lib/effects'
-import {
-  useI18n,
-  type Translations,
-  getRoleName as getRegistryRoleName,
-  getEffectName as getRegistryEffectName,
-  getRoleTranslations,
-  getEffectTranslations,
-} from '../../lib/i18n'
-import type { Language } from '../../lib/i18n'
-import { Badge, Icon } from '../atoms'
 import type { ReactNode } from 'react'
 
-type Props = {
+import { EFFECT_TYPE_BADGE_VARIANT, getEffect, getEffectType } from '../../lib/effects/registry'
+import {
+  type Translations,
+  getEffectTranslations,
+  getEffectName as getRegistryEffectName,
+  getRoleName as getRegistryRoleName,
+  getRoleTranslations,
+  useI18n,
+} from '../../lib/i18n'
+import type { Language } from '../../lib/i18n'
+import { getRole } from '../../lib/roles/registry'
+import { type GameState, type RichMessage as RichMessageType, getPlayer } from '../../lib/types'
+import { Badge, Icon } from '../atoms'
+
+interface Props {
   message: RichMessageType
   state: GameState
 }
@@ -40,7 +41,9 @@ function getTranslation(t: Translations, key: string, lang: Language): string | 
 
   // Try global translations first
   const globalResult = resolveNestedKey(t, parts)
-  if (globalResult !== undefined) return globalResult
+  if (globalResult !== undefined) {
+    return globalResult
+  }
 
   // Fallback: check role registry for keys like "roles.<roleId>.xxx"
   if (parts[0] === 'roles' && parts.length >= 3) {
@@ -60,7 +63,7 @@ function getTranslation(t: Translations, key: string, lang: Language): string | 
 }
 
 // Param keys that represent player IDs
-const PLAYER_PARAM_KEYS = [
+const PLAYER_PARAM_KEYS = new Set([
   'player',
   'player1',
   'player2',
@@ -70,7 +73,7 @@ const PLAYER_PARAM_KEYS = [
   'slayer',
   'redirect',
   'redHerring',
-]
+])
 // Param keys that represent role IDs
 const ROLE_PARAM_KEYS = ['role']
 // Param keys that represent effect IDs
@@ -130,7 +133,7 @@ export function RichMessage({ message, state }: Props) {
       const paramValue = params[paramKey]
 
       if (paramValue !== undefined) {
-        if (PLAYER_PARAM_KEYS.includes(paramKey)) {
+        if (PLAYER_PARAM_KEYS.has(paramKey)) {
           // Render as player badge
           result.push(renderPlayerBadge(String(paramValue), `${baseKey}-player-${paramKey}`))
         } else if (ROLE_PARAM_KEYS.includes(paramKey)) {
@@ -171,18 +174,21 @@ export function RichMessage({ message, state }: Props) {
     <span className='inline-flex flex-wrap items-center gap-1'>
       {message.map((part, index) => {
         switch (part.type) {
-          case 'text':
+          case 'text': {
             return <span key={index}>{part.content}</span>
+          }
 
           case 'i18n': {
             const template = getTranslation(t, part.key, language)
-            if (!template) return <span key={index}>[{part.key}]</span>
+            if (!template) {
+              return <span key={index}>[{part.key}]</span>
+            }
 
             if (part.params && Object.keys(part.params).length > 0) {
               // Render with badges for player/role params
               return (
                 <span key={index} className='inline-flex flex-wrap items-center gap-1'>
-                  {renderI18nWithParams(template, part.params as Record<string, string | number>, `i18n-${index}`)}
+                  {renderI18nWithParams(template, part.params, `i18n-${index}`)}
                 </span>
               )
             }
@@ -208,8 +214,9 @@ export function RichMessage({ message, state }: Props) {
             )
           }
 
-          default:
+          default: {
             return null
+          }
         }
       })}
     </span>

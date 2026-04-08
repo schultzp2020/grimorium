@@ -1,13 +1,14 @@
-import { useState, useMemo } from 'react'
-import { getRole } from '../../lib/roles'
-import { getTeam } from '../../lib/teams'
-import { useI18n, interpolate, getRoleName } from '../../lib/i18n'
-import { resolveRoleAssignments } from '../../lib/roleAssignment'
-import { Button, Icon, Badge, BackButton } from '../atoms'
-import { ScreenFooter } from '../layouts/ScreenFooter'
-import { cn } from '../../lib/utils'
+import { useMemo, useState } from 'react'
 
-type Props = {
+import { getRoleName, interpolate, useI18n } from '../../lib/i18n'
+import { resolveRoleAssignments } from '../../lib/roleAssignment'
+import { getRole } from '../../lib/roles/registry'
+import { getTeam } from '../../lib/teams'
+import { cn } from '../../lib/utils'
+import { BackButton, Badge, Button, Icon } from '../atoms'
+import { ScreenFooter } from '../layouts/ScreenFooter'
+
+interface Props {
   players: string[]
   selectedRoles: string[]
   onStart: (assignments: { name: string; roleId: string }[]) => void
@@ -89,7 +90,9 @@ export function RoleAssignment({ players, selectedRoles, onStart, onBack }: Prop
   const uniqueRoles = useMemo(() => {
     const seen = new Set<string>()
     return selectedRoles.filter((roleId) => {
-      if (seen.has(roleId)) return false
+      if (seen.has(roleId)) {
+        return false
+      }
       seen.add(roleId)
       return true
     })
@@ -100,7 +103,9 @@ export function RoleAssignment({ players, selectedRoles, onStart, onBack }: Prop
     const pool = { ...rolePool }
     for (const [roleId, count] of Object.entries(assignedCounts)) {
       pool[roleId] = (pool[roleId] ?? 0) - count
-      if (pool[roleId] <= 0) delete pool[roleId]
+      if (pool[roleId] <= 0) {
+        delete pool[roleId]
+      }
     }
     const result: string[] = []
     for (const [roleId, count] of Object.entries(pool)) {
@@ -157,7 +162,9 @@ export function RoleAssignment({ players, selectedRoles, onStart, onBack }: Prop
           <div className='mt-2 flex flex-wrap gap-1.5'>
             {uniqueRoles.map((roleId) => {
               const role = getRole(roleId)
-              if (!role) return null
+              if (!role) {
+                return null
+              }
               const count = rolePool[roleId] ?? 1
               return (
                 <Badge key={roleId} variant={role.team} className='inline-flex items-center gap-1'>
@@ -174,7 +181,9 @@ export function RoleAssignment({ players, selectedRoles, onStart, onBack }: Prop
         <button
           onClick={() => {
             setShowCustomize(!showCustomize)
-            if (showCustomize) setExpandedPlayer(null)
+            if (showCustomize) {
+              setExpandedPlayer(null)
+            }
           }}
           className='mb-4 flex w-full items-center justify-center gap-2 py-2.5 text-sm text-mystic-gold/80 transition-colors hover:text-mystic-gold'
         >
@@ -264,7 +273,9 @@ export function RoleAssignment({ players, selectedRoles, onStart, onBack }: Prop
                             {/* Available roles */}
                             {getAvailableRoles(playerName).map((roleId) => {
                               const r = getRole(roleId)
-                              if (!r) return null
+                              if (!r) {
+                                return null
+                              }
                               const rTeam = getTeam(r.team)
                               const isAssigned = currentRole === roleId
 

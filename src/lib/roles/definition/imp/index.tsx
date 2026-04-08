@@ -1,30 +1,30 @@
-import { useState, useMemo } from 'react'
-import type { RoleDefinition } from '../../types'
-import { isAlive, hasEffect } from '../../../types'
-import { isMalfunctioning } from '../../../effects'
-import {
-  useI18n,
-  interpolate,
-  registerRoleTranslations,
-  getRoleName,
-  getRoleDescription,
-  getRoleTranslations,
-} from '../../../i18n'
-import { getRole, getAllRoles } from '../../index'
-import { isGoodTeam, getTeam } from '../../../teams'
+import { useMemo, useState } from 'react'
+
+import { Button, Icon } from '../../../../components/atoms'
+import { PlayerPickerList, RolePickerGrid } from '../../../../components/inputs'
+import { EvilTeamReveal, MysticDivider, RoleCard, StepSection } from '../../../../components/items'
 import { DefaultRoleReveal } from '../../../../components/items/DefaultRoleReveal'
 import {
-  NightActionLayout,
   NarratorSetupLayout,
+  NightActionLayout,
   NightStepListLayout,
   PlayerFacingScreen,
 } from '../../../../components/layouts'
 import type { NightStep } from '../../../../components/layouts'
-import { PlayerPickerList, RolePickerGrid } from '../../../../components/inputs'
-import { StepSection, MysticDivider, EvilTeamReveal, RoleCard } from '../../../../components/items'
-import { Button, Icon } from '../../../../components/atoms'
 import { HandbackButton } from '../../../../components/layouts'
-
+import { isMalfunctioning } from '../../../effects/registry'
+import {
+  getRoleDescription,
+  getRoleName,
+  getRoleTranslations,
+  interpolate,
+  registerRoleTranslations,
+  useI18n,
+} from '../../../i18n'
+import { getTeam, isGoodTeam } from '../../../teams'
+import { hasEffect, isAlive } from '../../../types'
+import { getAllRoles, getRole } from '../../registry'
+import type { RoleDefinition } from '../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 
@@ -151,7 +151,9 @@ const definition: RoleDefinition = {
     const hasAliveMinions = useMemo(
       () =>
         state.players.some((p) => {
-          if (!isAlive(p)) return false
+          if (!isAlive(p)) {
+            return false
+          }
           const role = getRole(p.roleId)
           return role?.team === 'minion'
         }),
@@ -256,10 +258,14 @@ const definition: RoleDefinition = {
     // ================================================================
 
     const handleConfirmKill = () => {
-      if (!selectedTarget) return
+      if (!selectedTarget) {
+        return
+      }
 
       const target = state.players.find((p) => p.id === selectedTarget)
-      if (!target) return
+      if (!target) {
+        return
+      }
 
       // Self-kill with alive minions: route through pipeline with
       // imp_starpass_pending effect. Protection (Safe/Monk) can prevent
@@ -521,7 +527,9 @@ const definition: RoleDefinition = {
               <p className='mb-3 text-center text-sm font-medium text-red-300/70'>{roleT.theseAreYourBluffs}</p>
               <div className='grid grid-cols-1 gap-3'>
                 {bluffRoles.map((role) => {
-                  if (!role) return null
+                  if (!role) {
+                    return null
+                  }
                   const desc = getRoleDescription(role.id, language)
                   return (
                     <div

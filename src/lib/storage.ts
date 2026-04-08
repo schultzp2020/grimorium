@@ -22,7 +22,9 @@ export function saveGame(game: Game): void {
 
 export function getAllGames(): Game[] {
   const data = localStorage.getItem(STORAGE_KEY)
-  if (!data) return []
+  if (!data) {
+    return []
+  }
 
   try {
     return JSON.parse(data) as Game[]
@@ -64,7 +66,9 @@ export function clearCurrentGame(): void {
 
 export function getCurrentGame(): Game | undefined {
   const gameId = getCurrentGameId()
-  if (!gameId) return undefined
+  if (!gameId) {
+    return undefined
+  }
   return getGame(gameId)
 }
 
@@ -72,7 +76,7 @@ export function getCurrentGame(): Game | undefined {
 // GAME LIST HELPERS
 // ============================================================================
 
-export type GameSummary = {
+export interface GameSummary {
   id: string
   name: string
   createdAt: number
@@ -83,12 +87,16 @@ export type GameSummary = {
 
 export function getLastGamePlayers(): string[] {
   const games = getAllGames()
-  if (games.length === 0) return []
+  if (games.length === 0) {
+    return []
+  }
 
   const sorted = [...games].sort((a, b) => b.createdAt - a.createdAt)
   const lastGame = sorted[0]
   const lastEntry = lastGame.history.at(-1)
-  if (!lastEntry?.stateAfter?.players) return []
+  if (!lastEntry?.stateAfter?.players) {
+    return []
+  }
 
   return lastEntry.stateAfter.players.map((p) => p.name)
 }

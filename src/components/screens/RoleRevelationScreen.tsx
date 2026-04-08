@@ -1,13 +1,14 @@
 import { useMemo } from 'react'
-import type { Game, GameState, PlayerState } from '../../lib/types'
-import { getRole } from '../../lib/roles'
-import { getTeam } from '../../lib/teams'
-import { useI18n, getRoleName } from '../../lib/i18n'
-import { Button, Icon, BackButton } from '../atoms'
-import { ScreenFooter } from '../layouts/ScreenFooter'
-import { cn } from '../../lib/utils'
 
-type Props = {
+import { getRoleName, useI18n } from '../../lib/i18n'
+import { getRole } from '../../lib/roles/registry'
+import { getTeam } from '../../lib/teams'
+import type { Game, GameState, PlayerState } from '../../lib/types'
+import { cn } from '../../lib/utils'
+import { BackButton, Button, Icon } from '../atoms'
+import { ScreenFooter } from '../layouts/ScreenFooter'
+
+interface Props {
   game: Game
   state: GameState
   onRevealRole: (playerId: string) => void
@@ -18,9 +19,10 @@ type Props = {
 export function RoleRevelationScreen({ game, state, onRevealRole, onStartNight, onMainMenu }: Props) {
   const { t } = useI18n()
 
-  const revealedPlayerIds = useMemo(() => {
-    return new Set(game.history.filter((e) => e.type === 'role_revealed').map((e) => e.data.playerId as string))
-  }, [game.history])
+  const revealedPlayerIds = useMemo(
+    () => new Set(game.history.filter((e) => e.type === 'role_revealed').map((e) => e.data.playerId as string)),
+    [game.history],
+  )
 
   const allRevealed = state.players.every((p) => revealedPlayerIds.has(p.id))
 
@@ -106,9 +108,7 @@ function PlayerRevealRow({
   const role = getRole(player.roleId)
   const team = role ? getTeam(role.team) : null
 
-  const roleName = useMemo(() => {
-    return getRoleName(player.roleId, language)
-  }, [player.roleId, language])
+  const roleName = useMemo(() => getRoleName(player.roleId, language), [player.roleId, language])
 
   return (
     <button

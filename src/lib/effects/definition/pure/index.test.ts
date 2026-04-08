@@ -1,7 +1,8 @@
-import { assert, describe, it, expect, beforeEach } from 'vitest'
+import { assert, beforeEach, describe, expect, it } from 'vitest'
+
 import definition from '.'
+import { addEffectTo, makeGame, makePlayer, makeState, resetPlayerCounter } from '../../../__tests__/helpers'
 import type { NominateIntent } from '../../../pipeline/types'
-import { makePlayer, makeState, addEffectTo, makeGame, resetPlayerCounter } from '../../../__tests__/helpers'
 
 beforeEach(() => resetPlayerCounter())
 
@@ -22,7 +23,7 @@ describe('Pure effect', () => {
         nomineeId: 'p2',
       }
 
-      expect(handler.appliesTo(intent, virgin, state)).toBe(true)
+      expect(handler.appliesTo(intent, virgin, state)).toBeTruthy()
     })
 
     it('does not apply when a different player is nominated', () => {
@@ -34,7 +35,7 @@ describe('Pure effect', () => {
         nomineeId: 'p3',
       }
 
-      expect(handler.appliesTo(intent, virgin, state)).toBe(false)
+      expect(handler.appliesTo(intent, virgin, state)).toBeFalsy()
     })
   })
 

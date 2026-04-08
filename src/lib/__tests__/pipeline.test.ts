@@ -1,8 +1,9 @@
-import { assert, describe, it, expect, beforeEach } from 'vitest'
-import { resolveIntent, applyPipelineChanges, emptyStateChanges, mergeStateChanges } from '../pipeline'
-import { type KillIntent, type NominateIntent, type ExecuteIntent, type StateChanges } from '../pipeline/types'
+import { assert, beforeEach, describe, expect, it } from 'vitest'
+
+import { applyPipelineChanges, emptyStateChanges, mergeStateChanges, resolveIntent } from '../pipeline'
+import { type ExecuteIntent, type KillIntent, type NominateIntent, type StateChanges } from '../pipeline/types'
 import { getCurrentState, hasEffect } from '../types'
-import { makePlayer, makeGame, makeState, makeStandardPlayers, addEffectTo, resetPlayerCounter } from './helpers'
+import { addEffectTo, makeGame, makePlayer, makeStandardPlayers, makeState, resetPlayerCounter } from './helpers'
 
 beforeEach(() => {
   resetPlayerCounter()
@@ -281,7 +282,7 @@ describe('applyPipelineChanges', () => {
 
     const state = getCurrentState(updated)
     const p1 = state.players.find((p) => p.id === 'p1')!
-    expect(hasEffect(p1, 'dead')).toBe(true)
+    expect(hasEffect(p1, 'dead')).toBeTruthy()
   })
 
   it('handles no entries but has effect changes', () => {
@@ -299,7 +300,7 @@ describe('applyPipelineChanges', () => {
 
     const state = getCurrentState(updated)
     const p1 = state.players.find((p) => p.id === 'p1')!
-    expect(hasEffect(p1, 'safe')).toBe(true)
+    expect(hasEffect(p1, 'safe')).toBeTruthy()
   })
 
   it('returns game unchanged when changes are empty', () => {

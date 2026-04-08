@@ -1,6 +1,6 @@
 export type Language = 'en' | 'es'
 
-export type Translations = {
+export interface Translations {
   // Common
   common: {
     continue: string

@@ -1,9 +1,10 @@
-import * as React from 'react'
-import { useRef, useState, useCallback } from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { useDrag } from '@use-gesture/react'
-import { cn } from '../../lib/utils'
+import * as React from 'react'
+import { useCallback, useRef, useState } from 'react'
+
 import { useI18n } from '../../lib/i18n'
+import { cn } from '../../lib/utils'
 import { Icon } from './icon'
 
 const Dialog = DialogPrimitive.Root

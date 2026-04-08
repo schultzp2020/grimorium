@@ -1,21 +1,22 @@
 import { useEffect, useMemo, useState } from 'react'
-import { createGame, type PlayerSetup } from './lib/game'
-import { saveGame, setCurrentGameId, getGame, clearCurrentGame } from './lib/storage'
+
+import { LanguagePicker } from './components/atoms'
 import {
+  GameScreen,
+  HowToPlayScreen,
   MainMenu,
   PlayerEntry,
-  ScriptSelection,
-  RoleSelection,
   RoleAssignment,
-  GameScreen,
+  RoleSelection,
   RolesLibrary,
-  HowToPlayScreen,
+  ScriptSelection,
 } from './components/screens'
-import { LanguagePicker } from './components/atoms'
 import { useRouter } from './hooks/useRouter'
-import type { RoleId } from './lib/roles/types'
+import { type PlayerSetup, createGame } from './lib/game'
 import { getRole } from './lib/roles'
+import type { RoleId } from './lib/roles/types'
 import type { ScriptId } from './lib/scripts'
+import { clearCurrentGame, getGame, saveGame, setCurrentGameId } from './lib/storage'
 
 // Internal screens for the new-game wizard (not routed — stays on "/")
 type NewGameScreen =
@@ -197,10 +198,11 @@ function App() {
     // New-game wizard (internal to "/" route)
     if (newGameScreen) {
       switch (newGameScreen.type) {
-        case 'new_game_players':
+        case 'new_game_players': {
           return <PlayerEntry onNext={handlePlayersNext} onBack={handleBackToMenu} />
+        }
 
-        case 'new_game_script':
+        case 'new_game_script': {
           return (
             <ScriptSelection
               players={newGameScreen.players}
@@ -208,8 +210,9 @@ function App() {
               onBack={() => setNewGameScreen({ type: 'new_game_players' })}
             />
           )
+        }
 
-        case 'new_game_roles':
+        case 'new_game_roles': {
           return (
             <RoleSelection
               players={newGameScreen.players}
@@ -223,8 +226,9 @@ function App() {
               }
             />
           )
+        }
 
-        case 'new_game_assign':
+        case 'new_game_assign': {
           return (
             <RoleAssignment
               players={newGameScreen.players}
@@ -239,6 +243,7 @@ function App() {
               }
             />
           )
+        }
       }
     }
 

@@ -1,17 +1,18 @@
-import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
-import { ROLES } from '../../lib/roles'
-import type { RoleDefinition, RoleId } from '../../lib/roles/types'
-import type { Language } from '../../lib/i18n/types'
-import { SCRIPTS, type ScriptId, getRecommendedDistribution, applyDistributionModifiers } from '../../lib/scripts'
-import { type GeneratedPool, type GeneratorPreset } from '../../lib/scripts/types'
-import { generateRolePools, selectPresetPools } from '../../lib/scripts/generator'
-import { getTeam, type TeamId } from '../../lib/teams'
-import { useI18n, interpolate, getRoleName, getRoleDescription } from '../../lib/i18n'
-import { Button, Icon, Badge, BackButton } from '../atoms'
-import { ScreenFooter } from '../layouts/ScreenFooter'
-import { cn } from '../../lib/utils'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-type Props = {
+import { getRoleDescription, getRoleName, interpolate, useI18n } from '../../lib/i18n'
+import type { Language } from '../../lib/i18n/types'
+import { getRole } from '../../lib/roles/registry'
+import type { RoleDefinition, RoleId } from '../../lib/roles/types'
+import { SCRIPTS, type ScriptId, applyDistributionModifiers, getRecommendedDistribution } from '../../lib/scripts'
+import { generateRolePools, selectPresetPools } from '../../lib/scripts/generator'
+import { type GeneratedPool, type GeneratorPreset } from '../../lib/scripts/types'
+import { type TeamId, getTeam } from '../../lib/teams'
+import { cn } from '../../lib/utils'
+import { BackButton, Badge, Button, Icon } from '../atoms'
+import { ScreenFooter } from '../layouts/ScreenFooter'
+
+interface Props {
   players: string[]
   scriptId: ScriptId
   onNext: (selectedRoles: string[]) => void
@@ -28,9 +29,7 @@ export function RoleSelection({ players, scriptId, onNext, onBack }: Props) {
   const isCustomMode = scriptId === 'custom'
 
   // ── State ──────────────────────────────────────────────────────────
-  const [roleCounts, setRoleCounts] = useState<Record<string, number>>(() => {
-    return { imp: 1 }
-  })
+  const [roleCounts, setRoleCounts] = useState<Record<string, number>>(() => ({ imp: 1 }))
   const [mode, setMode] = useState<SelectionMode>(isCustomMode ? 'manual' : 'generate')
   const [selectedPreset, setSelectedPreset] = useState<GeneratorPreset>('interesting')
   const [presetPools, setPresetPools] = useState<Record<GeneratorPreset, GeneratedPool> | null>(null)
@@ -57,9 +56,11 @@ export function RoleSelection({ players, scriptId, onNext, onBack }: Props) {
   // Recommended distribution, adjusted for selected roles with modifiers
   const recommended = useMemo(() => {
     const base = getRecommendedDistribution(players.length)
-    if (!base) return null
+    if (!base) {
+      return null
+    }
     const modifiers = Object.entries(roleCounts).flatMap(([roleId, count]) => {
-      const role = ROLES[roleId as keyof typeof ROLES]
+      const role = getRole(roleId)
       return Array(count).fill(role?.distributionModifier) as (Partial<Record<TeamId, number>> | undefined)[]
     })
     return applyDistributionModifiers(base, modifiers)
@@ -74,7 +75,7 @@ export function RoleSelection({ players, scriptId, onNext, onBack }: Props) {
       demon: [],
     }
     for (const roleId of script.roles) {
-      const role = ROLES[roleId]
+      const role = getRole(roleId)
       if (role) {
         result[role.team].push(role)
       }
@@ -91,7 +92,7 @@ export function RoleSelection({ players, scriptId, onNext, onBack }: Props) {
       demon: 0,
     }
     for (const [roleId, count] of Object.entries(roleCounts)) {
-      const role = ROLES[roleId as keyof typeof ROLES]
+      const role = getRole(roleId)
       if (role) {
         counts[role.team] += count
       }
@@ -145,7 +146,9 @@ export function RoleSelection({ players, scriptId, onNext, onBack }: Props) {
     setMode('manual')
 
     // Show toast
-    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current)
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current)
+    }
     setAppliedToast({ preset: presetName, count: pool.roles.length })
     toastTimeoutRef.current = setTimeout(() => setAppliedToast(null), 3000)
   }
@@ -340,7 +343,7 @@ export function RoleSelection({ players, scriptId, onNext, onBack }: Props) {
 // DISTRIBUTION TRACKER (compact, always visible in manual mode)
 // ============================================================================
 
-type DistributionTrackerProps = {
+interface DistributionTrackerProps {
   recommended: Record<TeamId, number>
   teamCounts: Record<TeamId, number>
 }
@@ -431,7 +434,7 @@ const PRESET_CONFIG: {
   },
 ]
 
-type GenerateViewProps = {
+interface GenerateViewProps {
   presetPools: Record<GeneratorPreset, GeneratedPool> | null
   selectedPreset: GeneratorPreset
   onSelectPreset: (preset: GeneratorPreset) => void
@@ -456,7 +459,9 @@ function GenerateView({
 
   // Group roles of active pool by team
   const poolRolesByTeam = useMemo(() => {
-    if (!activePool) return null
+    if (!activePool) {
+      return null
+    }
     const groups: Record<TeamId, RoleId[]> = {
       townsfolk: [],
       outsider: [],
@@ -464,7 +469,7 @@ function GenerateView({
       demon: [],
     }
     for (const roleId of activePool.roles) {
-      const role = ROLES[roleId]
+      const role = getRole(roleId)
       if (role) {
         groups[role.team].push(roleId)
       }
@@ -534,7 +539,9 @@ function GenerateView({
           <div className='space-y-2 px-4 py-3'>
             {TEAM_ORDER.map((teamId) => {
               const roles = poolRolesByTeam[teamId]
-              if (roles.length === 0) return null
+              if (roles.length === 0) {
+                return null
+              }
               const team = getTeam(teamId)
 
               return (
@@ -548,7 +555,7 @@ function GenerateView({
                         team.colors.badgeText,
                       )}
                     >
-                      <Icon name={ROLES[roleId].icon} size='xs' />
+                      <Icon name={getRole(roleId)!.icon} size='xs' />
                       {getRoleName(roleId, language)}
                     </span>
                   ))}
@@ -594,7 +601,7 @@ function GenerateView({
 // MANUAL ROLE GRID (with sticky team section headers)
 // ============================================================================
 
-type ManualRoleGridProps = {
+interface ManualRoleGridProps {
   rolesByTeam: Record<TeamId, RoleDefinition[]>
   roleCounts: Record<string, number>
   teamCounts: Record<TeamId, number>
@@ -621,7 +628,9 @@ function ManualRoleGrid({
     <>
       {TEAM_ORDER.map((teamId) => {
         const roles = rolesByTeam[teamId]
-        if (roles.length === 0) return null
+        if (roles.length === 0) {
+          return null
+        }
 
         return (
           <TeamSection
@@ -647,7 +656,7 @@ function ManualRoleGrid({
 // TEAM SECTION (sticky header + role card grid)
 // ============================================================================
 
-type TeamSectionProps = {
+interface TeamSectionProps {
   teamId: TeamId
   roles: RoleDefinition[]
   roleCounts: Record<string, number>
@@ -729,7 +738,7 @@ function TeamSection({
 // ROLE CARD
 // ============================================================================
 
-type RoleCardProps = {
+interface RoleCardProps {
   role: RoleDefinition
   team: ReturnType<typeof getTeam>
   count: number

@@ -1,9 +1,10 @@
-import { assert, describe, it, expect, beforeEach } from 'vitest'
+import { assert, beforeEach, describe, expect, it } from 'vitest'
+
+import { isMalfunctioning } from '../effects'
 import { resolveIntent } from '../pipeline'
 import { getAvailableDayActions } from '../pipeline/index'
-import { isMalfunctioning } from '../effects'
 import type { KillIntent, NominateIntent } from '../pipeline/types'
-import { makePlayer, makeGame, makeState, addEffectTo, resetPlayerCounter } from './helpers'
+import { addEffectTo, makeGame, makePlayer, makeState, resetPlayerCounter } from './helpers'
 
 beforeEach(() => {
   resetPlayerCounter()
@@ -302,31 +303,31 @@ describe('SlayerBullet day action', () => {
 describe('isMalfunctioning', () => {
   it('returns true for a player with the poisoned effect', () => {
     const player = addEffectTo(makePlayer({ roleId: 'chef' }), 'poisoned')
-    expect(isMalfunctioning(player)).toBe(true)
+    expect(isMalfunctioning(player)).toBeTruthy()
   })
 
   it('returns true for a player with the drunk effect', () => {
     const player = addEffectTo(makePlayer({ roleId: 'chef' }), 'drunk')
-    expect(isMalfunctioning(player)).toBe(true)
+    expect(isMalfunctioning(player)).toBeTruthy()
   })
 
   it('returns false for a player with no malfunction effects', () => {
     const player = makePlayer({ roleId: 'chef' })
-    expect(isMalfunctioning(player)).toBe(false)
+    expect(isMalfunctioning(player)).toBeFalsy()
   })
 
   it('returns false for a player with non-malfunction effects', () => {
     let player = makePlayer({ roleId: 'soldier' })
     player = addEffectTo(player, 'safe')
     player = addEffectTo(player, 'dead')
-    expect(isMalfunctioning(player)).toBe(false)
+    expect(isMalfunctioning(player)).toBeFalsy()
   })
 
   it('returns true when poisoned is among multiple effects', () => {
     let player = makePlayer({ roleId: 'soldier' })
     player = addEffectTo(player, 'safe')
     player = addEffectTo(player, 'poisoned')
-    expect(isMalfunctioning(player)).toBe(true)
+    expect(isMalfunctioning(player)).toBeTruthy()
   })
 })
 

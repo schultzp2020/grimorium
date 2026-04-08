@@ -1,5 +1,5 @@
-import { type Intent, type KillIntent, type NominateIntent, type ExecuteIntent, type StateChanges } from './types'
 import type { GameState } from '../types'
+import { type ExecuteIntent, type Intent, type KillIntent, type NominateIntent, type StateChanges } from './types'
 
 // ============================================================================
 // DEFAULT RESOLVERS

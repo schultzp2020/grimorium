@@ -1,5 +1,6 @@
-import { useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { PlayerFacingContext, HandbackContext } from '../context/PlayerFacingContext'
+import { type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+
+import { HandbackContext, PlayerFacingContext } from '../context/PlayerFacingContext'
 import { HandDeviceScreen } from './HandDeviceScreen'
 import { ReturnDeviceScreen } from './ReturnDeviceScreen'
 

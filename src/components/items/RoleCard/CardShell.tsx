@@ -1,9 +1,10 @@
 import React, { type ReactNode } from 'react'
-import { getTeam, type TeamId } from '../../../lib/teams'
+
+import { type TeamId, getTeam } from '../../../lib/teams'
 import { cn } from '../../../lib/utils'
 import { Icon } from '../../atoms'
 import type { IconName } from '../../atoms/icon'
-import { TownsfolkParticles, MinionParticles } from './CardParticles'
+import { MinionParticles, TownsfolkParticles } from './CardParticles'
 
 // ─── Corner icon decorations ─────────────────────────────────────────────────
 
@@ -34,20 +35,24 @@ function CornerIcon({
 
 function getFrameClass(teamId: TeamId): string {
   switch (teamId) {
-    case 'demon':
+    case 'demon': {
       return 'card-frame-demon'
-    case 'minion':
+    }
+    case 'minion': {
       return 'card-frame-minion'
-    case 'outsider':
+    }
+    case 'outsider': {
       return 'card-frame-outsider'
-    default:
+    }
+    default: {
       return 'card-frame-townsfolk'
+    }
   }
 }
 
 // ─── CardShell ───────────────────────────────────────────────────────────────
 
-type CardShellProps = {
+interface CardShellProps {
   teamId: TeamId
   icon: IconName
   children: ReactNode

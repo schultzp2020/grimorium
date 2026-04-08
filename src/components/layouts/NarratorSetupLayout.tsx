@@ -1,12 +1,13 @@
 import type { ReactNode } from 'react'
-import { Icon, Button } from '../atoms'
+
+import { interpolate, useI18n } from '../../lib/i18n'
+import type { NightStepAudience } from '../../lib/roles/types'
+import { cn } from '../../lib/utils'
+import { Button, Icon } from '../atoms'
 import type { IconName } from '../atoms/icon'
 import { ScreenFooter } from './ScreenFooter'
-import { useI18n, interpolate } from '../../lib/i18n'
-import { cn } from '../../lib/utils'
-import type { NightStepAudience } from '../../lib/roles/types'
 
-type NarratorSetupLayoutProps = {
+interface NarratorSetupLayoutProps {
   icon: IconName
   roleName: string
   playerName: string

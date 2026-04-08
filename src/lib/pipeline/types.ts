@@ -1,27 +1,28 @@
 import type { FC } from 'react'
-import type { GameState, PlayerState, HistoryEntry, Game } from '../types'
-import type { EffectToAdd } from '../roles/types'
+
 import type { IconName } from '../../components/atoms/icon'
+import type { EffectToAdd } from '../roles/types'
 import type { TeamId } from '../teams/types'
+import type { Game, GameState, HistoryEntry, PlayerState } from '../types'
 
 // ============================================================================
 // INTENTS
 // ============================================================================
 
-export type KillIntent = {
+export interface KillIntent {
   type: 'kill'
   sourceId: string
   targetId: string
   cause: string
 }
 
-export type NominateIntent = {
+export interface NominateIntent {
   type: 'nominate'
   nominatorId: string
   nomineeId: string
 }
 
-export type ExecuteIntent = {
+export interface ExecuteIntent {
   type: 'execute'
   playerId: string
   cause: string
@@ -33,7 +34,7 @@ export type Intent = KillIntent | NominateIntent | ExecuteIntent
 // STATE CHANGES
 // ============================================================================
 
-export type StateChanges = {
+export interface StateChanges {
   entries: Omit<HistoryEntry, 'id' | 'timestamp' | 'stateAfter'>[]
   stateUpdates?: Partial<GameState>
   addEffects?: Record<string, EffectToAdd[]>
@@ -59,7 +60,7 @@ export type HandlerResult =
 // INTENT HANDLERS
 // ============================================================================
 
-export type IntentHandler = {
+export interface IntentHandler {
   intentType: Intent['type'] | Intent['type'][]
   priority: number
   appliesTo: (intent: Intent, effectPlayer: PlayerState, state: GameState) => boolean
@@ -70,7 +71,7 @@ export type IntentHandler = {
 // PIPELINE RESULTS
 // ============================================================================
 
-export type PipelineInputProps = {
+export interface PipelineInputProps {
   state: GameState
   intent: Intent
   onComplete: (result: unknown) => void
@@ -90,20 +91,20 @@ export type PipelineResult =
 // DAY ACTIONS
 // ============================================================================
 
-export type DayActionProps = {
+export interface DayActionProps {
   state: GameState
   playerId: string
   onComplete: (result: DayActionResult) => void
   onBack: () => void
 }
 
-export type DayActionResult = {
+export interface DayActionResult {
   entries: Omit<HistoryEntry, 'id' | 'timestamp' | 'stateAfter'>[]
   addEffects?: Record<string, EffectToAdd[]>
   removeEffects?: Record<string, string[]>
 }
 
-export type DayActionDefinition = {
+export interface DayActionDefinition {
   id: string
   icon: IconName
   // Functions receive the translations object and return localized strings
@@ -117,7 +118,7 @@ export type DayActionDefinition = {
 // AVAILABLE DAY ACTION (resolved for UI)
 // ============================================================================
 
-export type AvailableDayAction = {
+export interface AvailableDayAction {
   id: string
   playerId: string
   icon: IconName
@@ -134,7 +135,7 @@ export type AvailableDayAction = {
  * Props for a night follow-up's action component.
  * Similar to DayActionProps but includes game context for history checks.
  */
-export type NightFollowUpProps = {
+export interface NightFollowUpProps {
   state: GameState
   game: Game
   playerId: string
@@ -145,7 +146,7 @@ export type NightFollowUpProps = {
  * Result of a night follow-up action.
  * Applied the same way as DayActionResult — entries and effect changes.
  */
-export type NightFollowUpResult = {
+export interface NightFollowUpResult {
   entries: Omit<HistoryEntry, 'id' | 'timestamp' | 'stateAfter'>[]
   addEffects?: Record<string, EffectToAdd[]>
   removeEffects?: Record<string, string[]>
@@ -159,7 +160,7 @@ export type NightFollowUpResult = {
  * is met. They are used for reactive behaviors like role change reveals
  * (e.g., Scarlet Woman becoming the Demon after the Imp kills itself).
  */
-export type NightFollowUpDefinition = {
+export interface NightFollowUpDefinition {
   id: string
   icon: IconName
   getLabel: (t: Record<string, any>) => string
@@ -170,7 +171,7 @@ export type NightFollowUpDefinition = {
 /**
  * A resolved night follow-up ready for the UI.
  */
-export type AvailableNightFollowUp = {
+export interface AvailableNightFollowUp {
   id: string
   playerId: string
   playerName: string
@@ -185,7 +186,7 @@ export type AvailableNightFollowUp = {
 
 export type WinConditionTrigger = 'after_execution' | 'end_of_day' | 'after_state_change'
 
-export type WinConditionCheck = {
+export interface WinConditionCheck {
   trigger: WinConditionTrigger
   check: (state: GameState, game: Game) => 'townsfolk' | 'demon' | null
 }
@@ -208,7 +209,7 @@ export type PerceptionContext = 'alignment' | 'team' | 'role'
  * This may differ from the player's actual role/team/alignment due to
  * perception modifiers (e.g., Recluse registering as evil, Spy registering as good).
  */
-export type Perception = {
+export interface Perception {
   roleId: string
   team: TeamId
   alignment: 'good' | 'evil'
@@ -222,7 +223,7 @@ export type Perception = {
  * - Recluse: registers as evil/minion/demon to info abilities
  * - Spy: registers as good/townsfolk/outsider to info abilities
  */
-export type PerceptionModifier = {
+export interface PerceptionModifier {
   /** Which perception contexts this modifier applies to. */
   context: PerceptionContext | PerceptionContext[]
 

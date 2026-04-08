@@ -1,16 +1,16 @@
+import { getEffect, isMalfunctioning } from '../effects/registry'
+import type { EffectToAdd } from '../roles/types'
+import { type Game, type GameState, type HistoryEntry, type PlayerState, generateId } from '../types'
+import { getDefaultResolver } from './resolvers'
 import {
+  type AvailableDayAction,
+  type AvailableNightFollowUp,
   type Intent,
   type IntentHandler,
   type PipelineResult,
   type StateChanges,
-  type AvailableDayAction,
-  type AvailableNightFollowUp,
   type WinConditionTrigger,
 } from './types'
-import { type GameState, type PlayerState, type Game, type HistoryEntry, generateId } from '../types'
-import { getEffect, isMalfunctioning } from '../effects'
-import { getDefaultResolver } from './resolvers'
-import type { EffectToAdd } from '../roles/types'
 
 // ============================================================================
 // STATE CHANGES UTILITIES
@@ -21,7 +21,9 @@ export function emptyStateChanges(): StateChanges {
 }
 
 export function mergeStateChanges(target: StateChanges, source?: StateChanges): StateChanges {
-  if (!source) return target
+  if (!source) {
+    return target
+  }
 
   return {
     entries: [...target.entries, ...source.entries],
@@ -37,7 +39,9 @@ function mergeEffectRecords(
   a?: Record<string, EffectToAdd[]>,
   b?: Record<string, EffectToAdd[]>,
 ): Record<string, EffectToAdd[]> | undefined {
-  if (!a && !b) return undefined
+  if (!a && !b) {
+    return undefined
+  }
   const result: Record<string, EffectToAdd[]> = { ...a }
   if (b) {
     for (const [key, val] of Object.entries(b)) {
@@ -51,7 +55,9 @@ function mergeRemoveRecords(
   a?: Record<string, string[]>,
   b?: Record<string, string[]>,
 ): Record<string, string[]> | undefined {
-  if (!a && !b) return undefined
+  if (!a && !b) {
+    return undefined
+  }
   const result: Record<string, string[]> = { ...a }
   if (b) {
     for (const [key, val] of Object.entries(b)) {
@@ -68,18 +74,22 @@ function mergeRemoveRecords(
 function collectActiveHandlers(
   state: GameState,
   intentType: string,
-): Array<{ handler: IntentHandler; player: PlayerState }> {
-  const result: Array<{ handler: IntentHandler; player: PlayerState }> = []
+): { handler: IntentHandler; player: PlayerState }[] {
+  const result: { handler: IntentHandler; player: PlayerState }[] = []
 
   for (const player of state.players) {
     // Skip handlers from malfunctioning players — their passive abilities
     // don't work (e.g., Poisoned Soldier's Safe doesn't protect,
     // Drunk Virgin's Pure doesn't trigger)
-    if (isMalfunctioning(player)) continue
+    if (isMalfunctioning(player)) {
+      continue
+    }
 
     for (const effectInstance of player.effects) {
       const effectDef = getEffect(effectInstance.type)
-      if (!effectDef?.handlers) continue
+      if (!effectDef?.handlers) {
+        continue
+      }
 
       for (const handler of effectDef.handlers) {
         const types = Array.isArray(handler.intentType) ? handler.intentType : [handler.intentType]
@@ -99,7 +109,7 @@ function collectActiveHandlers(
 
 function runPipeline(
   intent: Intent,
-  handlers: Array<{ handler: IntentHandler; player: PlayerState }>,
+  handlers: { handler: IntentHandler; player: PlayerState }[],
   state: GameState,
   game: Game,
   accumulated: StateChanges,
@@ -107,22 +117,26 @@ function runPipeline(
 ): PipelineResult {
   for (let i = startIndex; i < handlers.length; i++) {
     const { handler, player } = handlers[i]
-    if (!handler.appliesTo(intent, player, state)) continue
+    if (!handler.appliesTo(intent, player, state)) {
+      continue
+    }
 
     const result = handler.handle(intent, player, state, game)
 
     switch (result.action) {
-      case 'allow':
+      case 'allow': {
         if (result.stateChanges) {
           accumulated = mergeStateChanges(accumulated, result.stateChanges)
         }
         continue
+      }
 
-      case 'prevent':
+      case 'prevent': {
         if (result.stateChanges) {
           accumulated = mergeStateChanges(accumulated, result.stateChanges)
         }
         return { type: 'prevented', stateChanges: accumulated }
+      }
 
       case 'redirect': {
         if (result.stateChanges) {
@@ -134,7 +148,7 @@ function runPipeline(
         return runPipeline(result.newIntent, newHandlers, state, game, accumulated, 0)
       }
 
-      case 'request_ui':
+      case 'request_ui': {
         return {
           type: 'needs_input',
           UIComponent: result.UIComponent,
@@ -170,6 +184,7 @@ function runPipeline(
             }
           },
         }
+      }
     }
   }
 
@@ -260,7 +275,7 @@ export function applyPipelineChanges(game: Game, changes: StateChanges): Game {
     newState = applyPlayerChanges(newState, changes.addEffects, changes.removeEffects, changes.changeRoles)
   }
 
-  const lastEntry = game.history[game.history.length - 1]
+  const lastEntry = game.history.at(-1)
   if (lastEntry) {
     return {
       ...game,
@@ -281,7 +296,7 @@ function applyPlayerChanges(
     ...state,
     players: state.players.map((player) => {
       let effects = [...player.effects]
-      let roleId = player.roleId
+      let { roleId } = player
 
       if (removeEffects?.[player.id]) {
         effects = effects.filter((e) => !removeEffects[player.id].includes(e.type))
@@ -320,7 +335,9 @@ export function getAvailableDayActions(state: GameState, t: Record<string, any>)
   for (const player of state.players) {
     for (const effectInstance of player.effects) {
       const effectDef = getEffect(effectInstance.type)
-      if (!effectDef?.dayActions) continue
+      if (!effectDef?.dayActions) {
+        continue
+      }
 
       for (const dayAction of effectDef.dayActions) {
         if (dayAction.condition(player, state)) {
@@ -361,7 +378,9 @@ export function getAvailableNightFollowUps(
   for (const player of state.players) {
     for (const effectInstance of player.effects) {
       const effectDef = getEffect(effectInstance.type)
-      if (!effectDef?.nightFollowUps) continue
+      if (!effectDef?.nightFollowUps) {
+        continue
+      }
 
       for (const followUp of effectDef.nightFollowUps) {
         if (followUp.condition(player, state, game)) {
@@ -398,16 +417,22 @@ export function checkDynamicWinConditions(
   // Skip win conditions from malfunctioning players (e.g., poisoned Saint's
   // martyrdom doesn't trigger evil winning)
   for (const player of state.players) {
-    if (isMalfunctioning(player)) continue
+    if (isMalfunctioning(player)) {
+      continue
+    }
 
     for (const effectInstance of player.effects) {
       const effectDef = getEffect(effectInstance.type)
-      if (!effectDef?.winConditions) continue
+      if (!effectDef?.winConditions) {
+        continue
+      }
 
       for (const wc of effectDef.winConditions) {
         if (triggers.includes(wc.trigger)) {
           const result = wc.check(state, game)
-          if (result) return result
+          if (result) {
+            return result
+          }
         }
       }
     }
@@ -417,15 +442,21 @@ export function checkDynamicWinConditions(
   // Skip win conditions from malfunctioning players (e.g., poisoned Mayor's
   // peaceful victory doesn't trigger)
   for (const player of state.players) {
-    if (isMalfunctioning(player)) continue
+    if (isMalfunctioning(player)) {
+      continue
+    }
 
     const role = getRole(player.roleId)
-    if (!role?.winConditions) continue
+    if (!role?.winConditions) {
+      continue
+    }
 
     for (const wc of role.winConditions) {
       if (triggers.includes(wc.trigger)) {
         const result = wc.check(state, game)
-        if (result) return result
+        if (result) {
+          return result
+        }
       }
     }
   }

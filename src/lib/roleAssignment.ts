@@ -1,6 +1,6 @@
 import { getRole } from './roles'
 
-export type RoleAssignmentInput = {
+export interface RoleAssignmentInput {
   /** Ordered list of player names */
   players: string[]
   /** Full pool of selected role IDs (may be larger than players) */
@@ -9,7 +9,7 @@ export type RoleAssignmentInput = {
   manualAssignments: Record<string, string | null>
 }
 
-export type PlayerRoleAssignment = {
+export interface PlayerRoleAssignment {
   name: string
   roleId: string
 }

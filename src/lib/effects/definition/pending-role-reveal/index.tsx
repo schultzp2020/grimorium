@@ -1,15 +1,14 @@
-import type { EffectDefinition } from '../../types'
-import { type NightFollowUpDefinition, type NightFollowUpProps } from '../../../pipeline/types'
-import { getRole } from '../../../roles'
-import { getTeam } from '../../../teams'
 import { RoleCard } from '../../../../components/items/RoleCard'
 import { TeamBackground } from '../../../../components/items/TeamBackground'
-import { PlayerFacingScreen } from '../../../../components/layouts/PlayerFacingScreen'
 import { HandbackCardLink } from '../../../../components/layouts'
-import { useI18n } from '../../../i18n'
+import { PlayerFacingScreen } from '../../../../components/layouts/PlayerFacingScreen'
 import { cn } from '../../../../lib/utils'
+import { useI18n } from '../../../i18n'
 import { registerEffectTranslations } from '../../../i18n'
-
+import { type NightFollowUpDefinition, type NightFollowUpProps } from '../../../pipeline/types'
+import { getRole } from '../../../roles/registry'
+import { getTeam } from '../../../teams'
+import type { EffectDefinition } from '../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 
@@ -25,7 +24,9 @@ registerEffectTranslations('pending_role_reveal', 'es', es)
 function RoleChangeRevealAction({ state, playerId, onComplete }: NightFollowUpProps) {
   const { t } = useI18n()
   const player = state.players.find((p) => p.id === playerId)
-  if (!player) return null
+  if (!player) {
+    return null
+  }
 
   const role = getRole(player.roleId)
   const teamId = role?.team ?? 'townsfolk'

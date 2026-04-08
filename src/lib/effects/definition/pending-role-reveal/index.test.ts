@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import definition from '.'
-import { makePlayer, makeState, makeGame, addEffectTo, resetPlayerCounter } from '../../../__tests__/helpers'
+import { addEffectTo, makeGame, makePlayer, makeState, resetPlayerCounter } from '../../../__tests__/helpers'
 
 beforeEach(() => resetPlayerCounter())
 
@@ -17,7 +18,7 @@ describe('PendingRoleReveal effect', () => {
       const state = makeState({ players: [player] })
       const game = makeGame(state)
 
-      expect(followUp.condition(player, state, game)).toBe(true)
+      expect(followUp.condition(player, state, game)).toBeTruthy()
     })
   })
 

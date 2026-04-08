@@ -1,9 +1,9 @@
 import { useI18n } from '../../lib/i18n'
 import { SCRIPTS, type ScriptId } from '../../lib/scripts'
-import { Icon, BackButton } from '../atoms'
 import { cn } from '../../lib/utils'
+import { BackButton, Icon } from '../atoms'
 
-type Props = {
+interface Props {
   players: string[]
   onSelect: (scriptId: ScriptId) => void
   onBack: () => void
@@ -14,9 +14,7 @@ const SCRIPT_ORDER: ScriptId[] = ['trouble-brewing', 'custom']
 export function ScriptSelection({ players, onSelect, onBack }: Props) {
   const { t } = useI18n()
 
-  const getScriptName = (id: ScriptId) => {
-    return t.scripts[id as keyof typeof t.scripts] ?? id
-  }
+  const getScriptName = (id: ScriptId) => t.scripts[id as keyof typeof t.scripts] ?? id
 
   return (
     <div className='flex min-h-app flex-col bg-gradient-to-b from-grimoire-purple via-grimoire-dark to-grimoire-darker'>

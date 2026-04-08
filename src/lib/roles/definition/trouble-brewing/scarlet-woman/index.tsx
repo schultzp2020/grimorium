@@ -1,17 +1,17 @@
 import { useState } from 'react'
-import type { RoleDefinition } from '../../../types'
+
+import { Icon } from '../../../../../components/atoms'
 import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
 import { EvilTeamReveal } from '../../../../../components/items/EvilTeamReveal'
-import { registerRoleTranslations, useI18n, getRoleName, getRoleTranslations } from '../../../../i18n'
 import {
+  HandbackButton,
   NightActionLayout,
   NightStepListLayout,
   PlayerFacingScreen,
-  HandbackButton,
 } from '../../../../../components/layouts'
 import type { NightStep } from '../../../../../components/layouts'
-import { Icon } from '../../../../../components/atoms'
-
+import { getRoleName, getRoleTranslations, registerRoleTranslations, useI18n } from '../../../../i18n'
+import type { RoleDefinition } from '../../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 

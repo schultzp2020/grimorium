@@ -1,19 +1,20 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+
+import { useI18n } from '../../lib/i18n'
+import { getRole } from '../../lib/roles/registry'
+import { getTeam } from '../../lib/teams'
+import { cn } from '../../lib/utils'
 import { Button, Icon } from '../atoms'
 import { TeamBackground } from '../items'
 import { RoleCard } from '../items/RoleCard'
-import { cn } from '../../lib/utils'
-import { getRole } from '../../lib/roles'
-import { getTeam } from '../../lib/teams'
-import { useI18n } from '../../lib/i18n'
 
-export type DeathRevealEntry = {
+export interface DeathRevealEntry {
   playerId: string
   playerName: string
   roleId: string
 }
 
-type Props = {
+interface Props {
   deaths: DeathRevealEntry[]
   onContinue: () => void
 }
@@ -44,7 +45,9 @@ export function DeathRevealScreen({ deaths, onContinue }: Props) {
     }
   }
 
-  if (!currentDeath) return null
+  if (!currentDeath) {
+    return null
+  }
 
   const role = getRole(currentDeath.roleId)
   const teamId = role?.team ?? 'townsfolk'

@@ -1,16 +1,17 @@
 import { useState } from 'react'
-import type { GameState, PlayerState } from '../../lib/types'
-import { getRole, getAllRoles } from '../../lib/roles'
-import { getEffect, resolveCanRegisterAs } from '../../lib/effects'
-import { useI18n, getRoleName as getRegistryRoleName, getEffectName as getRegistryEffectName } from '../../lib/i18n'
-import type { Perception, PerceptionContext } from '../../lib/pipeline/types'
-import type { TeamId } from '../../lib/teams'
-import { Icon } from '../atoms'
-import { NarratorSetupLayout } from '../layouts'
-import { RolePickerGrid } from '../inputs/RolePickerGrid'
-import { cn } from '../../lib/utils'
 
-type Props = {
+import { getEffect, resolveCanRegisterAs } from '../../lib/effects/registry'
+import { getEffectName as getRegistryEffectName, getRoleName as getRegistryRoleName, useI18n } from '../../lib/i18n'
+import type { Perception, PerceptionContext } from '../../lib/pipeline/types'
+import { getAllRoles, getRole } from '../../lib/roles/registry'
+import type { TeamId } from '../../lib/teams'
+import type { GameState, PlayerState } from '../../lib/types'
+import { cn } from '../../lib/utils'
+import { Icon } from '../atoms'
+import { RolePickerGrid } from '../inputs/RolePickerGrid'
+import { NarratorSetupLayout } from '../layouts'
+
+interface Props {
   /** Players whose perception is ambiguous for this context. */
   ambiguousPlayers: PlayerState[]
   /** What aspect of perception is being configured. */
@@ -110,23 +111,31 @@ export function PerceptionConfigStep({
         {ambiguousPlayers.map((player) => {
           const role = getRole(player.roleId)
           const isOverriddenEvil = overrides[player.id]?.alignment === 'evil'
-          const overriddenTeam = overrides[player.id]?.team as TeamId | undefined
-          const overriddenRole = overrides[player.id]?.roleId as string | undefined
+          const overriddenTeam = overrides[player.id]?.team
+          const overriddenRole = overrides[player.id]?.roleId
 
           // Find the effect that grants misregistration for display
           const misregisterEffect = player.effects.find((e) => {
             const def = getEffect(e.type)
             const canReg = resolveCanRegisterAs(e, def)
-            if (!canReg) return false
-            if (context === 'alignment' && canReg.alignments?.length) return true
-            if (context === 'team' && canReg.teams?.length) return true
-            if (context === 'role' && (canReg.teams?.length || canReg.alignments?.length)) return true
+            if (!canReg) {
+              return false
+            }
+            if (context === 'alignment' && canReg.alignments?.length) {
+              return true
+            }
+            if (context === 'team' && canReg.teams?.length) {
+              return true
+            }
+            if (context === 'role' && (canReg.teams?.length || canReg.alignments?.length)) {
+              return true
+            }
             return false
           })
           const effectDef = misregisterEffect ? getEffect(misregisterEffect.type) : null
           const effectName = effectDef ? getRegistryEffectName(effectDef.id, language) : ''
 
-          const actualTeam = (role?.team ?? 'townsfolk') as TeamId
+          const actualTeam = role?.team ?? 'townsfolk'
 
           const canRegTeams = misregisterEffect ? (resolveCanRegisterAs(misregisterEffect, effectDef)?.teams ?? []) : []
 
@@ -139,9 +148,15 @@ export function PerceptionConfigStep({
             : []
 
           const validRolesForOverride = getAllRoles().filter((r) => {
-            if (allowedTeams.includes(r.team)) return true
-            if (allowedAlignments.includes('evil') && (r.team === 'minion' || r.team === 'demon')) return true
-            if (allowedAlignments.includes('good') && (r.team === 'townsfolk' || r.team === 'outsider')) return true
+            if (allowedTeams.includes(r.team)) {
+              return true
+            }
+            if (allowedAlignments.includes('evil') && (r.team === 'minion' || r.team === 'demon')) {
+              return true
+            }
+            if (allowedAlignments.includes('good') && (r.team === 'townsfolk' || r.team === 'outsider')) {
+              return true
+            }
             return false
           })
 

@@ -1,9 +1,9 @@
-import { Icon, Badge } from '../atoms'
-import type { IconName } from '../atoms/icon'
-import { cn } from '../../lib/utils'
 import type { TeamId } from '../../lib/teams'
+import { cn } from '../../lib/utils'
+import { Badge, Icon } from '../atoms'
+import type { IconName } from '../atoms/icon'
 
-type SelectablePlayerItemProps = {
+interface SelectablePlayerItemProps {
   playerName: string
   roleName: string
   roleIcon: IconName

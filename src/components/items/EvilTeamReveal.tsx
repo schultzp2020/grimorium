@@ -1,14 +1,15 @@
 import { useMemo } from 'react'
+
+import { getRoleName, useI18n } from '../../lib/i18n'
+import { getRole } from '../../lib/roles/registry'
 import type { GameState, PlayerState } from '../../lib/types'
-import { getRole } from '../../lib/roles'
-import { useI18n, getRoleName } from '../../lib/i18n'
 import { Icon } from '../atoms'
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-type EvilTeamRevealProps = {
+interface EvilTeamRevealProps {
   /** Current game state */
   state: GameState
   /** The player viewing this screen (excluded from the list) */
@@ -17,7 +18,7 @@ type EvilTeamRevealProps = {
   viewerType: 'demon' | 'minion'
 }
 
-type TeamMember = {
+interface TeamMember {
   player: PlayerState
   showRole: boolean
   teamLabel: string
@@ -41,9 +42,13 @@ export function EvilTeamReveal({ state, viewer, viewerType }: EvilTeamRevealProp
     const members: TeamMember[] = []
 
     for (const p of state.players) {
-      if (p.id === viewer.id) continue
+      if (p.id === viewer.id) {
+        continue
+      }
       const role = getRole(p.roleId)
-      if (!role) continue
+      if (!role) {
+        continue
+      }
 
       if (role.team === 'minion') {
         members.push({
@@ -64,8 +69,12 @@ export function EvilTeamReveal({ state, viewer, viewerType }: EvilTeamRevealProp
     members.sort((a, b) => {
       const aRole = getRole(a.player.roleId)
       const bRole = getRole(b.player.roleId)
-      if (aRole?.team === 'demon' && bRole?.team !== 'demon') return -1
-      if (aRole?.team !== 'demon' && bRole?.team === 'demon') return 1
+      if (aRole?.team === 'demon' && bRole?.team !== 'demon') {
+        return -1
+      }
+      if (aRole?.team !== 'demon' && bRole?.team === 'demon') {
+        return 1
+      }
       return 0
     })
 

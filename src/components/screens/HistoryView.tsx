@@ -1,9 +1,9 @@
-import { type Game, getCurrentState } from '../../lib/types'
 import { useI18n } from '../../lib/i18n'
+import { type Game, getCurrentState } from '../../lib/types'
+import { BackButton, Icon, type IconName } from '../atoms'
 import { RichMessage } from '../items/RichMessage'
-import { Icon, type IconName, BackButton } from '../atoms'
 
-type Props = {
+interface Props {
   game: Game
   onClose: () => void
 }

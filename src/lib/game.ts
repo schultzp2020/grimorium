@@ -1,3 +1,8 @@
+import { trackEvent } from './analytics'
+import { applyPipelineChanges, checkDynamicWinConditions, resolveIntent } from './pipeline'
+import type { ExecuteIntent, NominateIntent } from './pipeline/types'
+import { getRole } from './roles'
+import type { EffectToAdd, NightActionResult, RoleDefinition } from './roles/types'
 import {
   type Game,
   type GameState,
@@ -5,21 +10,16 @@ import {
   type PlayerState,
   type RichMessage,
   generateId,
+  getAlivePlayers,
   getCurrentState,
   hasEffect,
-  getAlivePlayers,
 } from './types'
-import { getRole } from './roles'
-import type { RoleDefinition, NightActionResult, EffectToAdd } from './roles/types'
-import { resolveIntent, applyPipelineChanges, checkDynamicWinConditions } from './pipeline'
-import type { NominateIntent, ExecuteIntent } from './pipeline/types'
-import { trackEvent } from './analytics'
 
 // ============================================================================
 // GAME CREATION
 // ============================================================================
 
-export type PlayerSetup = {
+export interface PlayerSetup {
   name: string
   roleId: string
 }
@@ -122,7 +122,7 @@ export function addHistoryEntry(
       ...newState,
       players: newState.players.map((player) => {
         let effects = [...player.effects]
-        let roleId = player.roleId
+        let { roleId } = player
 
         // Remove effects
         if (removeEffects?.[player.id]) {
@@ -179,7 +179,9 @@ import type { SetupActionResult } from './roles/types'
 export function applySetupAction(game: Game, playerId: string, result: SetupActionResult): Game {
   const state = getCurrentState(game)
   const player = state.players.find((p) => p.id === playerId)
-  if (!player) return game
+  if (!player) {
+    return game
+  }
 
   const changeRoles = result.changeRole ? { [playerId]: result.changeRole } : undefined
 
@@ -253,9 +255,11 @@ export function getNextStep(game: Game): GameStep {
 
   if (state.phase === 'setup') {
     // Find next player who hasn't seen their role
-    const revealedPlayers = game.history.filter((e) => e.type === 'role_revealed').map((e) => e.data.playerId as string)
+    const revealedPlayers = new Set(
+      game.history.filter((e) => e.type === 'role_revealed').map((e) => e.data.playerId as string),
+    )
 
-    const nextPlayer = state.players.find((p) => !revealedPlayers.includes(p.id))
+    const nextPlayer = state.players.find((p) => !revealedPlayers.has(p.id))
 
     if (nextPlayer) {
       return { type: 'role_reveal', playerId: nextPlayer.id }
@@ -408,7 +412,9 @@ export function startDay(game: Game): Game {
 export function markRoleRevealed(game: Game, playerId: string): Game {
   const state = getCurrentState(game)
   const player = state.players.find((p) => p.id === playerId)
-  if (!player) return game
+  if (!player) {
+    return game
+  }
 
   return addHistoryEntry(game, {
     type: 'role_revealed',
@@ -487,7 +493,9 @@ export function nominate(game: Game, nominatorId: string, nomineeId: string): Ga
   const nominator = state.players.find((p) => p.id === nominatorId)
   const nominee = state.players.find((p) => p.id === nomineeId)
 
-  if (!nominator || !nominee) return game
+  if (!nominator || !nominee) {
+    return game
+  }
 
   const intent: NominateIntent = {
     type: 'nominate',
@@ -528,7 +536,9 @@ export type BlockStatus = {
  */
 export function getBlockStatus(game: Game): BlockStatus {
   const dayStartIndex = findLastEventIndex(game, 'day_started')
-  if (dayStartIndex === -1) return null
+  if (dayStartIndex === -1) {
+    return null
+  }
 
   let block: BlockStatus = null
 
@@ -551,7 +561,9 @@ export function getBlockStatus(game: Game): BlockStatus {
  */
 export function getNomineesToday(game: Game): Set<string> {
   const dayStartIndex = findLastEventIndex(game, 'day_started')
-  if (dayStartIndex === -1) return new Set()
+  if (dayStartIndex === -1) {
+    return new Set()
+  }
   const ids = new Set<string>()
   for (let i = dayStartIndex + 1; i < game.history.length; i++) {
     if (game.history[i].type === 'nomination') {
@@ -566,7 +578,9 @@ export function getNomineesToday(game: Game): Set<string> {
  */
 export function hasVirginExecutionToday(game: Game): boolean {
   const dayStartIndex = findLastEventIndex(game, 'day_started')
-  if (dayStartIndex === -1) return false
+  if (dayStartIndex === -1) {
+    return false
+  }
   for (let i = dayStartIndex + 1; i < game.history.length; i++) {
     if (game.history[i].type === 'virgin_execution') {
       return true
@@ -597,7 +611,9 @@ export function getVoteThreshold(state: GameState): number {
 export function resolveVote(game: Game, nomineeId: string, voteCount: number, votedIds?: string[]): Game {
   const state = getCurrentState(game)
   const nominee = state.players.find((p) => p.id === nomineeId)
-  if (!nominee) return game
+  if (!nominee) {
+    return game
+  }
 
   const threshold = getVoteThreshold(state)
   const meetsThreshold = voteCount >= threshold
@@ -706,7 +722,9 @@ export function resolveVote(game: Game, nomineeId: string, voteCount: number, vo
  */
 export function executeAtEndOfDay(game: Game): Game {
   const block = getBlockStatus(game)
-  if (!block) return game
+  if (!block) {
+    return game
+  }
 
   // Check for a tie-clear that happened after the block was set
   const dayStartIndex = findLastEventIndex(game, 'day_started')
@@ -772,7 +790,9 @@ export function checkWinCondition(state: GameState, game?: Game): 'townsfolk' | 
   // Check dynamic win conditions from effects and roles
   if (game) {
     const dynamicResult = checkDynamicWinConditions(state, game, ['after_execution', 'after_state_change'], getRole)
-    if (dynamicResult) return dynamicResult
+    if (dynamicResult) {
+      return dynamicResult
+    }
   }
 
   return null
@@ -821,12 +841,16 @@ export function endGame(game: Game, winner: 'townsfolk' | 'demon'): Game {
  */
 export function getLastNightDeaths(game: Game): string[] {
   const nightResolvedIndex = findLastEventIndex(game, 'night_resolved')
-  if (nightResolvedIndex === -1) return []
+  if (nightResolvedIndex === -1) {
+    return []
+  }
 
   const deaths: string[] = []
   for (let i = nightResolvedIndex + 1; i < game.history.length; i++) {
     const entry = game.history[i]
-    if (entry.type === 'day_started') break
+    if (entry.type === 'day_started') {
+      break
+    }
     if (entry.type === 'effect_added' && entry.data.effectType === 'dead' && entry.data.source !== 'narrator') {
       deaths.push(entry.data.playerId as string)
     }
@@ -839,7 +863,9 @@ export function getLastNightDeaths(game: Game): string[] {
  */
 export function getNominatorsToday(game: Game): Set<string> {
   const dayStartIndex = findLastEventIndex(game, 'day_started')
-  if (dayStartIndex === -1) return new Set()
+  if (dayStartIndex === -1) {
+    return new Set()
+  }
   const ids = new Set<string>()
   for (let i = dayStartIndex + 1; i < game.history.length; i++) {
     if (game.history[i].type === 'nomination') {
@@ -855,7 +881,9 @@ export function getNominatorsToday(game: Game): Set<string> {
  */
 export function getNightActionSummary(game: Game, playerId: string): RichMessage[] {
   const nightStartIndex = findLastEventIndex(game, 'night_started')
-  if (nightStartIndex === -1) return []
+  if (nightStartIndex === -1) {
+    return []
+  }
 
   const messages: RichMessage[] = []
   for (let i = nightStartIndex + 1; i < game.history.length; i++) {
@@ -871,7 +899,7 @@ export function getNightActionSummary(game: Game, playerId: string): RichMessage
 // NIGHT DASHBOARD HELPERS
 // ============================================================================
 
-export type NightRoleStatus = {
+export interface NightRoleStatus {
   roleId: string
   playerId: string
   playerName: string
@@ -998,14 +1026,20 @@ export function updateEffectData(
 ): Game {
   const currentState = getCurrentState(game)
   const player = currentState.players.find((p) => p.id === playerId)
-  if (!player) return game
+  if (!player) {
+    return game
+  }
 
   const hasTargetEffect = player.effects.some((e) => e.type === effectType)
-  if (!hasTargetEffect) return game
+  if (!hasTargetEffect) {
+    return game
+  }
 
   // Update the first matching effect instance's data
   const updatedPlayers = currentState.players.map((p) => {
-    if (p.id !== playerId) return p
+    if (p.id !== playerId) {
+      return p
+    }
     let found = false
     return {
       ...p,

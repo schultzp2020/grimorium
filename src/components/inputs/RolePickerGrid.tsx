@@ -1,21 +1,22 @@
 import { useMemo } from 'react'
-import type { RoleDefinition } from '../../lib/roles/types'
-import { getTeam, type TeamId } from '../../lib/teams'
-import { type GameState, type PlayerState, hasEffect } from '../../lib/types'
-import { getEffect } from '../../lib/effects'
+
+import { getEffect } from '../../lib/effects/registry'
 import {
-  useI18n,
-  getRoleName as getRegistryRoleName,
   getRoleDescription as getRegistryRoleDescription,
+  getRoleName as getRegistryRoleName,
+  useI18n,
 } from '../../lib/i18n'
+import type { RoleDefinition } from '../../lib/roles/types'
+import { type TeamId, getTeam } from '../../lib/teams'
+import { type GameState, type PlayerState, hasEffect } from '../../lib/types'
+import { cn } from '../../lib/utils'
 import { Icon } from '../atoms'
 import type { IconName } from '../atoms/icon'
 import { filterVisibleEffects } from '../items/PlayerRoleIcon'
-import { cn } from '../../lib/utils'
 
 const TEAM_ORDER: TeamId[] = ['townsfolk', 'outsider', 'minion', 'demon']
 
-type RolePickerGridProps = {
+interface RolePickerGridProps {
   /** All roles available for selection. Pre-filtered by the caller. */
   roles: RoleDefinition[]
 
@@ -98,7 +99,9 @@ export function RolePickerGrid({
     <div className='space-y-4'>
       {TEAM_ORDER.map((teamId) => {
         const teamRoles = rolesByTeam[teamId]
-        if (teamRoles.length === 0) return null
+        if (teamRoles.length === 0) {
+          return null
+        }
         const team = getTeam(teamId)
 
         return (
@@ -216,7 +219,7 @@ function PlayerRow({ player }: { player: PlayerState }) {
   const effectIcons = filterVisibleEffects(player.effects)
     .map((e) => {
       const def = getEffect(e.type)
-      return def ? { id: e.type, icon: def.icon as IconName } : null
+      return def ? { id: e.type, icon: def.icon } : null
     })
     .filter((e): e is { id: string; icon: IconName } => e !== null)
 

@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import definition from '.'
-import { makePlayer, makeState, addEffectTo, makeGameWithHistory, resetPlayerCounter } from '../../../__tests__/helpers'
+import { addEffectTo, makeGameWithHistory, makePlayer, makeState, resetPlayerCounter } from '../../../__tests__/helpers'
 
 beforeEach(() => resetPlayerCounter())
 

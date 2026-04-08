@@ -1,6 +1,7 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react'
-import { getTeam, type TeamId } from '../../lib/teams'
+
 import { useShaderBackground } from '../../hooks/useShaderBackground'
+import { type TeamId, getTeam } from '../../lib/teams'
 import { cn } from '../../lib/utils'
 
 // =============================================================================
@@ -426,7 +427,7 @@ const TEAM_SHADERS: Record<TeamId, string> = {
 // COMPONENTS
 // =============================================================================
 
-type TeamBackgroundProps = {
+interface TeamBackgroundProps {
   teamId: TeamId
   children: ReactNode
 }
@@ -466,7 +467,10 @@ function FadeOutLayer({ teamId, onDone }: { teamId: TeamId; onDone: () => void }
 
 // ─── Public component ───────────────────────────────────────────────────────
 
-type FadingLayer = { key: number; teamId: TeamId }
+interface FadingLayer {
+  key: number
+  teamId: TeamId
+}
 
 /**
  * Full-screen team-themed background with a live WebGL shader animation.
@@ -510,7 +514,7 @@ export function TeamBackground({ teamId, children }: TeamBackgroundProps) {
   )
 }
 
-type CardLinkProps = {
+interface CardLinkProps {
   onClick: () => void
   isEvil: boolean
   children: ReactNode

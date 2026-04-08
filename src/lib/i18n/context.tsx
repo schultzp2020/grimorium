@@ -1,11 +1,12 @@
-import { createContext, useContext, useState, useCallback, type ReactNode, useMemo } from 'react'
-import type { Language, Translations } from './types'
+import { type ReactNode, createContext, useCallback, useContext, useMemo, useState } from 'react'
+
 import en from './translations/en'
 import es from './translations/es'
+import type { Language, Translations } from './types'
 
 const TRANSLATIONS: Record<Language, Translations> = { en, es }
 
-export type LanguageOption = {
+export interface LanguageOption {
   code: Language
   nativeName: string
 }
@@ -39,7 +40,7 @@ function getInitialLanguage(): Language {
   return 'en'
 }
 
-type I18nContextType = {
+interface I18nContextType {
   language: Language
   setLanguage: (lang: Language) => void
   t: Translations
@@ -47,7 +48,7 @@ type I18nContextType = {
 
 const I18nContext = createContext<I18nContextType | null>(null)
 
-type Props = {
+interface Props {
   children: ReactNode
 }
 
@@ -77,5 +78,5 @@ export function useI18n(): I18nContextType {
 // Helper function to interpolate variables in strings
 // Usage: interpolate("Hello {name}!", { name: "World" }) => "Hello World!"
 export function interpolate(template: string, vars: Record<string, string | number>): string {
-  return template.replace(/\{(\w+)\}/g, (_, key) => String(vars[key] ?? `{${key}}`))
+  return template.replaceAll(/\{(\w+)\}/g, (_, key) => String(vars[key] ?? `{${key}}`))
 }

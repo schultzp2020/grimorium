@@ -1,4 +1,4 @@
-import { useEffect, type RefObject } from 'react'
+import { type RefObject, useEffect } from 'react'
 
 const VERTEX_SHADER = `
 attribute vec2 a_position;
@@ -9,7 +9,9 @@ void main() {
 
 function compileShader(gl: WebGLRenderingContext, type: number, source: string): WebGLShader | null {
   const shader = gl.createShader(type)
-  if (!shader) return null
+  if (!shader) {
+    return null
+  }
   gl.shaderSource(shader, source)
   gl.compileShader(shader)
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
@@ -37,7 +39,9 @@ export function useShaderBackground(
 ) {
   useEffect(() => {
     const canvas = canvasRef.current
-    if (!canvas) return
+    if (!canvas) {
+      return
+    }
 
     const gl = canvas.getContext('webgl', {
       alpha: false,
@@ -46,15 +50,21 @@ export function useShaderBackground(
       stencil: false,
       preserveDrawingBuffer: false,
     })
-    if (!gl) return
+    if (!gl) {
+      return
+    }
 
     // --- Compile & link program ---
     const vs = compileShader(gl, gl.VERTEX_SHADER, VERTEX_SHADER)
     const fs = compileShader(gl, gl.FRAGMENT_SHADER, fragmentShader)
-    if (!vs || !fs) return
+    if (!vs || !fs) {
+      return
+    }
 
     const program = gl.createProgram()
-    if (!program) return
+    if (!program) {
+      return
+    }
     gl.attachShader(program, vs)
     gl.attachShader(program, fs)
     gl.linkProgram(program)

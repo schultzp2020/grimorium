@@ -1,9 +1,8 @@
-import type { EffectDefinition } from '../../types'
-import type { IntentHandler, NominateIntent } from '../../../pipeline/types'
-import type { PlayerState } from '../../../types'
-import { getRole } from '../../../roles'
 import { registerEffectTranslations } from '../../../i18n'
-
+import type { IntentHandler, NominateIntent } from '../../../pipeline/types'
+import { getRole } from '../../../roles/registry'
+import type { PlayerState } from '../../../types'
+import type { EffectDefinition } from '../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 
@@ -34,13 +33,13 @@ function getActualTeam(player: PlayerState): string {
 const pureHandler: IntentHandler = {
   intentType: 'nominate',
   priority: 10,
-  appliesTo: (intent, effectPlayer) => {
-    return intent.type === 'nominate' && (intent as NominateIntent).nomineeId === effectPlayer.id
-  },
+  appliesTo: (intent, effectPlayer) => intent.type === 'nominate' && intent.nomineeId === effectPlayer.id,
   handle: (intent, effectPlayer, state) => {
     const nom = intent as NominateIntent
     const nominator = state.players.find((p) => p.id === nom.nominatorId)
-    if (!nominator) return { action: 'allow' }
+    if (!nominator) {
+      return { action: 'allow' }
+    }
 
     const isTownsfolk = getActualTeam(nominator) === 'townsfolk'
 
@@ -84,35 +83,34 @@ const pureHandler: IntentHandler = {
           },
         },
       }
-    } else {
-      // Non-townsfolk nominates Virgin → loses purity, nomination proceeds
-      return {
-        action: 'allow',
-        stateChanges: {
-          entries: [
-            {
-              type: 'virgin_spent',
-              message: [
-                {
-                  type: 'i18n',
-                  key: 'roles.virgin.history.lostPurity',
-                  params: {
-                    nominator: nom.nominatorId,
-                  },
+    }
+    // Non-townsfolk nominates Virgin → loses purity, nomination proceeds
+    return {
+      action: 'allow',
+      stateChanges: {
+        entries: [
+          {
+            type: 'virgin_spent',
+            message: [
+              {
+                type: 'i18n',
+                key: 'roles.virgin.history.lostPurity',
+                params: {
+                  nominator: nom.nominatorId,
                 },
-              ],
-              data: {
-                nominatorId: nom.nominatorId,
-                nomineeId: nom.nomineeId,
-                virginTriggered: false,
               },
+            ],
+            data: {
+              nominatorId: nom.nominatorId,
+              nomineeId: nom.nomineeId,
+              virginTriggered: false,
             },
-          ],
-          removeEffects: {
-            [effectPlayer.id]: ['pure'],
           },
+        ],
+        removeEffects: {
+          [effectPlayer.id]: ['pure'],
         },
-      }
+      },
     }
   },
 }

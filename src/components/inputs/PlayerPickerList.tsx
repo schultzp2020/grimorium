@@ -1,20 +1,21 @@
 import { useMemo } from 'react'
-import { type PlayerState, hasEffect } from '../../lib/types'
-import { getRole } from '../../lib/roles'
+
+import { getEffect } from '../../lib/effects/registry'
+import { getRoleName as getRegistryRoleName, useI18n } from '../../lib/i18n'
+import { getRole } from '../../lib/roles/registry'
 import { getTeam } from '../../lib/teams'
-import { getEffect } from '../../lib/effects'
-import { useI18n, getRoleName as getRegistryRoleName } from '../../lib/i18n'
+import { type PlayerState, hasEffect } from '../../lib/types'
+import { cn } from '../../lib/utils'
 import { Icon } from '../atoms'
 import type { IconName } from '../atoms/icon'
 import { PlayerRoleIcon, filterVisibleEffects } from '../items/PlayerRoleIcon'
-import { cn } from '../../lib/utils'
 
-export type PlayerGroup = {
+export interface PlayerGroup {
   label: string
   playerIds: string[]
 }
 
-type PlayerPickerListProps = {
+interface PlayerPickerListProps {
   /** Players available for selection. Pre-filtered by the caller. */
   players: PlayerState[]
 
@@ -169,7 +170,9 @@ export function PlayerPickerList({
     return (
       <div className='space-y-4'>
         {groups.map((group) => {
-          if (group.playerIds.length === 0) return null
+          if (group.playerIds.length === 0) {
+            return null
+          }
 
           const groupPlayers = group.playerIds
             .map((id) => players.find((p) => p.id === id))
@@ -196,16 +199,20 @@ export function PlayerPickerList({
 // ============================================================================
 
 function EffectIcons({ player }: { player: PlayerState }) {
-  const effectIcons = useMemo(() => {
-    return filterVisibleEffects(player.effects)
-      .map((e) => {
-        const def = getEffect(e.type)
-        return def ? { id: e.type, icon: def.icon as IconName } : null
-      })
-      .filter((e): e is { id: string; icon: IconName } => e !== null)
-  }, [player.effects])
+  const effectIcons = useMemo(
+    () =>
+      filterVisibleEffects(player.effects)
+        .map((e) => {
+          const def = getEffect(e.type)
+          return def ? { id: e.type, icon: def.icon } : null
+        })
+        .filter((e): e is { id: string; icon: IconName } => e !== null),
+    [player.effects],
+  )
 
-  if (effectIcons.length === 0) return null
+  if (effectIcons.length === 0) {
+    return null
+  }
 
   return (
     <div className='ml-auto flex flex-shrink-0 items-center gap-0.5'>

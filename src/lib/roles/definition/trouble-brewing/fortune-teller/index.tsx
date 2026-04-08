@@ -1,30 +1,30 @@
-import { useState, useMemo } from 'react'
-import { type RoleDefinition, type NightActionResult, type SetupActionProps } from '../../../types'
-import { getRole } from '../../../index'
-import { isAlive } from '../../../../types'
-import { useI18n, interpolate, registerRoleTranslations, getRoleName, getRoleTranslations } from '../../../../i18n'
+import { useMemo, useState } from 'react'
+
+import { Button, Icon } from '../../../../../components/atoms'
+import { PlayerPickerList } from '../../../../../components/inputs'
+import {
+  MalfunctionConfigStep,
+  OracleCard,
+  PerceptionConfigStep,
+  StepSection,
+  TeamBackground,
+  VisionReveal,
+} from '../../../../../components/items'
 import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
 import {
+  HandbackCardLink,
   NarratorSetupLayout,
   NightStepListLayout,
   PlayerFacingScreen,
-  HandbackCardLink,
 } from '../../../../../components/layouts'
 import type { NightStep } from '../../../../../components/layouts'
-import {
-  StepSection,
-  MalfunctionConfigStep,
-  PerceptionConfigStep,
-  OracleCard,
-  VisionReveal,
-  TeamBackground,
-} from '../../../../../components/items'
-import { PlayerPickerList } from '../../../../../components/inputs'
-import { Button, Icon } from '../../../../../components/atoms'
-import { perceive, getAmbiguousPlayers, applyPerceptionOverrides } from '../../../../pipeline'
-import { isMalfunctioning } from '../../../../effects'
+import { isMalfunctioning } from '../../../../effects/registry'
+import { getRoleName, getRoleTranslations, interpolate, registerRoleTranslations, useI18n } from '../../../../i18n'
+import { applyPerceptionOverrides, getAmbiguousPlayers, perceive } from '../../../../pipeline'
 import type { Perception } from '../../../../pipeline/types'
-
+import { isAlive } from '../../../../types'
+import { getRole } from '../../../registry'
+import { type NightActionResult, type RoleDefinition, type SetupActionProps } from '../../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 
@@ -45,13 +45,17 @@ function FortuneTellerSetupAction({ player, state, onComplete }: SetupActionProp
   })
 
   const handleSelectRandom = () => {
-    if (goodPlayers.length === 0) return
+    if (goodPlayers.length === 0) {
+      return
+    }
     const randomIndex = Math.floor(Math.random() * goodPlayers.length)
     setSelectedRedHerring(goodPlayers[randomIndex].id)
   }
 
   const handleConfirm = () => {
-    if (!selectedRedHerring) return
+    if (!selectedRedHerring) {
+      return
+    }
     onComplete({
       addEffects: {
         [selectedRedHerring]: [
@@ -186,9 +190,7 @@ const definition: RoleDefinition = {
     )
     const needsPerceptionConfig = ambiguousPlayers.length > 0
 
-    const getPlayerName = (playerId: string) => {
-      return state.players.find((p) => p.id === playerId)?.name ?? t.ui.unknown
-    }
+    const getPlayerName = (playerId: string) => state.players.find((p) => p.id === playerId)?.name ?? t.ui.unknown
 
     // Build steps: Select players, Configure Perceptions (cond.), Configure Malfunction (cond.), Show Result
     const steps: NightStep[] = useMemo(() => {
@@ -269,7 +271,9 @@ const definition: RoleDefinition = {
     }
 
     const handleSelectPlayersDone = () => {
-      if (selectedPlayers.length !== 2) return
+      if (selectedPlayers.length !== 2) {
+        return
+      }
       setSelectPlayersDone(true)
       setPhase('step_list')
     }
@@ -281,24 +285,30 @@ const definition: RoleDefinition = {
     )
 
     const handleComplete = () => {
-      if (selectedPlayers.length !== 2) return
+      if (selectedPlayers.length !== 2) {
+        return
+      }
 
       const player1 = effectiveState.players.find((p) => p.id === selectedPlayers[0])
       const player2 = effectiveState.players.find((p) => p.id === selectedPlayers[1])
-      if (!player1 || !player2) return
+      if (!player1 || !player2) {
+        return
+      }
 
       const effectiveObserver = effectiveState.players.find((p) => p.id === player.id) ?? player
 
       // Check if either selected player registers as a Demon
       const registersDemon = (p: typeof player1) => {
-        if (!p) return false
+        if (!p) {
+          return false
+        }
         const perception = perceive(p, effectiveObserver, 'team', effectiveState)
         return perception.team === 'demon'
       }
 
       const calculatedSawDemon = registersDemon(player1) || registersDemon(player2)
       // Use malfunction override if set, otherwise use calculated result
-      const sawDemon = malfunctionValue !== null ? malfunctionValue : calculatedSawDemon
+      const sawDemon = malfunctionValue ?? calculatedSawDemon
 
       const entries: NightActionResult['entries'] = []
 
@@ -414,13 +424,14 @@ const definition: RoleDefinition = {
 
     // Calculate result for display
     const registersDemon = (p: typeof player1) => {
-      if (!p) return false
+      if (!p) {
+        return false
+      }
       const perception = perceive(p, effectiveObserver, 'team', effectiveState)
       return perception.team === 'demon'
     }
 
-    const displaySawDemon =
-      malfunctionValue !== null ? malfunctionValue : registersDemon(player1) || registersDemon(player2)
+    const displaySawDemon = malfunctionValue ?? (registersDemon(player1) || registersDemon(player2))
 
     // Dynamic theme: demon background when detected, townsfolk when safe
     const resultTeam = displaySawDemon ? 'demon' : 'townsfolk'

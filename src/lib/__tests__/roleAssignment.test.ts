@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { resolveRoleAssignments } from '../roleAssignment'
 
 // ============================================================================
@@ -141,7 +142,7 @@ describe('resolveRoleAssignments', () => {
         })
 
         const hasDemon = result.some((a) => a.roleId === 'imp')
-        expect(hasDemon).toBe(true)
+        expect(hasDemon).toBeTruthy()
       }
     })
 
@@ -178,7 +179,7 @@ describe('resolveRoleAssignments', () => {
       expect(result).toHaveLength(5)
       // No demon in pool — nothing to guarantee, but it shouldn't crash
       const hasDemon = result.some((a) => a.roleId === 'imp')
-      expect(hasDemon).toBe(false)
+      expect(hasDemon).toBeFalsy()
     })
 
     it('guarantees demon even when pool greatly exceeds player count', () => {
@@ -214,7 +215,7 @@ describe('resolveRoleAssignments', () => {
 
         expect(result).toHaveLength(3)
         const hasDemon = result.some((a) => a.roleId === 'imp')
-        expect(hasDemon).toBe(true)
+        expect(hasDemon).toBeTruthy()
       }
     })
 

@@ -1,7 +1,7 @@
-import { useI18n, interpolate } from '../../lib/i18n'
+import { interpolate, useI18n } from '../../lib/i18n'
 import { Button, Icon } from '../atoms'
 
-type Props = {
+interface Props {
   playerName: string
   onReady: () => void
 }

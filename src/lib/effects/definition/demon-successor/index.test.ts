@@ -1,7 +1,8 @@
-import { assert, describe, it, expect, beforeEach } from 'vitest'
+import { assert, beforeEach, describe, expect, it } from 'vitest'
+
 import definition from '.'
-import type { KillIntent, ExecuteIntent } from '../../../pipeline/types'
-import { makePlayer, makeState, addEffectTo, makeGame, resetPlayerCounter } from '../../../__tests__/helpers'
+import { addEffectTo, makeGame, makePlayer, makeState, resetPlayerCounter } from '../../../__tests__/helpers'
+import type { ExecuteIntent, KillIntent } from '../../../pipeline/types'
 
 beforeEach(() => resetPlayerCounter())
 
@@ -49,7 +50,7 @@ describe('DemonSuccessor effect', () => {
         cause: 'execution',
       }
 
-      expect(handler.appliesTo(intent, sw, state)).toBe(true)
+      expect(handler.appliesTo(intent, sw, state)).toBeTruthy()
     })
 
     it('applies when the Demon is killed and 5+ players are alive', () => {
@@ -61,7 +62,7 @@ describe('DemonSuccessor effect', () => {
         cause: 'demon',
       }
 
-      expect(handler.appliesTo(intent, sw, state)).toBe(true)
+      expect(handler.appliesTo(intent, sw, state)).toBeTruthy()
     })
 
     it('applies with exactly 5 alive players', () => {
@@ -72,7 +73,7 @@ describe('DemonSuccessor effect', () => {
         cause: 'execution',
       }
 
-      expect(handler.appliesTo(intent, sw, state)).toBe(true)
+      expect(handler.appliesTo(intent, sw, state)).toBeTruthy()
     })
 
     it('does not apply when fewer than 5 players are alive', () => {
@@ -83,7 +84,7 @@ describe('DemonSuccessor effect', () => {
         cause: 'execution',
       }
 
-      expect(handler.appliesTo(intent, sw, state)).toBe(false)
+      expect(handler.appliesTo(intent, sw, state)).toBeFalsy()
     })
 
     it('does not apply when the target is not a Demon', () => {
@@ -102,7 +103,7 @@ describe('DemonSuccessor effect', () => {
         cause: 'execution',
       }
 
-      expect(handler.appliesTo(intent, sw, state)).toBe(false)
+      expect(handler.appliesTo(intent, sw, state)).toBeFalsy()
     })
 
     it('does not apply when the successor is dead', () => {
@@ -116,7 +117,7 @@ describe('DemonSuccessor effect', () => {
         cause: 'execution',
       }
 
-      expect(handler.appliesTo(intent, sw, state)).toBe(false)
+      expect(handler.appliesTo(intent, sw, state)).toBeFalsy()
     })
 
     it('does not apply for voluntary Imp self-kill (imp_self_kill cause)', () => {
@@ -128,7 +129,7 @@ describe('DemonSuccessor effect', () => {
         cause: 'imp_self_kill',
       }
 
-      expect(handler.appliesTo(intent, sw, state)).toBe(false)
+      expect(handler.appliesTo(intent, sw, state)).toBeFalsy()
     })
 
     it('does not apply when the successor is the target', () => {
@@ -147,7 +148,7 @@ describe('DemonSuccessor effect', () => {
         cause: 'execution',
       }
 
-      expect(handler.appliesTo(intent, swDemon, state)).toBe(false)
+      expect(handler.appliesTo(intent, swDemon, state)).toBeFalsy()
     })
   })
 

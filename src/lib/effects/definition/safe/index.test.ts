@@ -1,7 +1,8 @@
-import { assert, describe, it, expect, beforeEach } from 'vitest'
+import { assert, beforeEach, describe, expect, it } from 'vitest'
+
 import definition from '.'
+import { addEffectTo, makeGame, makePlayer, makeState, resetPlayerCounter } from '../../../__tests__/helpers'
 import type { KillIntent } from '../../../pipeline/types'
-import { makePlayer, makeState, addEffectTo, makeGame, resetPlayerCounter } from '../../../__tests__/helpers'
 
 beforeEach(() => resetPlayerCounter())
 
@@ -23,7 +24,7 @@ describe('Safe effect', () => {
         cause: 'demon',
       }
 
-      expect(handler.appliesTo(intent, protectedPlayer, state)).toBe(true)
+      expect(handler.appliesTo(intent, protectedPlayer, state)).toBeTruthy()
     })
 
     it('does not apply when the kill targets a different player', () => {
@@ -36,7 +37,7 @@ describe('Safe effect', () => {
         cause: 'demon',
       }
 
-      expect(handler.appliesTo(intent, protectedPlayer, state)).toBe(false)
+      expect(handler.appliesTo(intent, protectedPlayer, state)).toBeFalsy()
     })
   })
 
@@ -90,8 +91,8 @@ describe('Safe effect', () => {
       const result = handler.handle(intent, protectedPlayer, state, game)
       assert(result.action === 'prevent')
       expect(result.stateChanges?.entries).toHaveLength(1)
-      expect(result.stateChanges!.entries![0].data.reason).toBe('safe')
-      expect(result.stateChanges!.entries![0].data.targetId).toBe('p2')
+      expect(result.stateChanges!.entries[0].data.reason).toBe('safe')
+      expect(result.stateChanges!.entries[0].data.targetId).toBe('p2')
     })
   })
 })

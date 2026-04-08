@@ -1,7 +1,7 @@
 import { Icon } from '../atoms'
 import type { IconName } from '../atoms/icon'
 
-type InfoBoxProps = {
+interface InfoBoxProps {
   icon: IconName
   title: string
   description?: string

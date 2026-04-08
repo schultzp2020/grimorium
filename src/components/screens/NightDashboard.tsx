@@ -1,18 +1,19 @@
 import { useMemo, useState } from 'react'
-import type { Game, GameState, PlayerState, RichMessage } from '../../lib/types'
-import { getRole } from '../../lib/roles'
-import { getTeam } from '../../lib/teams'
-import { getNightRolesStatus, getNightActionSummary, type NightRoleStatus } from '../../lib/game'
+
+import { type NightRoleStatus, getNightActionSummary, getNightRolesStatus } from '../../lib/game'
+import { getRoleName, useI18n } from '../../lib/i18n'
 import { getAvailableNightFollowUps } from '../../lib/pipeline'
 import type { AvailableNightFollowUp } from '../../lib/pipeline/types'
-import { useI18n, getRoleName } from '../../lib/i18n'
-import { Button, Icon } from '../atoms'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody } from '../atoms'
-import { RichMessage as RichMessageDisplay } from '../items/RichMessage'
-import { Grimoire } from '../items/Grimoire'
-import { MysticDivider } from '../items'
-import { ScreenFooter } from '../layouts/ScreenFooter'
+import { getRole } from '../../lib/roles/registry'
+import { getTeam } from '../../lib/teams'
+import type { Game, GameState, PlayerState, RichMessage } from '../../lib/types'
 import { cn } from '../../lib/utils'
+import { Button, Icon } from '../atoms'
+import { Dialog, DialogBody, DialogContent, DialogHeader, DialogTitle } from '../atoms'
+import { MysticDivider } from '../items'
+import { Grimoire } from '../items/Grimoire'
+import { RichMessage as RichMessageDisplay } from '../items/RichMessage'
+import { ScreenFooter } from '../layouts/ScreenFooter'
 
 // ============================================================================
 // UNIFIED NIGHT DASHBOARD ITEM
@@ -26,7 +27,7 @@ type NightDashboardItem =
 // COMPONENT
 // ============================================================================
 
-type Props = {
+interface Props {
   game: Game
   state: GameState
   onOpenNightAction: (playerId: string, roleId: string) => void
@@ -73,7 +74,9 @@ export function NightDashboard({
 
   // Derive next pending item and allDone from the unified list
   const nextPendingIndex = items.findIndex((item) => {
-    if (item.type === 'night_action') return item.data.status === 'pending'
+    if (item.type === 'night_action') {
+      return item.data.status === 'pending'
+    }
     // Follow-ups are always pending (they disappear when completed)
     return true
   })
@@ -81,7 +84,9 @@ export function NightDashboard({
 
   // Review dialog data
   const reviewMessages: RichMessage[] = useMemo(() => {
-    if (!reviewPlayerId) return []
+    if (!reviewPlayerId) {
+      return []
+    }
     return getNightActionSummary(game, reviewPlayerId)
   }, [game, reviewPlayerId])
 
@@ -205,7 +210,9 @@ export function NightDashboard({
       <Dialog
         open={reviewPlayerId !== null}
         onOpenChange={(open) => {
-          if (!open) setReviewPlayerId(null)
+          if (!open) {
+            setReviewPlayerId(null)
+          }
         }}
       >
         <DialogContent>
@@ -253,9 +260,7 @@ function NightActionRow({
   const role = getRole(roleStatus.roleId)
   const team = role ? getTeam(role.team) : null
 
-  const roleName = useMemo(() => {
-    return getRoleName(roleStatus.roleId, language)
-  }, [roleStatus.roleId, language])
+  const roleName = useMemo(() => getRoleName(roleStatus.roleId, language), [roleStatus.roleId, language])
 
   const isDone = roleStatus.status === 'done'
 

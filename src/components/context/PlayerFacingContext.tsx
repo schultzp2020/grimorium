@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react'
 
-export type PlayerFacingContextType = {
+export interface PlayerFacingContextType {
   setPlayerFacing: (value: boolean) => void
 }
 
@@ -15,7 +15,7 @@ export const PlayerFacingContext = createContext<PlayerFacingContextType>({
  *
  * Default behavior (when no PlayerFacingScreen wraps): call callback immediately.
  */
-export type HandbackContextType = {
+export interface HandbackContextType {
   requestHandback: (callback: () => void) => void
 }
 

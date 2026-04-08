@@ -1,4 +1,4 @@
-import { type PlayerState, type GameState, type Game, type HistoryEntry, generateId } from '../types'
+import { type Game, type GameState, type HistoryEntry, type PlayerState, generateId } from '../types'
 
 // ============================================================================
 // PLAYER FACTORY
@@ -84,11 +84,11 @@ export function makeGame(state?: GameState): Game {
  * The first entry uses the provided state; subsequent entries clone it.
  */
 export function makeGameWithHistory(
-  entries: Array<{
+  entries: {
     type: HistoryEntry['type']
     data?: Record<string, unknown>
     stateOverrides?: Partial<GameState>
-  }>,
+  }[],
   baseState?: GameState,
 ): Game {
   const state = baseState ?? makeState()

@@ -1,10 +1,10 @@
+import { getRoleName, interpolate, useI18n } from '../../lib/i18n'
+import { getRole } from '../../lib/roles/registry'
 import type { PlayerState } from '../../lib/types'
-import { getRole } from '../../lib/roles'
-import { useI18n, interpolate, getRoleName } from '../../lib/i18n'
-import { Button, Icon, BackButton } from '../atoms'
+import { BackButton, Button, Icon } from '../atoms'
 import { MysticDivider } from '../items'
 
-type Props = {
+interface Props {
   player: PlayerState
   action: 'role_reveal' | 'night_action' | 'role_change'
   onProceed: () => void
@@ -20,22 +20,28 @@ export function NarratorPrompt({ player, action, onProceed, onMainMenu }: Props)
   const isRoleChange = action === 'role_change'
 
   const getIcon = () => {
-    if (isRoleReveal)
+    if (isRoleReveal) {
       return {
         name: 'eye' as const,
         className: 'text-mystic-gold text-glow-gold',
       }
-    if (isRoleChange)
+    }
+    if (isRoleChange) {
       return {
         name: 'sparkles' as const,
         className: 'text-purple-400 text-glow-gold',
       }
+    }
     return { name: 'moon' as const, className: 'text-indigo-400' }
   }
 
   const getMessage = () => {
-    if (isRoleReveal) return interpolate(t.game.narratorGiveDevice, { player: player.name })
-    if (isRoleChange) return interpolate(t.game.narratorRoleChanged, { player: player.name })
+    if (isRoleReveal) {
+      return interpolate(t.game.narratorGiveDevice, { player: player.name })
+    }
+    if (isRoleChange) {
+      return interpolate(t.game.narratorRoleChanged, { player: player.name })
+    }
     return interpolate(t.game.narratorWakePlayer, {
       player: player.name,
       role: roleName,

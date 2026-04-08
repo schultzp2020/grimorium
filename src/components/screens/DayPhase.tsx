@@ -1,20 +1,21 @@
 import { useState } from 'react'
-import type { GameState, PlayerState } from '../../lib/types'
-import type { AvailableDayAction } from '../../lib/pipeline/types'
-import { useI18n, interpolate } from '../../lib/i18n'
-import { Button, Icon } from '../atoms'
-import { Grimoire } from '../items/Grimoire'
-import { MysticDivider } from '../items'
-import { ScreenFooter } from '../layouts/ScreenFooter'
-import { cn } from '../../lib/utils'
-import type { BlockStatus } from '../../lib/game'
 
-type NightSummary = {
+import type { BlockStatus } from '../../lib/game'
+import { interpolate, useI18n } from '../../lib/i18n'
+import type { AvailableDayAction } from '../../lib/pipeline/types'
+import type { GameState, PlayerState } from '../../lib/types'
+import { cn } from '../../lib/utils'
+import { Button, Icon } from '../atoms'
+import { MysticDivider } from '../items'
+import { Grimoire } from '../items/Grimoire'
+import { ScreenFooter } from '../layouts/ScreenFooter'
+
+interface NightSummary {
   deaths: string[]
   round: number
 }
 
-type Props = {
+interface Props {
   state: GameState
   blockStatus: BlockStatus
   dayActions: AvailableDayAction[]

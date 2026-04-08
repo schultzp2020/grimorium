@@ -2,7 +2,7 @@ import type { IconName } from '../../components/atoms/icon'
 
 export type TeamId = 'townsfolk' | 'outsider' | 'minion' | 'demon'
 
-export type TeamDefinition = {
+export interface TeamDefinition {
   id: TeamId
   icon: IconName
   isEvil: boolean

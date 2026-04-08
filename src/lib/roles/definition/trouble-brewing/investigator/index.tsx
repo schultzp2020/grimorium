@@ -1,9 +1,8 @@
-import type { RoleDefinition } from '../../../types'
-import { isAlive } from '../../../../types'
-import { registerRoleTranslations } from '../../../../i18n'
 import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
-import { InfoRoleNightAction, type InfoRoleConfig } from '../../../../../components/night_steps/InfoRoleNightAction'
-
+import { type InfoRoleConfig, InfoRoleNightAction } from '../../../../../components/night_steps/InfoRoleNightAction'
+import { registerRoleTranslations } from '../../../../i18n'
+import { isAlive } from '../../../../types'
+import type { RoleDefinition } from '../../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 

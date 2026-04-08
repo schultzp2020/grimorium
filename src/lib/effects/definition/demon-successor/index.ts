@@ -1,9 +1,8 @@
-import type { EffectDefinition } from '../../types'
-import { type IntentHandler, type KillIntent, type ExecuteIntent } from '../../../pipeline/types'
-import { getRole } from '../../../roles'
-import { hasEffect, getAlivePlayers } from '../../../types'
 import { registerEffectTranslations } from '../../../i18n'
-
+import { type ExecuteIntent, type IntentHandler } from '../../../pipeline/types'
+import { getRole } from '../../../roles/registry'
+import { getAlivePlayers, hasEffect } from '../../../types'
+import type { EffectDefinition } from '../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 
@@ -28,29 +27,39 @@ const demonSuccessorHandler: IntentHandler = {
   appliesTo: (intent, effectPlayer, state) => {
     // Skip for voluntary Imp self-kill starpass — the narrator manually
     // chooses who becomes the new Imp via the starpass handler.
-    if (intent.type === 'kill' && (intent as KillIntent).cause === 'imp_self_kill') return false
+    if (intent.type === 'kill' && intent.cause === 'imp_self_kill') {
+      return false
+    }
 
     // Get the target of the intent
     let targetId: string
     if (intent.type === 'kill') {
-      targetId = (intent as KillIntent).targetId
+      ;({ targetId } = intent)
     } else if (intent.type === 'execute') {
-      targetId = (intent as ExecuteIntent).playerId
+      targetId = intent.playerId
     } else {
       return false
     }
 
     // The target must be a Demon
     const target = state.players.find((p) => p.id === targetId)
-    if (!target) return false
+    if (!target) {
+      return false
+    }
     const targetRole = getRole(target.roleId)
-    if (targetRole?.team !== 'demon') return false
+    if (targetRole?.team !== 'demon') {
+      return false
+    }
 
     // The successor (effect holder) must be alive
-    if (hasEffect(effectPlayer, 'dead')) return false
+    if (hasEffect(effectPlayer, 'dead')) {
+      return false
+    }
 
     // The successor must not be the target themselves
-    if (effectPlayer.id === targetId) return false
+    if (effectPlayer.id === targetId) {
+      return false
+    }
 
     // 5+ alive players (Travellers don't count — none exist yet)
     const aliveCount = getAlivePlayers(state).length
@@ -60,7 +69,7 @@ const demonSuccessorHandler: IntentHandler = {
     // Determine the demon's role so the successor inherits it
     let targetId: string
     if (intent.type === 'kill') {
-      targetId = (intent as KillIntent).targetId
+      ;({ targetId } = intent)
     } else {
       targetId = (intent as ExecuteIntent).playerId
     }

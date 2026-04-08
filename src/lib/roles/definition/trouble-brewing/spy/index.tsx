@@ -1,20 +1,20 @@
 import { useState } from 'react'
-import type { RoleDefinition } from '../../../types'
-import { useI18n, registerRoleTranslations, getRoleName, getRoleTranslations } from '../../../../i18n'
+
+import { Button, Icon } from '../../../../../components/atoms'
 import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
 import { EvilTeamReveal } from '../../../../../components/items/EvilTeamReveal'
+import { Grimoire } from '../../../../../components/items/Grimoire'
 import {
+  HandbackButton,
   NightActionLayout,
   NightStepListLayout,
   PlayerFacingScreen,
-  HandbackButton,
 } from '../../../../../components/layouts'
 import type { NightStep } from '../../../../../components/layouts'
-import { Button, Icon } from '../../../../../components/atoms'
-import { Grimoire } from '../../../../../components/items/Grimoire'
+import { isMalfunctioning } from '../../../../effects/registry'
+import { getRoleName, getRoleTranslations, registerRoleTranslations, useI18n } from '../../../../i18n'
 import { isAlive } from '../../../../types'
-import { isMalfunctioning } from '../../../../effects'
-
+import type { RoleDefinition } from '../../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 

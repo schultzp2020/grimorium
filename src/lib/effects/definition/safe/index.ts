@@ -1,7 +1,6 @@
-import type { EffectDefinition } from '../../types'
-import type { IntentHandler, KillIntent } from '../../../pipeline/types'
 import { registerEffectTranslations } from '../../../i18n'
-
+import type { IntentHandler, KillIntent } from '../../../pipeline/types'
+import type { EffectDefinition } from '../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 
@@ -11,9 +10,7 @@ registerEffectTranslations('safe', 'es', es)
 const safeHandler: IntentHandler = {
   intentType: 'kill',
   priority: 10, // After deflect (5) so redirected kills can still be blocked
-  appliesTo: (intent, effectPlayer) => {
-    return intent.type === 'kill' && intent.targetId === effectPlayer.id
-  },
+  appliesTo: (intent, effectPlayer) => intent.type === 'kill' && intent.targetId === effectPlayer.id,
   handle: (intent, effectPlayer) => {
     const kill = intent as KillIntent
     return {

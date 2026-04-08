@@ -1,6 +1,6 @@
 import { Icon } from '../atoms'
 
-type PlayerNameCardProps = {
+interface PlayerNameCardProps {
   name: string
 }
 

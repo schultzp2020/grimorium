@@ -1,11 +1,11 @@
+import { getRoleName, useI18n } from '../../lib/i18n'
+import { getRole } from '../../lib/roles/registry'
 import { type GameState, hasEffect } from '../../lib/types'
-import { getRole } from '../../lib/roles'
-import { useI18n, getRoleName } from '../../lib/i18n'
-import { Button, Badge, Icon } from '../atoms'
-import { MysticDivider } from '../items'
 import { cn } from '../../lib/utils'
+import { Badge, Button, Icon } from '../atoms'
+import { MysticDivider } from '../items'
 
-type Props = {
+interface Props {
   state: GameState
   onMainMenu: () => void
   onShowHistory: () => void
@@ -13,7 +13,7 @@ type Props = {
 
 export function GameOver({ state, onMainMenu, onShowHistory }: Props) {
   const { t, language } = useI18n()
-  const winner = state.winner
+  const { winner } = state
   const isGoodWin = winner === 'townsfolk'
 
   return (

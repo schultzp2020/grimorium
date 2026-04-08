@@ -1,9 +1,9 @@
-import { getRole } from '../../lib/roles'
-import { useI18n, getRoleName as getRegistryRoleName } from '../../lib/i18n'
-import { Badge, Icon } from '../atoms'
+import { getRoleName as getRegistryRoleName, useI18n } from '../../lib/i18n'
+import { getRole } from '../../lib/roles/registry'
 import { cn } from '../../lib/utils'
+import { Badge, Icon } from '../atoms'
 
-type Props = {
+interface Props {
   roleId: string
   showIcon?: boolean
   size?: 'sm' | 'md' | 'lg'
@@ -13,7 +13,9 @@ type Props = {
 export function RoleBadge({ roleId, showIcon = true, size = 'md', className }: Props) {
   const { language } = useI18n()
   const role = getRole(roleId)
-  if (!role) return null
+  if (!role) {
+    return null
+  }
 
   const sizeClasses = {
     sm: 'text-xs px-2 py-0.5',

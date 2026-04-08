@@ -1,9 +1,8 @@
-import type { RoleDefinition } from '../../../types'
 import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
-import { getAlivePlayers } from '../../../../types'
-import { isMalfunctioning } from '../../../../effects'
+import { isMalfunctioning } from '../../../../effects/registry'
 import { registerRoleTranslations } from '../../../../i18n'
-
+import { getAlivePlayers } from '../../../../types'
+import type { RoleDefinition } from '../../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 
@@ -25,15 +24,21 @@ const definition: RoleDefinition = {
     {
       trigger: 'end_of_day',
       check: (state, game) => {
-        if (state.phase !== 'day') return null
+        if (state.phase !== 'day') {
+          return null
+        }
 
         const alivePlayers = getAlivePlayers(state)
-        if (alivePlayers.length !== 3) return null
+        if (alivePlayers.length !== 3) {
+          return null
+        }
 
         // Check if an execution happened today
         for (let i = game.history.length - 1; i >= 0; i--) {
           const entry = game.history[i]
-          if (entry.type === 'day_started') break
+          if (entry.type === 'day_started') {
+            break
+          }
           if (entry.type === 'execution' || entry.type === 'virgin_execution') {
             return null // Execution happened — no peaceful victory
           }
@@ -43,7 +48,9 @@ const definition: RoleDefinition = {
         // (A Drunk-as-Mayor has roleId 'mayor' but is malfunctioning,
         // so they shouldn't count for the peaceful victory)
         const hasAliveMayor = alivePlayers.some((p) => p.roleId === 'mayor' && !isMalfunctioning(p))
-        if (!hasAliveMayor) return null
+        if (!hasAliveMayor) {
+          return null
+        }
 
         return 'townsfolk'
       },

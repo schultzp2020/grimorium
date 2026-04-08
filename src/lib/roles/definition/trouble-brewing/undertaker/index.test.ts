@@ -1,31 +1,44 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+
 import definition from '.'
-import { perceive } from '../../../../pipeline/perception'
-import type { EffectDefinition, EffectId } from '../../../../effects/types'
 import {
-  makePlayer,
-  makeState,
   addEffectTo,
   makeGameWithHistory,
+  makePlayer,
+  makeState,
   resetPlayerCounter,
 } from '../../../../__tests__/helpers'
+import { getEffect, registerEffect, unregisterEffect } from '../../../../effects/registry'
+import type { EffectDefinition, EffectId } from '../../../../effects/types'
+import { perceive } from '../../../../pipeline/perception'
 
-vi.mock('../../../../effects', async (importOriginal) => {
-  const actual = (await importOriginal()) as Record<string, unknown>
-  return {
-    ...actual,
-    getEffect: (effectId: string) => {
-      if (testEffects[effectId]) return testEffects[effectId]
-      return (actual.getEffect as (id: string) => EffectDefinition | undefined)(effectId)
-    },
+// Track registered test effects so we can restore originals after each test
+const originalEffects: Map<EffectId, EffectDefinition | undefined> = new Map()
+
+function registerTestEffect(def: EffectDefinition) {
+  if (!originalEffects.has(def.id)) {
+    originalEffects.set(def.id, getEffect(def.id))
   }
-})
+  registerEffect(def)
+}
 
-const testEffects: Record<string, EffectDefinition> = {}
+function clearTestEffects() {
+  for (const [id, original] of originalEffects) {
+    if (original) {
+      registerEffect(original)
+    } else {
+      unregisterEffect(id)
+    }
+  }
+  originalEffects.clear()
+}
 
 beforeEach(() => {
   resetPlayerCounter()
-  for (const key of Object.keys(testEffects)) delete testEffects[key]
+})
+
+afterEach(() => {
+  clearTestEffects()
 })
 
 describe('Undertaker', () => {
@@ -46,7 +59,7 @@ describe('Undertaker', () => {
         ],
         makeState({ round: 1, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBe(false)
+      expect(definition.shouldWake!(game, player)).toBeFalsy()
     })
 
     it('does not wake when dead', () => {
@@ -67,7 +80,7 @@ describe('Undertaker', () => {
         ],
         makeState({ round: 2, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBe(false)
+      expect(definition.shouldWake!(game, player)).toBeFalsy()
     })
 
     it('does not wake if no execution happened', () => {
@@ -87,7 +100,7 @@ describe('Undertaker', () => {
         ],
         makeState({ round: 2, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBe(false)
+      expect(definition.shouldWake!(game, player)).toBeFalsy()
     })
 
     it('wakes when alive, after first night, and execution occurred', () => {
@@ -108,7 +121,7 @@ describe('Undertaker', () => {
         ],
         makeState({ round: 2, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBe(true)
+      expect(definition.shouldWake!(game, player)).toBeTruthy()
     })
   })
 
@@ -128,7 +141,7 @@ describe('Undertaker', () => {
     })
 
     it('sees deceived role when target has role perception modifier', () => {
-      testEffects['appears_as_villager'] = {
+      registerTestEffect({
         id: 'appears_as_villager' as EffectId,
         icon: 'user',
         perceptionModifiers: [
@@ -137,7 +150,7 @@ describe('Undertaker', () => {
             modify: (p) => ({ ...p, roleId: 'villager', team: 'townsfolk' }),
           },
         ],
-      }
+      })
 
       const undertaker = makePlayer({ id: 'p1', roleId: 'undertaker' })
       const executed = addEffectTo(makePlayer({ id: 'p2', roleId: 'imp' }), 'appears_as_villager')

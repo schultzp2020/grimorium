@@ -1,32 +1,17 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import definition from '.'
-import type { EffectDefinition } from '../../../../effects/types'
 import {
-  makePlayer,
-  makeState,
   addEffectTo,
   makeGameWithHistory,
+  makePlayer,
+  makeState,
   resetPlayerCounter,
 } from '../../../../__tests__/helpers'
-import { getAmbiguousPlayers, canRegisterAsTeam, canRegisterAsAlignment } from '../../../../pipeline/perception'
-
-// Mock getEffect to inject test perception modifiers
-vi.mock('../../../../effects', async (importOriginal) => {
-  const actual = (await importOriginal()) as Record<string, unknown>
-  return {
-    ...actual,
-    getEffect: (effectId: string) => {
-      if (testEffects[effectId]) return testEffects[effectId]
-      return (actual.getEffect as (id: string) => EffectDefinition | undefined)(effectId)
-    },
-  }
-})
-
-const testEffects: Record<string, EffectDefinition> = {}
+import { canRegisterAsAlignment, canRegisterAsTeam, getAmbiguousPlayers } from '../../../../pipeline/perception'
 
 beforeEach(() => {
   resetPlayerCounter()
-  for (const key of Object.keys(testEffects)) delete testEffects[key]
 })
 
 describe('Spy', () => {
@@ -48,7 +33,7 @@ describe('Spy', () => {
         makeState({ round: 1, players: [player] }),
       )
 
-      expect(definition.shouldWake!(game, player)).toBe(true)
+      expect(definition.shouldWake!(game, player)).toBeTruthy()
     })
 
     it('wakes on subsequent nights', () => {
@@ -64,7 +49,7 @@ describe('Spy', () => {
         makeState({ round: 3, players: [player] }),
       )
 
-      expect(definition.shouldWake!(game, player)).toBe(true)
+      expect(definition.shouldWake!(game, player)).toBeTruthy()
     })
 
     it('does not wake when dead', () => {
@@ -80,7 +65,7 @@ describe('Spy', () => {
         makeState({ round: 1, players: [player] }),
       )
 
-      expect(definition.shouldWake!(game, player)).toBe(false)
+      expect(definition.shouldWake!(game, player)).toBeFalsy()
     })
   })
 
@@ -124,17 +109,17 @@ describe('Spy', () => {
     it('canRegisterAsTeam returns true for townsfolk and outsider', () => {
       const spy = addEffectTo(makePlayer({ id: 's1', roleId: 'spy' }), 'misregister', spyData)
 
-      expect(canRegisterAsTeam(spy, 'townsfolk')).toBe(true)
-      expect(canRegisterAsTeam(spy, 'outsider')).toBe(true)
-      expect(canRegisterAsTeam(spy, 'minion')).toBe(false)
-      expect(canRegisterAsTeam(spy, 'demon')).toBe(false)
+      expect(canRegisterAsTeam(spy, 'townsfolk')).toBeTruthy()
+      expect(canRegisterAsTeam(spy, 'outsider')).toBeTruthy()
+      expect(canRegisterAsTeam(spy, 'minion')).toBeFalsy()
+      expect(canRegisterAsTeam(spy, 'demon')).toBeFalsy()
     })
 
     it('canRegisterAsAlignment returns true for good', () => {
       const spy = addEffectTo(makePlayer({ id: 's1', roleId: 'spy' }), 'misregister', spyData)
 
-      expect(canRegisterAsAlignment(spy, 'good')).toBe(true)
-      expect(canRegisterAsAlignment(spy, 'evil')).toBe(false)
+      expect(canRegisterAsAlignment(spy, 'good')).toBeTruthy()
+      expect(canRegisterAsAlignment(spy, 'evil')).toBeFalsy()
     })
   })
 

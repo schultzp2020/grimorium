@@ -1,8 +1,8 @@
-import type { TeamDefinition, TeamId } from './types'
-import townsfolk from './definition/townsfolk'
-import outsider from './definition/outsider'
-import minion from './definition/minion'
 import demon from './definition/demon'
+import minion from './definition/minion'
+import outsider from './definition/outsider'
+import townsfolk from './definition/townsfolk'
+import type { TeamDefinition, TeamId } from './types'
 
 export type { TeamDefinition, TeamId } from './types'
 

@@ -1,14 +1,14 @@
-import type { GameState, PlayerState, HistoryEntry, Game } from '../types'
 import type { IconName } from '../../components/atoms/icon'
-import type { TeamId } from '../teams'
-import type { Intent, WinConditionCheck } from '../pipeline/types'
 import type { Translations } from '../i18n/types'
+import type { Intent, WinConditionCheck } from '../pipeline/types'
+import type { TeamId } from '../teams'
+import type { Game, GameState, HistoryEntry, PlayerState } from '../types'
 
 // ============================================================================
 // EFFECT TYPES
 // ============================================================================
 
-export type EffectToAdd = {
+export interface EffectToAdd {
   type: string
   data?: Record<string, unknown>
   sourcePlayerId?: string
@@ -23,7 +23,7 @@ export type GrimoireIntentForNightAction =
   | { view: 'list'; readOnly?: boolean }
   | { view: 'player_detail'; player: PlayerState; readOnly?: boolean }
 
-export type NightActionProps = {
+export interface NightActionProps {
   game: Game
   state: GameState
   player: PlayerState
@@ -32,7 +32,7 @@ export type NightActionProps = {
   onOpenGrimoire?: (intent: GrimoireIntentForNightAction, readOnly?: boolean) => void
 }
 
-export type NightActionResult = {
+export interface NightActionResult {
   // The events to add to history
   entries: Omit<HistoryEntry, 'id' | 'timestamp' | 'stateAfter'>[]
   // Updates to apply to the game state
@@ -51,7 +51,7 @@ export type NightActionResult = {
 // ROLE REVEAL PROPS
 // ============================================================================
 
-export type RoleRevealProps = {
+export interface RoleRevealProps {
   player: PlayerState
   onContinue: () => void
 }
@@ -66,7 +66,7 @@ export type RoleRevealProps = {
  */
 export type NightStepAudience = 'narrator' | 'player_choice' | 'player_reveal'
 
-export type NightStepDefinition = {
+export interface NightStepDefinition {
   id: string
   icon: IconName
   getLabel: (t: Translations) => string
@@ -90,13 +90,13 @@ export type NightStepDefinition = {
  * Used for roles that need narrator configuration before role revelation
  * (e.g., the Drunk choosing which Townsfolk to believe they are).
  */
-export type SetupActionProps = {
+export interface SetupActionProps {
   player: PlayerState
   state: GameState
   onComplete: (result: SetupActionResult) => void
 }
 
-export type SetupActionResult = {
+export interface SetupActionResult {
   // Change this player's roleId to a new role
   changeRole?: string
   // Effects to add to players (playerId -> effects to add)
@@ -134,7 +134,7 @@ export type RoleId =
   | 'baron'
   | 'spy'
 
-export type RoleDefinition = {
+export interface RoleDefinition {
   id: RoleId
   team: TeamId
   icon: IconName

@@ -1,12 +1,13 @@
 import { useMemo } from 'react'
+
+import { getRoleName, useI18n } from '../../lib/i18n'
+import { getRole } from '../../lib/roles/registry'
 import type { Game, GameState, PlayerState } from '../../lib/types'
-import { getRole } from '../../lib/roles'
-import { useI18n, getRoleName } from '../../lib/i18n'
+import { cn } from '../../lib/utils'
 import { Button, Icon, type IconName } from '../atoms'
 import { ScreenFooter } from '../layouts/ScreenFooter'
-import { cn } from '../../lib/utils'
 
-type Props = {
+interface Props {
   game: Game
   state: GameState
   onOpenSetupAction: (playerId: string, roleId: string) => void
@@ -15,7 +16,7 @@ type Props = {
   onEditEffects: (player: PlayerState) => void
 }
 
-type SetupActionItem = {
+interface SetupActionItem {
   playerId: string
   playerName: string
   roleId: string
@@ -37,8 +38,12 @@ export function SetupActionsScreen({ game, state, onOpenSetupAction, onContinue 
 
     for (const player of state.players) {
       const role = getRole(player.roleId)
-      if (!role?.SetupAction) continue
-      if (completedSetupPlayerIds.has(player.id)) continue
+      if (!role?.SetupAction) {
+        continue
+      }
+      if (completedSetupPlayerIds.has(player.id)) {
+        continue
+      }
 
       items.push({
         playerId: player.id,

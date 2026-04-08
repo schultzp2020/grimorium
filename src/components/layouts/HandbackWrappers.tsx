@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
+
+import { Button, type ButtonProps } from '../atoms'
 import { useHandback } from '../context/PlayerFacingContext'
 import { CardLink } from '../items/TeamBackground'
-import { Button, type ButtonProps } from '../atoms'
 
 /**
  * A CardLink that automatically routes its onClick through the

@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import definition from '.'
-import { makePlayer, makeState, addEffectTo, resetPlayerCounter } from '../../../__tests__/helpers'
+import { addEffectTo, makePlayer, makeState, resetPlayerCounter } from '../../../__tests__/helpers'
 
 beforeEach(() => resetPlayerCounter())
 
@@ -11,15 +12,15 @@ describe('Dead effect', () => {
 
   describe('behavior flags', () => {
     it('prevents night wake', () => {
-      expect(definition.preventsNightWake).toBe(true)
+      expect(definition.preventsNightWake).toBeTruthy()
     })
 
     it('prevents voting by default', () => {
-      expect(definition.preventsVoting).toBe(true)
+      expect(definition.preventsVoting).toBeTruthy()
     })
 
     it('prevents nomination', () => {
-      expect(definition.preventsNomination).toBe(true)
+      expect(definition.preventsNomination).toBeTruthy()
     })
   })
 
@@ -31,14 +32,14 @@ describe('Dead effect', () => {
     it('dead player can vote once (no used_dead_vote yet)', () => {
       const player = addEffectTo(makePlayer({ id: 'p1' }), 'dead')
       const state = makeState({ players: [player] })
-      expect(definition.canVote!(player, state)).toBe(true)
+      expect(definition.canVote!(player, state)).toBeTruthy()
     })
 
     it('dead player cannot vote after using dead vote', () => {
       let player = addEffectTo(makePlayer({ id: 'p1' }), 'dead')
       player = addEffectTo(player, 'used_dead_vote')
       const state = makeState({ players: [player] })
-      expect(definition.canVote!(player, state)).toBe(false)
+      expect(definition.canVote!(player, state)).toBeFalsy()
     })
   })
 
@@ -50,7 +51,7 @@ describe('Dead effect', () => {
     it('dead player can never nominate', () => {
       const player = addEffectTo(makePlayer({ id: 'p1' }), 'dead')
       const state = makeState({ players: [player] })
-      expect(definition.canNominate!(player, state)).toBe(false)
+      expect(definition.canNominate!(player, state)).toBeFalsy()
     })
   })
 })

@@ -1,4 +1,5 @@
-import { it, expect } from 'vitest'
+import { expect, it } from 'vitest'
+
 import definition from '.'
 
 // The Drunk's ability malfunction behavior is tested in Drunk.test.ts (effects).

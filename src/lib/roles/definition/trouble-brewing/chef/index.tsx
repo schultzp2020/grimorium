@@ -1,21 +1,21 @@
-import { useState, useMemo } from 'react'
-import type { RoleDefinition } from '../../../types'
-import { useI18n, registerRoleTranslations, getRoleName, getRoleTranslations } from '../../../../i18n'
-import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
-import { NightStepListLayout, PlayerFacingScreen, HandbackCardLink } from '../../../../../components/layouts'
-import type { NightStep } from '../../../../../components/layouts'
+import { useMemo, useState } from 'react'
+
 import {
-  PerceptionConfigStep,
   MalfunctionConfigStep,
-  OracleCard,
   NumberReveal,
+  OracleCard,
+  PerceptionConfigStep,
   TeamBackground,
 } from '../../../../../components/items'
-import { type GameState, type PlayerState, isAlive } from '../../../../types'
-import { perceive, getAmbiguousPlayers, applyPerceptionOverrides } from '../../../../pipeline'
-import { isMalfunctioning } from '../../../../effects'
+import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
+import { HandbackCardLink, NightStepListLayout, PlayerFacingScreen } from '../../../../../components/layouts'
+import type { NightStep } from '../../../../../components/layouts'
+import { isMalfunctioning } from '../../../../effects/registry'
+import { getRoleName, getRoleTranslations, registerRoleTranslations, useI18n } from '../../../../i18n'
+import { applyPerceptionOverrides, getAmbiguousPlayers, perceive } from '../../../../pipeline'
 import type { Perception } from '../../../../pipeline/types'
-
+import { type GameState, type PlayerState, isAlive } from '../../../../types'
+import type { RoleDefinition } from '../../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 
@@ -29,7 +29,9 @@ registerRoleTranslations('chef', 'es', es)
  */
 export function countEvilPairs(state: GameState, observer: PlayerState): number {
   const alivePlayers = state.players.filter(isAlive)
-  if (alivePlayers.length < 2) return 0
+  if (alivePlayers.length < 2) {
+    return 0
+  }
 
   // Get indices of alive players in the original order
   const aliveIndices = state.players.map((p, i) => (isAlive(p) ? i : -1)).filter((i) => i !== -1)

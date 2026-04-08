@@ -1,16 +1,17 @@
 import { useMemo } from 'react'
-import { getRole } from '../../lib/roles'
-import { SCRIPTS } from '../../lib/scripts'
-import type { RoleId } from '../../lib/roles/types'
-import { getTeam, type TeamId } from '../../lib/teams'
-import { useI18n, getRoleName, getRoleDescription } from '../../lib/i18n'
-import { Icon, BackButton } from '../atoms'
-import { RoleCard } from '../items/RoleCard'
-import { TeamBackground, CardLink } from '../items/TeamBackground'
-import { MysticDivider } from '../items'
-import { cn } from '../../lib/utils'
 
-type Props = {
+import { getRoleDescription, getRoleName, useI18n } from '../../lib/i18n'
+import { getRole } from '../../lib/roles/registry'
+import type { RoleId } from '../../lib/roles/types'
+import { SCRIPTS } from '../../lib/scripts'
+import { type TeamId, getTeam } from '../../lib/teams'
+import { cn } from '../../lib/utils'
+import { BackButton, Icon } from '../atoms'
+import { MysticDivider } from '../items'
+import { RoleCard } from '../items/RoleCard'
+import { CardLink, TeamBackground } from '../items/TeamBackground'
+
+interface Props {
   selectedRoleId: RoleId | null
   onBack: () => void
   onSelectRole: (roleId: RoleId) => void
@@ -30,7 +31,7 @@ export function RolesLibrary({ selectedRoleId, onBack, onSelectRole, onDeselectR
     const team = getTeam(teamId)
     const roles = scriptRoles
       .map((roleId) => getRole(roleId))
-      .filter((role): role is NonNullable<ReturnType<typeof getRole>> => role !== undefined && role.team === teamId)
+      .filter((role): role is NonNullable<ReturnType<typeof getRole>> => role?.team === teamId)
     return { teamId, team, roles }
   }).filter((group) => group.roles.length > 0)
 
@@ -108,7 +109,7 @@ export function RolesLibrary({ selectedRoleId, onBack, onSelectRole, onDeselectR
         <div className='mx-auto w-full max-w-lg space-y-6'>
           {rolesByTeam.map(({ teamId, team, roles }) => {
             const teamTranslation = t.teams[teamId as keyof typeof t.teams]
-            const isEvil = team.isEvil
+            const { isEvil } = team
 
             return (
               <div key={teamId}>

@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import type { EffectDefinition, EffectConfigEditorProps } from '../../types'
-import { registerEffectTranslations, getEffectTranslations } from '../../../i18n'
-import type { Language } from '../../../i18n'
-import { Button, Icon } from '../../../../components/atoms'
 
+import { Button, Icon } from '../../../../components/atoms'
+import { getEffectTranslations, registerEffectTranslations } from '../../../i18n'
+import type { Language } from '../../../i18n'
+import type { EffectConfigEditorProps, EffectDefinition } from '../../types'
 import en from './i18n/en'
 import es from './i18n/es'
 
@@ -18,7 +18,9 @@ function ButlerMasterConfigEditor({ data, state, playerId, language, onSave, onC
   const players = state.players.filter((p) => p.id !== playerId)
 
   const handleSave = () => {
-    if (!selectedMasterId) return
+    if (!selectedMasterId) {
+      return
+    }
     onSave({ ...data, masterId: selectedMasterId })
   }
 
@@ -82,14 +84,20 @@ const definition: EffectDefinition = {
   preventsVoting: true,
   canVote: (player, _state, votes) => {
     // If the Butler is dead, they lose their ability, so the restriction lifts
-    if (hasEffect(player, 'dead')) return true
+    if (hasEffect(player, 'dead')) {
+      return true
+    }
 
     // If we're not in an active voting session or don't have vote data, default allow so they aren't fully disabled globally
-    if (!votes) return true
+    if (!votes) {
+      return true
+    }
 
     // Check if the master has voted
     const masterId = player.effects.find((e) => e.type === 'butler_master')?.data?.masterId as string
-    if (!masterId) return true // No master assigned, no restriction
+    if (!masterId) {
+      return true
+    } // No master assigned, no restriction
 
     // Can only vote if the master has voted
     return !!votes[masterId]

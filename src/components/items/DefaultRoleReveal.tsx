@@ -1,11 +1,11 @@
-import { getRole } from '../../lib/roles'
-import { getTeam } from '../../lib/teams'
 import { useI18n } from '../../lib/i18n'
-import { RoleCard } from './RoleCard'
-import { TeamBackground, CardLink } from './TeamBackground'
-import { cn } from '../../lib/utils'
+import { getRole } from '../../lib/roles/registry'
 import type { RoleRevealProps } from '../../lib/roles/types'
+import { getTeam } from '../../lib/teams'
+import { cn } from '../../lib/utils'
 import { useHandback } from '../context/PlayerFacingContext'
+import { RoleCard } from './RoleCard'
+import { CardLink, TeamBackground } from './TeamBackground'
 
 /**
  * Standard role revelation screen used by most roles.
@@ -21,7 +21,7 @@ export function DefaultRoleReveal({ player, onContinue }: RoleRevealProps) {
   const role = getRole(player.roleId)
   const teamId = role?.team ?? 'townsfolk'
   const team = getTeam(teamId)
-  const isEvil = team.isEvil
+  const { isEvil } = team
 
   return (
     <TeamBackground teamId={teamId}>

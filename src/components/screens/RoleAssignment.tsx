@@ -262,7 +262,7 @@ export function RoleAssignment({ players, selectedRoles, onStart, onBack }: Prop
                                 setExpandedPlayer(null)
                               }}
                               className={cn(
-                                'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors border min-h-[36px]',
+                                'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors border min-h-9',
                                 !currentRole
                                   ? 'bg-mystic-gold/20 border-mystic-gold/40 text-mystic-gold'
                                   : 'bg-white/5 border-white/20 text-parchment-400 hover:bg-white/10',
@@ -290,7 +290,7 @@ export function RoleAssignment({ players, selectedRoles, onStart, onBack }: Prop
                                     setExpandedPlayer(null)
                                   }}
                                   className={cn(
-                                    'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors border min-h-[36px]',
+                                    'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors border min-h-9',
                                     isAssigned
                                       ? cn(rTeam.colors.badge, rTeam.colors.badgeText, 'ring-1 ring-white/30')
                                       : cn('bg-white/5 border-white/20 hover:bg-white/10', rTeam.colors.text),

@@ -187,7 +187,7 @@ function DialogContent({
         <DialogContentInner bodyRef={bodyRef}>{children}</DialogContentInner>
         <DialogPrimitive.Close
           ref={closeRef}
-          className='absolute top-3 right-3 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-3 text-parchment-400 transition-colors hover:bg-white/10 hover:text-parchment-100 active:bg-white/20'
+          className='absolute top-3 right-3 flex min-h-11 min-w-11 items-center justify-center rounded-full p-3 text-parchment-400 transition-colors hover:bg-white/10 hover:text-parchment-100 active:bg-white/20'
         >
           <Icon name='x' size='md' />
           <span className='sr-only'>{t.ui.close}</span>

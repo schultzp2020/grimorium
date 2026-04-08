@@ -236,7 +236,7 @@ export function PlayerEntry({ onNext, onBack }: Props) {
               {/* Drag handle */}
               <div
                 {...bindDrag(index)}
-                className='flex min-h-[44px] w-11 shrink-0 cursor-grab touch-none items-center justify-center py-3 text-parchment-500/40 select-none hover:text-parchment-400 active:cursor-grabbing'
+                className='flex min-h-11 w-11 shrink-0 cursor-grab touch-none items-center justify-center py-3 text-parchment-500/40 select-none hover:text-parchment-400 active:cursor-grabbing'
               >
                 <Icon name='gripVertical' size='md' />
               </div>

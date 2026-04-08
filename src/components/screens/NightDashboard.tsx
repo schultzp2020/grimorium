@@ -102,7 +102,7 @@ export function NightDashboard({
             <button
               type='button'
               onClick={onMainMenu}
-              className='-ml-3 flex min-h-[44px] min-w-[44px] items-center justify-center p-3 text-parchment-500 transition-colors hover:text-parchment-200'
+              className='-ml-3 flex min-h-11 min-w-11 items-center justify-center p-3 text-parchment-500 transition-colors hover:text-parchment-200'
             >
               <Icon name='menu' size='md' />
             </button>

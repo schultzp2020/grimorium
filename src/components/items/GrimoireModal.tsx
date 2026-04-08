@@ -449,7 +449,7 @@ function EditEffectsContent({
                           onClick={() => handleEditEffect(effectInstance)}
                           size='icon'
                           variant='ghost'
-                          className='min-h-[44px] min-w-[44px] text-cyan-400 hover:bg-cyan-900/20 hover:text-cyan-300'
+                          className='min-h-11 min-w-11 text-cyan-400 hover:bg-cyan-900/20 hover:text-cyan-300'
                         >
                           <Icon name='pencil' size='sm' />
                         </Button>
@@ -458,7 +458,7 @@ function EditEffectsContent({
                         onClick={() => onRemoveEffect(player.id, effectInstance.type)}
                         size='icon'
                         variant='ghost'
-                        className='min-h-[44px] min-w-[44px] text-red-400 hover:bg-red-900/20 hover:text-red-300'
+                        className='min-h-11 min-w-11 text-red-400 hover:bg-red-900/20 hover:text-red-300'
                       >
                         <Icon name='minus' size='sm' />
                       </Button>
@@ -494,7 +494,7 @@ function EditEffectsContent({
                 onClick={() => handleAddEffect(effect)}
                 disabled={alreadyHas}
                 className={cn(
-                  'flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg border transition-colors text-left min-h-[44px]',
+                  'flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg border transition-colors text-left min-h-11',
                   alreadyHas
                     ? 'bg-white/5 border-white/5 opacity-40 cursor-not-allowed'
                     : 'bg-white/5 border-white/10 hover:border-green-500/50 hover:bg-green-900/20',

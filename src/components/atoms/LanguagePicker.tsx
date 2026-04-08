@@ -26,7 +26,7 @@ export function LanguagePicker({ variant = 'button', className = '' }: Props) {
         ) : (
           <button
             type='button'
-            className={`flex min-h-[44px] items-center gap-2 rounded-full border border-mystic-gold/30 px-3 py-2 text-sm text-mystic-gold/70 transition-all hover:border-mystic-gold/50 hover:text-mystic-gold active:scale-95 ${className}`}
+            className={`flex min-h-11 items-center gap-2 rounded-full border border-mystic-gold/30 px-3 py-2 text-sm text-mystic-gold/70 transition-all hover:border-mystic-gold/50 hover:text-mystic-gold active:scale-95 ${className}`}
           >
             <Icon name='globe' size='sm' />
             {current?.nativeName ?? language.toUpperCase()}
@@ -50,7 +50,7 @@ export function LanguagePicker({ variant = 'button', className = '' }: Props) {
                   <button
                     type='button'
                     onClick={() => setLanguage(lang.code)}
-                    className={`flex min-h-[48px] w-full items-center gap-3 px-4 py-3.5 text-left transition-colors ${
+                    className={`flex min-h-12 w-full items-center gap-3 px-4 py-3.5 text-left transition-colors ${
                       isActive ? 'bg-mystic-gold/15 text-mystic-gold' : 'text-parchment-300 active:bg-white/10'
                     }`}
                   >

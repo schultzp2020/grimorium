@@ -259,7 +259,7 @@ export function VotingPhase({ state, nomineeId, blockStatus, onVoteComplete, onC
                     onClick={() => handleToggleVote(player.id)}
                     disabled={!canVote}
                     className={cn(
-                      'w-full py-2.5 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-2 active:scale-[0.97] min-h-[48px]',
+                      'w-full py-2.5 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-2 active:scale-[0.97] min-h-12',
                       voted
                         ? 'bg-red-600 text-white'
                         : canVote

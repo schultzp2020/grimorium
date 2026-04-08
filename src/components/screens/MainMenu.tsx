@@ -542,7 +542,7 @@ export function MainMenu({ onNewGame, onContinue, onLoadGame, onRolesLibrary, on
                       closePastGames()
                       onLoadGame(game.id)
                     }}
-                    className='group min-h-[44px] w-full rounded-lg px-4 py-3 text-left transition-colors hover:bg-white/5'
+                    className='group min-h-11 w-full rounded-lg px-4 py-3 text-left transition-colors hover:bg-white/5'
                   >
                     <div className='flex items-start gap-3'>
                       <Icon

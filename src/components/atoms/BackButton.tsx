@@ -12,7 +12,7 @@ export function BackButton({ onClick, label }: BackButtonProps) {
       type='button'
       onClick={onClick}
       className={cn(
-        'p-3 -ml-3 text-parchment-400 hover:text-parchment-100 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center',
+        'p-3 -ml-3 text-parchment-400 hover:text-parchment-100 transition-colors min-w-11 min-h-11 flex items-center justify-center',
         label && 'flex items-center gap-1',
       )}
     >

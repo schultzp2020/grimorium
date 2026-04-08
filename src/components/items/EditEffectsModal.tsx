@@ -181,7 +181,7 @@ export function EditEffectsModal({ player, state, open, onClose, onAddEffect, on
                               onClick={() => handleEditEffect(effectInstance)}
                               size='icon'
                               variant='ghost'
-                              className='min-h-[44px] min-w-[44px] text-cyan-400 hover:bg-cyan-900/20 hover:text-cyan-300'
+                              className='min-h-11 min-w-11 text-cyan-400 hover:bg-cyan-900/20 hover:text-cyan-300'
                             >
                               <Icon name='pencil' size='sm' />
                             </Button>
@@ -190,7 +190,7 @@ export function EditEffectsModal({ player, state, open, onClose, onAddEffect, on
                             onClick={() => handleRemoveEffect(effectInstance.type)}
                             size='icon'
                             variant='ghost'
-                            className='min-h-[44px] min-w-[44px] text-red-400 hover:bg-red-900/20 hover:text-red-300'
+                            className='min-h-11 min-w-11 text-red-400 hover:bg-red-900/20 hover:text-red-300'
                           >
                             <Icon name='minus' size='sm' />
                           </Button>
@@ -227,7 +227,7 @@ export function EditEffectsModal({ player, state, open, onClose, onAddEffect, on
                     key={effect.id}
                     onClick={() => handleAddEffect(effect)}
                     disabled={alreadyHas}
-                    className={`flex min-h-[44px] w-full items-center gap-3 rounded-lg border px-3 py-3 text-left transition-colors ${
+                    className={`flex min-h-11 w-full items-center gap-3 rounded-lg border px-3 py-3 text-left transition-colors ${
                       alreadyHas
                         ? 'cursor-not-allowed border-white/5 bg-white/5 opacity-40'
                         : 'border-white/10 bg-white/5 hover:border-green-500/50 hover:bg-green-900/20 active:bg-green-900/30'

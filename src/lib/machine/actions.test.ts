@@ -17,7 +17,7 @@ import { createInitialContext } from './types'
 
 // Mock storage to avoid localStorage in tests
 vi.mock('../storage', () => ({
-  saveGame: vi.fn(),
+  saveGame: vi.fn<() => void>(),
 }))
 
 describe('actions', () => {
@@ -80,7 +80,7 @@ describe('actions', () => {
       const newGame = applyNightActionDirect(ctx, result)
       const newState = getCurrentState(newGame)
       const p2 = newState.players.find((p) => p.id === 'p2')
-      expect(p2?.effects.some((e) => e.type === 'safe')).toBe(true)
+      expect(p2?.effects.some((e) => e.type === 'safe')).toBeTruthy()
     })
   })
 
@@ -99,7 +99,7 @@ describe('actions', () => {
       }
       const newGame = applySkipNightAction(ctx)
       const hasSkipEntry = newGame.history.some((e) => e.type === 'night_skipped')
-      expect(hasSkipEntry).toBe(true)
+      expect(hasSkipEntry).toBeTruthy()
     })
   })
 
@@ -128,7 +128,7 @@ describe('actions', () => {
       const newGame = applyAddEffect(ctx, 'p1', 'safe')
       const newState = getCurrentState(newGame)
       const player = newState.players.find((p) => p.id === 'p1')
-      expect(player?.effects.some((e) => e.type === 'safe')).toBe(true)
+      expect(player?.effects.some((e) => e.type === 'safe')).toBeTruthy()
     })
   })
 
@@ -142,7 +142,7 @@ describe('actions', () => {
       const newGame = applyRemoveEffect(ctx, 'p1', 'safe')
       const newState = getCurrentState(newGame)
       const player = newState.players.find((p) => p.id === 'p1')
-      expect(player?.effects.some((e) => e.type === 'safe')).toBe(false)
+      expect(player?.effects.some((e) => e.type === 'safe')).toBeFalsy()
     })
   })
 

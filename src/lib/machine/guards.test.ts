@@ -16,7 +16,7 @@ describe('guards', () => {
       })
       const game = makeGame(state)
       const ctx = createInitialContext(game)
-      expect(hasSetupActions(ctx)).toBe(false)
+      expect(hasSetupActions(ctx)).toBeFalsy()
     })
 
     it('returns true when a player has a setup action', () => {
@@ -25,7 +25,7 @@ describe('guards', () => {
       })
       const game = makeGame(state)
       const ctx = createInitialContext(game)
-      expect(hasSetupActions(ctx)).toBe(true)
+      expect(hasSetupActions(ctx)).toBeTruthy()
     })
 
     it('returns false when setup actions are already completed', () => {
@@ -42,7 +42,7 @@ describe('guards', () => {
         stateAfter: state,
       })
       const ctx = createInitialContext(game)
-      expect(hasSetupActions(ctx)).toBe(false)
+      expect(hasSetupActions(ctx)).toBeFalsy()
     })
   })
 
@@ -57,7 +57,7 @@ describe('guards', () => {
       })
       const game = makeGame(state)
       const ctx = createInitialContext(game)
-      expect(isGameOver(ctx)).toBe(false)
+      expect(isGameOver(ctx)).toBeFalsy()
     })
 
     it('returns true when game phase is ended', () => {
@@ -67,7 +67,7 @@ describe('guards', () => {
       })
       const game = makeGame(state)
       const ctx = createInitialContext(game)
-      expect(isGameOver(ctx)).toBe(true)
+      expect(isGameOver(ctx)).toBeTruthy()
     })
 
     it('returns true when all demons are dead', () => {
@@ -81,7 +81,7 @@ describe('guards', () => {
       })
       const game = makeGame(state)
       const ctx = createInitialContext(game)
-      expect(isGameOver(ctx)).toBe(true)
+      expect(isGameOver(ctx)).toBeTruthy()
     })
 
     it('returns true when only 2 players remain alive and one is a demon', () => {
@@ -95,7 +95,7 @@ describe('guards', () => {
       })
       const game = makeGame(state)
       const ctx = createInitialContext(game)
-      expect(isGameOver(ctx)).toBe(true)
+      expect(isGameOver(ctx)).toBeTruthy()
     })
 
     it('returns false during setup phase even with dead demons', () => {
@@ -106,7 +106,7 @@ describe('guards', () => {
       })
       const game = makeGame(state)
       const ctx = createInitialContext(game)
-      expect(isGameOver(ctx)).toBe(false)
+      expect(isGameOver(ctx)).toBeFalsy()
     })
   })
 
@@ -122,7 +122,7 @@ describe('guards', () => {
       })
       const game = makeGame(state)
       const ctx = createInitialContext(game)
-      expect(hasEndOfDayWinner(ctx)).toBe(false)
+      expect(hasEndOfDayWinner(ctx)).toBeFalsy()
     })
   })
 })

@@ -10,9 +10,9 @@ vi.mock('../lib/storage', () => ({
   getCurrentGameId: () => null,
   getLastGamePlayers: () => [],
   getGame: () => undefined,
-  saveGame: vi.fn(),
-  setCurrentGameId: vi.fn(),
-  clearCurrentGame: vi.fn(),
+  saveGame: vi.fn<() => void>(),
+  setCurrentGameId: vi.fn<() => void>(),
+  clearCurrentGame: vi.fn<() => void>(),
 }))
 
 async function renderRoute(path: string) {

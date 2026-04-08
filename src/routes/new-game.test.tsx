@@ -10,8 +10,8 @@ vi.mock('../lib/storage', () => ({
   getGameSummaries: () => [],
   getCurrentGameId: () => null,
   getLastGamePlayers: () => [],
-  saveGame: vi.fn(),
-  setCurrentGameId: vi.fn(),
+  saveGame: vi.fn<() => void>(),
+  setCurrentGameId: vi.fn<() => void>(),
 }))
 
 afterEach(() => clearWizardState())

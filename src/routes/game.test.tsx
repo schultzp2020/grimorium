@@ -31,9 +31,9 @@ const mockGame = {
 
 vi.mock('../lib/storage', () => ({
   getGame: (id: string) => (id === 'test-game-1' ? mockGame : undefined),
-  saveGame: vi.fn(),
-  setCurrentGameId: vi.fn(),
-  clearCurrentGame: vi.fn(),
+  saveGame: vi.fn<() => void>(),
+  setCurrentGameId: vi.fn<() => void>(),
+  clearCurrentGame: vi.fn<() => void>(),
   getCurrentGameId: () => null,
   getGameSummaries: () => [],
   getLastGamePlayers: () => [],

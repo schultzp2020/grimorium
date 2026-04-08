@@ -104,7 +104,9 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
     if (snapshot.matches({ setup: 'action' })) {
       const setupPlayer = context.setupActionPlayerId ? getPlayer(state, context.setupActionPlayerId) : null
       const setupRole = context.setupActionRoleId ? getRole(context.setupActionRoleId) : null
-      if (!setupPlayer || !setupRole?.SetupAction) return null
+      if (!setupPlayer || !setupRole?.SetupAction) {
+        return null
+      }
 
       return (
         <setupRole.SetupAction
@@ -129,9 +131,13 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
 
     if (snapshot.matches({ revelation: 'showing_role' })) {
       const player = context.showingRolePlayerId ? getPlayer(state, context.showingRolePlayerId) : null
-      if (!player) return null
+      if (!player) {
+        return null
+      }
       const role = getRole(player.roleId)
-      if (!role) return null
+      if (!role) {
+        return null
+      }
 
       return (
         <PlayerFacingScreen playerName={player.name}>
@@ -169,7 +175,9 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
     if (snapshot.matches({ playing: { night: 'action' } })) {
       const player = context.nightActionPlayerId ? getPlayer(state, context.nightActionPlayerId) : null
       const role = context.nightActionRoleId ? getRole(context.nightActionRoleId) : null
-      if (!player || !role?.NightAction) return null
+      if (!player || !role?.NightAction) {
+        return null
+      }
 
       return (
         <role.NightAction
@@ -189,7 +197,9 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
 
     if (snapshot.matches({ playing: { night: 'follow_up' } })) {
       const followUp = context.activeFollowUp
-      if (!followUp) return null
+      if (!followUp) {
+        return null
+      }
       const FollowUpComponent = followUp.ActionComponent
       return (
         <FollowUpComponent
@@ -202,7 +212,9 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
     }
 
     if (snapshot.matches({ playing: { night: 'pipeline_input' } })) {
-      if (!context.pipelineUI) return null
+      if (!context.pipelineUI) {
+        return null
+      }
       const PipelineComponent = context.pipelineUI.Component
       return (
         <PipelineComponent
@@ -281,7 +293,9 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
     }
 
     if (snapshot.matches({ playing: { day: 'voting' } })) {
-      if (!context.votingNomineeId) return null
+      if (!context.votingNomineeId) {
+        return null
+      }
       return (
         <VotingPhase
           state={state}
@@ -294,7 +308,9 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
     }
 
     if (snapshot.matches({ playing: { day: 'day_action' } })) {
-      if (!context.activeDayAction) return null
+      if (!context.activeDayAction) {
+        return null
+      }
       const { ActionComponent } = context.activeDayAction
       return (
         <ActionComponent

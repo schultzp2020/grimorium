@@ -43,7 +43,9 @@ export const gameMachine = setup({
     hasPendingDeathReveals: ({ context }) => context.deathRevealQueue.length > 0,
     hasPipelineNeedsInput: ({ context }) => context.pipelineUI !== null,
     hasRoleNightAction: ({ event }) => {
-      if (event.type !== 'OPEN_NIGHT_ACTION') return false
+      if (event.type !== 'OPEN_NIGHT_ACTION') {
+        return false
+      }
       const role = getRole(event.roleId)
       return role?.NightAction !== null && role?.NightAction !== undefined
     },
@@ -67,17 +69,23 @@ export const gameMachine = setup({
 
     setSetupActionTarget: assign({
       setupActionPlayerId: ({ event }) => {
-        if (event.type !== 'OPEN_SETUP_ACTION') return null
+        if (event.type !== 'OPEN_SETUP_ACTION') {
+          return null
+        }
         return event.playerId
       },
       setupActionRoleId: ({ event }) => {
-        if (event.type !== 'OPEN_SETUP_ACTION') return null
+        if (event.type !== 'OPEN_SETUP_ACTION') {
+          return null
+        }
         return event.roleId
       },
     }),
     applySetupAction: assign({
       game: ({ context, event }) => {
-        if (event.type !== 'SETUP_ACTION_COMPLETE') return context.game
+        if (event.type !== 'SETUP_ACTION_COMPLETE') {
+          return context.game
+        }
         return applySetupActionToContext(context, event.result)
       },
       setupActionPlayerId: () => null,
@@ -86,13 +94,17 @@ export const gameMachine = setup({
 
     setShowingRole: assign({
       showingRolePlayerId: ({ event }) => {
-        if (event.type !== 'REVEAL_ROLE') return null
+        if (event.type !== 'REVEAL_ROLE') {
+          return null
+        }
         return event.playerId
       },
     }),
     markRoleRevealed: assign({
       game: ({ context }) => {
-        if (!context.showingRolePlayerId) return context.game
+        if (!context.showingRolePlayerId) {
+          return context.game
+        }
         return applyMarkRoleRevealed(context, context.showingRolePlayerId)
       },
       showingRolePlayerId: () => null,
@@ -103,22 +115,30 @@ export const gameMachine = setup({
     }),
     setNightActionTarget: assign({
       nightActionPlayerId: ({ event }) => {
-        if (event.type !== 'OPEN_NIGHT_ACTION') return null
+        if (event.type !== 'OPEN_NIGHT_ACTION') {
+          return null
+        }
         return event.playerId
       },
       nightActionRoleId: ({ event }) => {
-        if (event.type !== 'OPEN_NIGHT_ACTION') return null
+        if (event.type !== 'OPEN_NIGHT_ACTION') {
+          return null
+        }
         return event.roleId
       },
     }),
     autoSkipNightAction: assign({
       game: ({ context, event }) => {
-        if (event.type !== 'OPEN_NIGHT_ACTION') return context.game
+        if (event.type !== 'OPEN_NIGHT_ACTION') {
+          return context.game
+        }
         return autoSkipNightAction(context.game, event.roleId, event.playerId)
       },
     }),
     applyNightActionDirect: assign(({ context, event }) => {
-      if (event.type !== 'NIGHT_ACTION_COMPLETE') return {}
+      if (event.type !== 'NIGHT_ACTION_COMPLETE') {
+        return {}
+      }
 
       const gameAfterDirect = applyNightActionDirect(context, event.result)
       const pipelineResult = resolveIntentFromResult(gameAfterDirect, event.result)
@@ -188,13 +208,17 @@ export const gameMachine = setup({
     }),
     setActiveFollowUp: assign({
       activeFollowUp: ({ event }) => {
-        if (event.type !== 'OPEN_NIGHT_FOLLOW_UP') return null
+        if (event.type !== 'OPEN_NIGHT_FOLLOW_UP') {
+          return null
+        }
         return event.followUp
       },
     }),
     applyNightFollowUp: assign({
       game: ({ context, event }) => {
-        if (event.type !== 'NIGHT_FOLLOW_UP_COMPLETE') return context.game
+        if (event.type !== 'NIGHT_FOLLOW_UP_COMPLETE') {
+          return context.game
+        }
         return applyFollowUpResult(context, event.result)
       },
       activeFollowUp: () => null,
@@ -238,7 +262,9 @@ export const gameMachine = setup({
     }),
 
     applyNomination: assign(({ context, event }) => {
-      if (event.type !== 'NOMINATE') return {}
+      if (event.type !== 'NOMINATE') {
+        return {}
+      }
 
       const preState = getCurrentState(context.game)
       const preAliveIds = new Set(preState.players.filter(isAlive).map((p) => p.id))
@@ -274,7 +300,9 @@ export const gameMachine = setup({
     }),
     applyVote: assign({
       game: ({ context, event }) => {
-        if (event.type !== 'VOTE_COMPLETE' || !context.votingNomineeId) return context.game
+        if (event.type !== 'VOTE_COMPLETE' || !context.votingNomineeId) {
+          return context.game
+        }
         return applyVote(context, context.votingNomineeId, event.voteCount, event.votedIds)
       },
       votingNomineeId: () => null,
@@ -304,12 +332,16 @@ export const gameMachine = setup({
 
     setActiveDayAction: assign({
       activeDayAction: ({ event }) => {
-        if (event.type !== 'OPEN_DAY_ACTION') return null
+        if (event.type !== 'OPEN_DAY_ACTION') {
+          return null
+        }
         return event.action
       },
     }),
     applyDayAction: assign(({ context, event }) => {
-      if (event.type !== 'DAY_ACTION_COMPLETE') return {}
+      if (event.type !== 'DAY_ACTION_COMPLETE') {
+        return {}
+      }
 
       const preState = getCurrentState(context.game)
       const preAliveIds = new Set(preState.players.filter(isAlive).map((p) => p.id))
@@ -347,7 +379,9 @@ export const gameMachine = setup({
     openGrimoire: assign({
       grimoireOpen: () => true,
       grimoireIntent: ({ event }) => {
-        if (event.type !== 'OPEN_GRIMOIRE') return { view: 'list' as const }
+        if (event.type !== 'OPEN_GRIMOIRE') {
+          return { view: 'list' as const }
+        }
         return event.intent
       },
     }),
@@ -356,7 +390,9 @@ export const gameMachine = setup({
     }),
     showGrimoireRoleCard: assign({
       grimoireRoleCardPlayerId: ({ event }) => {
-        if (event.type !== 'SHOW_GRIMOIRE_ROLE_CARD') return null
+        if (event.type !== 'SHOW_GRIMOIRE_ROLE_CARD') {
+          return null
+        }
         return event.playerId
       },
       grimoireOpen: () => false,
@@ -374,26 +410,34 @@ export const gameMachine = setup({
 
     addEffect: assign({
       game: ({ context, event }) => {
-        if (event.type !== 'ADD_EFFECT') return context.game
+        if (event.type !== 'ADD_EFFECT') {
+          return context.game
+        }
         return applyAddEffect(context, event.playerId, event.effectType, event.data)
       },
     }),
     removeEffect: assign({
       game: ({ context, event }) => {
-        if (event.type !== 'REMOVE_EFFECT') return context.game
+        if (event.type !== 'REMOVE_EFFECT') {
+          return context.game
+        }
         return applyRemoveEffect(context, event.playerId, event.effectType)
       },
     }),
     updateEffect: assign({
       game: ({ context, event }) => {
-        if (event.type !== 'UPDATE_EFFECT') return context.game
+        if (event.type !== 'UPDATE_EFFECT') {
+          return context.game
+        }
         return applyUpdateEffect(context, event.playerId, event.effectType, event.data)
       },
     }),
 
     setPlayerFacing: assign({
       isPlayerFacing: ({ event }) => {
-        if (event.type !== 'SET_PLAYER_FACING') return false
+        if (event.type !== 'SET_PLAYER_FACING') {
+          return false
+        }
         return event.value
       },
     }),

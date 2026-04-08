@@ -6,7 +6,7 @@ import { getCurrentState } from '../types'
 import { gameMachine } from './gameMachine'
 
 vi.mock('../storage', () => ({
-  saveGame: vi.fn(),
+  saveGame: vi.fn<() => void>(),
 }))
 
 function createTestActor(game: ReturnType<typeof makeGame>) {
@@ -35,18 +35,18 @@ describe('integration: full game flows', () => {
       const actor = createTestActor(game)
 
       // 1. Should start at revelation (no setup actions)
-      expect(actor.getSnapshot().matches({ revelation: 'list' })).toBe(true)
+      expect(actor.getSnapshot().matches({ revelation: 'list' })).toBeTruthy()
 
       // 2. Reveal each player's role
       actor.send({ type: 'REVEAL_ROLE', playerId: 'p1' })
-      expect(actor.getSnapshot().matches({ revelation: 'showing_role' })).toBe(true)
+      expect(actor.getSnapshot().matches({ revelation: 'showing_role' })).toBeTruthy()
 
       actor.send({ type: 'ROLE_REVEAL_DISMISS' })
-      expect(actor.getSnapshot().matches({ revelation: 'list' })).toBe(true)
+      expect(actor.getSnapshot().matches({ revelation: 'list' })).toBeTruthy()
 
       // 3. Start first night
       actor.send({ type: 'START_FIRST_NIGHT' })
-      expect(actor.getSnapshot().matches({ playing: { night: 'dashboard' } })).toBe(true)
+      expect(actor.getSnapshot().matches({ playing: { night: 'dashboard' } })).toBeTruthy()
 
       // Verify the game transitioned to night
       const nightState = getCurrentState(actor.getSnapshot().context.game)
@@ -71,7 +71,7 @@ describe('integration: full game flows', () => {
       const game = makeGame(state)
       const actor = createTestActor(game)
 
-      expect(actor.getSnapshot().matches({ playing: { night: 'dashboard' } })).toBe(true)
+      expect(actor.getSnapshot().matches({ playing: { night: 'dashboard' } })).toBeTruthy()
 
       actor.stop()
     })
@@ -89,7 +89,7 @@ describe('integration: full game flows', () => {
       const game = makeGame(state)
       const actor = createTestActor(game)
 
-      expect(actor.getSnapshot().matches({ playing: { day: 'main' } })).toBe(true)
+      expect(actor.getSnapshot().matches({ playing: { day: 'main' } })).toBeTruthy()
 
       actor.stop()
     })
@@ -102,7 +102,7 @@ describe('integration: full game flows', () => {
       const game = makeGame(state)
       const actor = createTestActor(game)
 
-      expect(actor.getSnapshot().matches('game_over')).toBe(true)
+      expect(actor.getSnapshot().matches('game_over')).toBeTruthy()
 
       actor.stop()
     })
@@ -124,7 +124,7 @@ describe('integration: full game flows', () => {
 
       // Open nomination
       actor.send({ type: 'OPEN_NOMINATION' })
-      expect(actor.getSnapshot().matches({ playing: { day: 'nomination' } })).toBe(true)
+      expect(actor.getSnapshot().matches({ playing: { day: 'nomination' } })).toBeTruthy()
 
       // Nominate — should go to voting (no Virgin effect)
       actor.send({
@@ -132,12 +132,12 @@ describe('integration: full game flows', () => {
         nominatorId: 'p1',
         nomineeId: 'p3',
       })
-      expect(actor.getSnapshot().matches({ playing: { day: 'voting' } })).toBe(true)
+      expect(actor.getSnapshot().matches({ playing: { day: 'voting' } })).toBeTruthy()
       expect(actor.getSnapshot().context.votingNomineeId).toBe('p3')
 
       // Complete vote — back to day main
       actor.send({ type: 'VOTE_COMPLETE', voteCount: 2 })
-      expect(actor.getSnapshot().matches({ playing: { day: 'main' } })).toBe(true)
+      expect(actor.getSnapshot().matches({ playing: { day: 'main' } })).toBeTruthy()
 
       actor.stop()
     })
@@ -159,13 +159,13 @@ describe('integration: full game flows', () => {
 
       // Open grimoire
       actor.send({ type: 'OPEN_GRIMOIRE', intent: { view: 'list' } })
-      expect(actor.getSnapshot().context.grimoireOpen).toBe(true)
+      expect(actor.getSnapshot().context.grimoireOpen).toBeTruthy()
       // Machine state should NOT change
-      expect(actor.getSnapshot().matches({ playing: { day: 'main' } })).toBe(true)
+      expect(actor.getSnapshot().matches({ playing: { day: 'main' } })).toBeTruthy()
 
       // Close grimoire
       actor.send({ type: 'CLOSE_GRIMOIRE' })
-      expect(actor.getSnapshot().context.grimoireOpen).toBe(false)
+      expect(actor.getSnapshot().context.grimoireOpen).toBeFalsy()
 
       actor.stop()
     })
@@ -188,11 +188,11 @@ describe('integration: full game flows', () => {
 
       // Navigate to night
       actor.send({ type: 'START_FIRST_NIGHT' })
-      expect(actor.getSnapshot().matches({ playing: { night: 'dashboard' } })).toBe(true)
+      expect(actor.getSnapshot().matches({ playing: { night: 'dashboard' } })).toBeTruthy()
 
       // Open a night action
       actor.send({ type: 'OPEN_NIGHT_ACTION', playerId: 'p1', roleId: 'monk' })
-      expect(actor.getSnapshot().matches({ playing: { night: 'action' } })).toBe(true)
+      expect(actor.getSnapshot().matches({ playing: { night: 'action' } })).toBeTruthy()
 
       // Complete with no intent
       actor.send({
@@ -207,7 +207,7 @@ describe('integration: full game flows', () => {
           ],
         },
       })
-      expect(actor.getSnapshot().matches({ playing: { night: 'dashboard' } })).toBe(true)
+      expect(actor.getSnapshot().matches({ playing: { night: 'dashboard' } })).toBeTruthy()
 
       actor.stop()
     })
@@ -232,7 +232,7 @@ describe('integration: full game flows', () => {
       actor.send({ type: 'END_DAY' })
 
       // Should be in night dashboard (no deaths to reveal)
-      expect(actor.getSnapshot().matches({ playing: { night: 'dashboard' } })).toBe(true)
+      expect(actor.getSnapshot().matches({ playing: { night: 'dashboard' } })).toBeTruthy()
 
       actor.stop()
     })
@@ -254,10 +254,10 @@ describe('integration: full game flows', () => {
 
       actor.send({ type: 'OPEN_NOMINATION' })
       actor.send({ type: 'NOMINATE', nominatorId: 'p1', nomineeId: 'p3' })
-      expect(actor.getSnapshot().matches({ playing: { day: 'voting' } })).toBe(true)
+      expect(actor.getSnapshot().matches({ playing: { day: 'voting' } })).toBeTruthy()
 
       actor.send({ type: 'CANCEL_VOTE' })
-      expect(actor.getSnapshot().matches({ playing: { day: 'main' } })).toBe(true)
+      expect(actor.getSnapshot().matches({ playing: { day: 'main' } })).toBeTruthy()
 
       actor.stop()
     })

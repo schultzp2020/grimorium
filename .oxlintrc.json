@@ -125,5 +125,5 @@
     "vitest/prefer-to-be-truthy": "warn",
     "vitest/prefer-to-be-falsy": "warn"
   },
-  "ignorePatterns": ["**/node_modules", "**/dist", "**/public"]
+  "ignorePatterns": ["**/node_modules", "**/dist", "**/public", "**/.worktrees"]
 }

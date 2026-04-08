@@ -74,29 +74,42 @@
 type Phase = 'setup' | 'night' | 'day' | 'ended'
 
 type Game = {
-  id: string; name: string; createdAt: number; scriptId: string
+  id: string
+  name: string
+  createdAt: number
+  scriptId: string
   history: HistoryEntry[]
 }
 
 type HistoryEntry = {
-  id: string; timestamp: number; type: EventType
-  message: RichMessage; data: Record<string, unknown>
+  id: string
+  timestamp: number
+  type: EventType
+  message: RichMessage
+  data: Record<string, unknown>
   stateAfter: GameState
 }
 
 type GameState = {
-  phase: Phase; round: number  // 0 = setup, 1+ = game rounds
-  players: PlayerState[]; winner: Team | null
+  phase: Phase
+  round: number // 0 = setup, 1+ = game rounds
+  players: PlayerState[]
+  winner: Team | null
 }
 
 type PlayerState = {
-  id: string; name: string; roleId: string
+  id: string
+  name: string
+  roleId: string
   effects: EffectInstance[]
 }
 
 type EffectInstance = {
-  id: string; type: string; data?: Record<string, unknown>
-  sourcePlayerId?: string; expiresAt?: 'end_of_night' | 'end_of_day' | 'never'
+  id: string
+  type: string
+  data?: Record<string, unknown>
+  sourcePlayerId?: string
+  expiresAt?: 'end_of_night' | 'end_of_day' | 'never'
 }
 ```
 
@@ -114,29 +127,29 @@ State evolves via `addHistoryEntry(game, entry, stateUpdates, addEffects, remove
 
 Pure functions: `Game → Game`. Zero knowledge of individual roles.
 
-| Function | Purpose |
-|---|---|
-| `createGame(name, scriptId, players)` | Creates game, applies `initialEffects` |
-| `getNextStep(game)` | Returns next `GameStep` |
-| `startNight(game)` | Night phase, increment round |
-| `startDay(game)` | Resolve night, announce deaths, expire effects |
-| `applyNightAction(game, result)` | Apply direct entries/effects from night action |
-| `skipNightAction(game, roleId, playerId)` | Skip a role's night action |
-| `processAutoSkips(game)` | Auto-skip roles where `shouldWake` returns false |
-| `nominate(game, nominatorId, nomineeId)` | Send nomination through pipeline |
-| `resolveVote(game, nomineeId, voteCount, votedIds)` | Process vote result |
-| `executeAtEndOfDay(game)` | Execute the player on the block via pipeline |
-| `getBlockStatus(game)` | Who's on the block |
-| `checkWinCondition(state, game)` | Core + dynamic win conditions |
-| `checkEndOfDayWinConditions(state, game)` | End-of-day trigger win conditions |
-| `endGame(game, winner)` | End game with winner |
-| `applySetupAction(game, playerId, result)` | Pre-revelation setup (e.g., Drunk) |
-| `addEffectToPlayer(game, playerId, effectType, data)` | Narrator adds effect |
-| `updateEffectData(game, playerId, effectType, data)` | Narrator updates effect data |
-| `removeEffectFromPlayer(game, playerId, effectType)` | Narrator removes effect |
-| `getNightRolesStatus(game)` | Night dashboard role status list |
-| `getVoteThreshold(state)` | Votes needed for execution |
-| `markRoleRevealed(game, playerId)` | Mark a role as revealed |
+| Function                                              | Purpose                                          |
+| ----------------------------------------------------- | ------------------------------------------------ |
+| `createGame(name, scriptId, players)`                 | Creates game, applies `initialEffects`           |
+| `getNextStep(game)`                                   | Returns next `GameStep`                          |
+| `startNight(game)`                                    | Night phase, increment round                     |
+| `startDay(game)`                                      | Resolve night, announce deaths, expire effects   |
+| `applyNightAction(game, result)`                      | Apply direct entries/effects from night action   |
+| `skipNightAction(game, roleId, playerId)`             | Skip a role's night action                       |
+| `processAutoSkips(game)`                              | Auto-skip roles where `shouldWake` returns false |
+| `nominate(game, nominatorId, nomineeId)`              | Send nomination through pipeline                 |
+| `resolveVote(game, nomineeId, voteCount, votedIds)`   | Process vote result                              |
+| `executeAtEndOfDay(game)`                             | Execute the player on the block via pipeline     |
+| `getBlockStatus(game)`                                | Who's on the block                               |
+| `checkWinCondition(state, game)`                      | Core + dynamic win conditions                    |
+| `checkEndOfDayWinConditions(state, game)`             | End-of-day trigger win conditions                |
+| `endGame(game, winner)`                               | End game with winner                             |
+| `applySetupAction(game, playerId, result)`            | Pre-revelation setup (e.g., Drunk)               |
+| `addEffectToPlayer(game, playerId, effectType, data)` | Narrator adds effect                             |
+| `updateEffectData(game, playerId, effectType, data)`  | Narrator updates effect data                     |
+| `removeEffectFromPlayer(game, playerId, effectType)`  | Narrator removes effect                          |
+| `getNightRolesStatus(game)`                           | Night dashboard role status list                 |
+| `getVoteThreshold(state)`                             | Votes needed for execution                       |
+| `markRoleRevealed(game, playerId)`                    | Mark a role as revealed                          |
 
 **Night action flow**: `applyNightAction()` applies direct changes (entries, effects, role changes). The `intent` field (if present) is resolved separately by the XState machine via `resolveIntent()`, because the pipeline may return `needs_input` requiring UI.
 
@@ -215,31 +228,31 @@ definition/
 
 ### Current Roles (23)
 
-| Role | Team | Night Action | Pattern |
-|---|---|---|---|
-| `villager` | townsfolk | none | Passive, no abilities |
-| `washerwoman` | townsfolk | yes | Info: narrator-setup, first night only |
-| `librarian` | townsfolk | yes | Info: narrator-setup, first night only |
-| `investigator` | townsfolk | yes | Info: narrator-setup, first night only |
-| `chef` | townsfolk | yes | Info: auto-calc alignment, first night only |
-| `empath` | townsfolk | yes | Info: auto-calc alignment, every night |
-| `fortune_teller` | townsfolk | yes | Info: boolean result, every night |
-| `undertaker` | townsfolk | yes | Info: death-triggered (execution), skips night 1 |
-| `monk` | townsfolk | yes | Action: applies `safe` effect, skips night 1 |
-| `ravenkeeper` | townsfolk | yes | Info: death-triggered (own death) |
-| `soldier` | townsfolk | none | Passive via `safe` effect (permanent) |
-| `virgin` | townsfolk | none | Passive via `pure` effect |
-| `slayer` | townsfolk | none | Passive via `slayer_bullet` day action |
-| `mayor` | townsfolk | none | Passive via `deflect` effect + win condition |
-| `saint` | townsfolk | none | Passive via `martyrdom` effect |
-| `butler` | outsider | yes | Action: chooses master, `butler_master` effect |
-| `drunk` | outsider | setup action | Narrator picks believed role, permanent malfunction |
-| `recluse` | outsider | none | Passive via `misregister` effect |
-| `baron` | minion | none | Passive, `distributionModifier: { outsider: +2, townsfolk: -2 }` |
-| `spy` | minion | yes | Info: sees grimoire (read-only), every night |
-| `scarlet_woman` | minion | none | Passive via `demon_successor` effect |
-| `poisoner` | minion | yes | Action: applies `poisoned` effect, every night |
-| `imp` | demon | yes | Action: kill intent, self-starpass |
+| Role             | Team      | Night Action | Pattern                                                          |
+| ---------------- | --------- | ------------ | ---------------------------------------------------------------- |
+| `villager`       | townsfolk | none         | Passive, no abilities                                            |
+| `washerwoman`    | townsfolk | yes          | Info: narrator-setup, first night only                           |
+| `librarian`      | townsfolk | yes          | Info: narrator-setup, first night only                           |
+| `investigator`   | townsfolk | yes          | Info: narrator-setup, first night only                           |
+| `chef`           | townsfolk | yes          | Info: auto-calc alignment, first night only                      |
+| `empath`         | townsfolk | yes          | Info: auto-calc alignment, every night                           |
+| `fortune_teller` | townsfolk | yes          | Info: boolean result, every night                                |
+| `undertaker`     | townsfolk | yes          | Info: death-triggered (execution), skips night 1                 |
+| `monk`           | townsfolk | yes          | Action: applies `safe` effect, skips night 1                     |
+| `ravenkeeper`    | townsfolk | yes          | Info: death-triggered (own death)                                |
+| `soldier`        | townsfolk | none         | Passive via `safe` effect (permanent)                            |
+| `virgin`         | townsfolk | none         | Passive via `pure` effect                                        |
+| `slayer`         | townsfolk | none         | Passive via `slayer_bullet` day action                           |
+| `mayor`          | townsfolk | none         | Passive via `deflect` effect + win condition                     |
+| `saint`          | townsfolk | none         | Passive via `martyrdom` effect                                   |
+| `butler`         | outsider  | yes          | Action: chooses master, `butler_master` effect                   |
+| `drunk`          | outsider  | setup action | Narrator picks believed role, permanent malfunction              |
+| `recluse`        | outsider  | none         | Passive via `misregister` effect                                 |
+| `baron`          | minion    | none         | Passive, `distributionModifier: { outsider: +2, townsfolk: -2 }` |
+| `spy`            | minion    | yes          | Info: sees grimoire (read-only), every night                     |
+| `scarlet_woman`  | minion    | none         | Passive via `demon_successor` effect                             |
+| `poisoner`       | minion    | yes          | Action: applies `poisoned` effect, every night                   |
+| `imp`            | demon     | yes          | Action: kill intent, self-starpass                               |
 
 ### RoleDefinition
 
@@ -248,12 +261,12 @@ interface RoleDefinition {
   id: RoleId
   team: TeamId
   icon: IconName
-  nightOrder: number | null           // Lower = wakes earlier. null = doesn't wake
+  nightOrder: number | null // Lower = wakes earlier. null = doesn't wake
   distributionModifier?: Partial<Record<TeamId, number>>
   shouldWake?: (game, player) => boolean
   initialEffects?: EffectToAdd[]
   winConditions?: WinConditionCheck[]
-  nightSteps?: NightStepDefinition[]  // Step list metadata for NightStepListLayout
+  nightSteps?: NightStepDefinition[] // Step list metadata for NightStepListLayout
   RoleReveal: FC<RoleRevealProps>
   NightAction: FC<NightActionProps> | null
   SetupAction?: FC<SetupActionProps>
@@ -268,8 +281,8 @@ interface NightActionResult {
   stateUpdates?: Partial<GameState>
   addEffects?: Record<string, EffectToAdd[]>
   removeEffects?: Record<string, string[]>
-  changeRoles?: Record<string, string>     // playerId -> new roleId
-  intent?: Intent                           // Sent through pipeline
+  changeRoles?: Record<string, string> // playerId -> new roleId
+  intent?: Intent // Sent through pipeline
 }
 ```
 
@@ -301,23 +314,23 @@ Each effect lives in `definition/<effect-name>/` with `index.ts` (or `.tsx`), `i
 
 ### Current Effects (15)
 
-| Effect | Purpose | Key Features |
-|---|---|---|
-| `dead` | Player is dead | `preventsNightWake`, conditional voting (one dead vote) |
-| `used_dead_vote` | Dead player used their vote | `preventsVoting` |
-| `safe` | Protection from death | Handler: prevents kill intents (priority 10) |
-| `red_herring` | Fortune Teller false positive | Marker, checked directly by FT |
-| `pure` | Virgin: nominator executed | Handler: intercepts nominations |
-| `slayer_bullet` | One-shot day kill | Day action: SlayerActionScreen |
-| `deflect` | Mayor: redirects kills | Handler: requests UI, redirects kill (priority 5) |
-| `martyrdom` | Saint: evil wins if executed | Win condition: `after_execution` |
-| `demon_successor` | Scarlet Woman: becomes Demon | Handler: piggybacks role change + `pending_role_reveal` |
-| `misregister` | Recluse/Spy: perceived differently | Perception modifiers + `canRegisterAs`. Configured per-instance via `data.canRegisterAs` |
-| `pending_role_reveal` | Signals role change needs reveal | Night follow-up: shows RoleCard |
-| `poisoned` | Ability malfunction (temporary) | `poisonsAbility: true`, expires end of day |
-| `drunk` | Permanent malfunction | `poisonsAbility: true`, perception: always Drunk/Outsider |
-| `butler_master` | Butler's chosen master | Marker, `canVote` restricts voting to match master |
-| `imp_starpass_pending` | Imp self-kill: starpass pending | Night follow-up for Imp → minion role change |
+| Effect                 | Purpose                            | Key Features                                                                             |
+| ---------------------- | ---------------------------------- | ---------------------------------------------------------------------------------------- |
+| `dead`                 | Player is dead                     | `preventsNightWake`, conditional voting (one dead vote)                                  |
+| `used_dead_vote`       | Dead player used their vote        | `preventsVoting`                                                                         |
+| `safe`                 | Protection from death              | Handler: prevents kill intents (priority 10)                                             |
+| `red_herring`          | Fortune Teller false positive      | Marker, checked directly by FT                                                           |
+| `pure`                 | Virgin: nominator executed         | Handler: intercepts nominations                                                          |
+| `slayer_bullet`        | One-shot day kill                  | Day action: SlayerActionScreen                                                           |
+| `deflect`              | Mayor: redirects kills             | Handler: requests UI, redirects kill (priority 5)                                        |
+| `martyrdom`            | Saint: evil wins if executed       | Win condition: `after_execution`                                                         |
+| `demon_successor`      | Scarlet Woman: becomes Demon       | Handler: piggybacks role change + `pending_role_reveal`                                  |
+| `misregister`          | Recluse/Spy: perceived differently | Perception modifiers + `canRegisterAs`. Configured per-instance via `data.canRegisterAs` |
+| `pending_role_reveal`  | Signals role change needs reveal   | Night follow-up: shows RoleCard                                                          |
+| `poisoned`             | Ability malfunction (temporary)    | `poisonsAbility: true`, expires end of day                                               |
+| `drunk`                | Permanent malfunction              | `poisonsAbility: true`, perception: always Drunk/Outsider                                |
+| `butler_master`        | Butler's chosen master             | Marker, `canVote` restricts voting to match master                                       |
+| `imp_starpass_pending` | Imp self-kill: starpass pending    | Night follow-up for Imp → minion role change                                             |
 
 ### EffectDefinition
 
@@ -328,19 +341,19 @@ interface EffectDefinition {
   preventsNightWake?: boolean
   preventsVoting?: boolean
   preventsNomination?: boolean
-  poisonsAbility?: boolean                        // Malfunction flag
-  canVote?: (player, state, votes?) => boolean    // Conditional voting
+  poisonsAbility?: boolean // Malfunction flag
+  canVote?: (player, state, votes?) => boolean // Conditional voting
   canNominate?: (player, state) => boolean
-  handlers?: IntentHandler[]                      // Pipeline integration
+  handlers?: IntentHandler[] // Pipeline integration
   dayActions?: DayActionDefinition[]
   nightFollowUps?: NightFollowUpDefinition[]
   winConditions?: WinConditionCheck[]
   perceptionModifiers?: PerceptionModifier[]
   canRegisterAs?: { teams?: TeamId[]; alignments?: ('good' | 'evil')[] }
-  defaultType?: EffectType                        // Badge styling
+  defaultType?: EffectType // Badge styling
   getType?: (instance: EffectInstance) => EffectType
-  Description?: FC<EffectDescriptionProps>         // Custom rich description
-  ConfigEditor?: FC<EffectConfigEditorProps>        // Narrator configuration UI
+  Description?: FC<EffectDescriptionProps> // Custom rich description
+  ConfigEditor?: FC<EffectConfigEditorProps> // Narrator configuration UI
 }
 ```
 
@@ -356,15 +369,15 @@ interface EffectDefinition {
 
 Effects with `poisonsAbility: true` cause malfunction. `isMalfunctioning(player)` checks for any such effect.
 
-| Role Category | Malfunction Behavior |
-|---|---|
-| Info roles (auto-calc) | Narrator picks false result via `MalfunctionConfigStep` |
-| Info roles (narrator-setup) | Narrator freely picks any players/roles |
-| Info roles (death-triggered) | Narrator picks false role via `MalfunctionConfigStep` |
-| Info roles (boolean) | Narrator picks true/false via `MalfunctionConfigStep` |
-| Action roles | Effect/intent conditionally omitted |
-| Passive handlers | `collectActiveHandlers()` skips malfunctioning players automatically |
-| Win conditions | `checkDynamicWinConditions()` skips malfunctioning players automatically |
+| Role Category                | Malfunction Behavior                                                     |
+| ---------------------------- | ------------------------------------------------------------------------ |
+| Info roles (auto-calc)       | Narrator picks false result via `MalfunctionConfigStep`                  |
+| Info roles (narrator-setup)  | Narrator freely picks any players/roles                                  |
+| Info roles (death-triggered) | Narrator picks false role via `MalfunctionConfigStep`                    |
+| Info roles (boolean)         | Narrator picks true/false via `MalfunctionConfigStep`                    |
+| Action roles                 | Effect/intent conditionally omitted                                      |
+| Passive handlers             | `collectActiveHandlers()` skips malfunctioning players automatically     |
+| Win conditions               | `checkDynamicWinConditions()` skips malfunctioning players automatically |
 
 ### Registering a New Effect
 
@@ -401,20 +414,20 @@ type Intent = KillIntent | NominateIntent | ExecuteIntent
 
 ### Default Resolvers
 
-| Intent | Default Action |
-|---|---|
-| `kill` | Adds `dead` effect to target |
-| `nominate` | Creates nomination entry |
-| `execute` | Creates execution entry, adds `dead` effect |
+| Intent     | Default Action                              |
+| ---------- | ------------------------------------------- |
+| `kill`     | Adds `dead` effect to target                |
+| `nominate` | Creates nomination entry                    |
+| `execute`  | Creates execution entry, adds `dead` effect |
 
 ### Priority Conventions
 
-| Priority | Use Case |
-|---|---|
-| 1-5 | Redirects (Deflect/Mayor) |
-| 6-10 | Protection (Safe/Soldier) |
-| 11-20 | Modification |
-| 21+ | Observation |
+| Priority | Use Case                  |
+| -------- | ------------------------- |
+| 1-5      | Redirects (Deflect/Mayor) |
+| 6-10     | Protection (Safe/Soldier) |
+| 11-20    | Modification              |
+| 21+      | Observation               |
 
 ---
 
@@ -426,11 +439,11 @@ Info roles call `perceive(target, observer, context, state)` instead of checking
 
 ### Contexts
 
-| Context | Used By | Queries |
-|---|---|---|
-| `"alignment"` | Chef, Empath | Good or evil? |
-| `"team"` | Washerwoman, Librarian, Investigator | Which team? |
-| `"role"` | Fortune Teller, Undertaker, Ravenkeeper | Which role? |
+| Context       | Used By                                 | Queries       |
+| ------------- | --------------------------------------- | ------------- |
+| `"alignment"` | Chef, Empath                            | Good or evil? |
+| `"team"`      | Washerwoman, Librarian, Investigator    | Which team?   |
+| `"role"`      | Fortune Teller, Undertaker, Ravenkeeper | Which role?   |
 
 ### Perception Utilities
 
@@ -465,10 +478,10 @@ Follow-ups disappear when done — the completion handler removes the triggering
 
 ### Dynamic (on effects/roles)
 
-| Source | Trigger | Condition |
-|---|---|---|
-| `martyrdom` effect (Saint) | `after_execution` | Evil wins if Saint is executed |
-| `mayor` role | `end_of_day` | Good wins if 3 alive, no execution, Mayor alive |
+| Source                     | Trigger           | Condition                                       |
+| -------------------------- | ----------------- | ----------------------------------------------- |
+| `martyrdom` effect (Saint) | `after_execution` | Evil wins if Saint is executed                  |
+| `mayor` role               | `end_of_day`      | Good wins if 3 alive, no execution, Mayor alive |
 
 `checkDynamicWinConditions()` skips malfunctioning players automatically.
 
@@ -515,19 +528,19 @@ Global translations in `src/lib/i18n/translations/en.ts` and `es.ts`. Type in `s
 
 ### Capability Reference
 
-| I want to... | Use... |
-|---|---|
-| Prevent a kill | `handlers` with `intentType: "kill"`, return `prevent` |
-| Redirect a kill | `handlers` with `intentType: "kill"`, return `redirect` |
-| Need narrator input during pipeline | `handlers` returning `request_ui` |
-| Day-phase ability | `dayActions` |
-| Reactive night action | `nightFollowUps` |
-| Role change reveal | Add `pending_role_reveal` effect |
-| Custom win condition | `winConditions` |
-| Alter perceived identity | `perceptionModifiers` + `canRegisterAs` |
-| Malfunction a player | `poisonsAbility: true` |
-| Prevent night wake | `preventsNightWake: true` |
-| Prevent voting | `preventsVoting: true` or `canVote` |
+| I want to...                        | Use...                                                  |
+| ----------------------------------- | ------------------------------------------------------- |
+| Prevent a kill                      | `handlers` with `intentType: "kill"`, return `prevent`  |
+| Redirect a kill                     | `handlers` with `intentType: "kill"`, return `redirect` |
+| Need narrator input during pipeline | `handlers` returning `request_ui`                       |
+| Day-phase ability                   | `dayActions`                                            |
+| Reactive night action               | `nightFollowUps`                                        |
+| Role change reveal                  | Add `pending_role_reveal` effect                        |
+| Custom win condition                | `winConditions`                                         |
+| Alter perceived identity            | `perceptionModifiers` + `canRegisterAs`                 |
+| Malfunction a player                | `poisonsAbility: true`                                  |
+| Prevent night wake                  | `preventsNightWake: true`                               |
+| Prevent voting                      | `preventsVoting: true` or `canVote`                     |
 
 ---
 
@@ -569,15 +582,15 @@ src/lib/
 
 ### What to Test
 
-| Category | Test |
-|---|---|
-| Info roles | `shouldWake`, perception integration (false positives + negatives) |
-| Action roles | `shouldWake` conditions |
-| Passive roles | Empty test delegating to effect test |
-| Effect handlers | `appliesTo` guard, `handle` logic, stateChanges |
-| Effect day/night actions | `condition` function |
-| Win conditions | `check` with various states |
-| Malfunction | `poisonsAbility`, pipeline skipping |
+| Category                 | Test                                                               |
+| ------------------------ | ------------------------------------------------------------------ |
+| Info roles               | `shouldWake`, perception integration (false positives + negatives) |
+| Action roles             | `shouldWake` conditions                                            |
+| Passive roles            | Empty test delegating to effect test                               |
+| Effect handlers          | `appliesTo` guard, `handle` logic, stateChanges                    |
+| Effect day/night actions | `condition` function                                               |
+| Win conditions           | `check` with various states                                        |
+| Malfunction              | `poisonsAbility`, pipeline skipping                                |
 
 ### Perception Deception Testing
 

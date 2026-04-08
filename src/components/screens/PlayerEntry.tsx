@@ -19,32 +19,38 @@ interface PlayerItem {
 const MIN_PLAYERS = 5
 const MAX_PLAYERS = 20
 
-let _nextId = 0
 function makePlayerItem(name: string): PlayerItem {
-  return { id: `p-${_nextId++}`, name }
+  return { id: crypto.randomUUID(), name }
 }
 
 export function PlayerEntry({ onNext, onBack }: Props) {
   const { t } = useI18n()
-  const [players, setPlayers] = useState<PlayerItem[]>(() => {
-    _nextId = 0
-    const lastPlayers = getLastGamePlayers()
-    if (lastPlayers.length >= MIN_PLAYERS) {
-      return lastPlayers.map((n) => makePlayerItem(n))
-    }
-    if (lastPlayers.length > 0) {
-      return [
-        ...lastPlayers.map((n) => makePlayerItem(n)),
-        ...Array(MIN_PLAYERS - lastPlayers.length)
-          .fill('')
-          .map(() => makePlayerItem('')),
-      ]
-    }
-    return Array(MIN_PLAYERS)
+  const [players, setPlayers] = useState<PlayerItem[]>(() =>
+    Array(MIN_PLAYERS)
       .fill('')
-      .map(() => makePlayerItem(''))
-  })
-  const [loadedFromLast] = useState(() => getLastGamePlayers().length > 0)
+      .map(() => makePlayerItem('')),
+  )
+  const [loadedFromLast, setLoadedFromLast] = useState(false)
+
+  useEffect(() => {
+    async function loadLastPlayers() {
+      const lastPlayers = await getLastGamePlayers()
+      if (lastPlayers.length > 0) {
+        if (lastPlayers.length >= MIN_PLAYERS) {
+          setPlayers(lastPlayers.map((n) => makePlayerItem(n)))
+        } else {
+          setPlayers([
+            ...lastPlayers.map((n) => makePlayerItem(n)),
+            ...Array(MIN_PLAYERS - lastPlayers.length)
+              .fill('')
+              .map(() => makePlayerItem('')),
+          ])
+        }
+        setLoadedFromLast(true)
+      }
+    }
+    void loadLastPlayers()
+  }, [])
   const lastInputRef = useRef<HTMLInputElement>(null)
   const prevLengthRef = useRef(players.length)
 

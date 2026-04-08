@@ -54,7 +54,7 @@ export const gameMachine = setup({
   },
   actions: {
     persistGame: ({ context }) => {
-      saveGame(context.game)
+      void saveGame(context.game)
     },
     applyEndOfDayWin: assign({
       game: ({ context }) => {

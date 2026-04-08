@@ -103,15 +103,14 @@ Grimorium is built upon several advanced architectural patterns to ensure flexib
 
 Grimorium is designed to work anywhere:
 
-- Installable as a Progressive Web App (PWA)
-- Fully functional offline
+- **Web** — Installable as a Progressive Web App (PWA), fully functional offline
+- **Desktop** — Native Windows and Mac apps via [Tauri v2](https://v2.tauri.app/)
+- **Android** — Native app via Tauri v2 (APK from [GitHub Releases](https://github.com/pschultz/grimorium/releases))
 - No accounts
 - No servers
 - No game data leaves your device
 
-Once loaded, everything runs locally in your browser.
-
-Your games stay yours.
+Everything runs locally. Your games stay yours.
 
 ---
 
@@ -124,17 +123,58 @@ Your games stay yours.
 
 ## Development
 
-Requires Node.js 22+.
+Requires Node.js 22+. For native builds, also install [Rust](https://rustup.rs/) and the [Tauri v2 prerequisites](https://v2.tauri.app/start/prerequisites/).
 
 ```bash
 npm install
-npm run dev        # start dev server
-npm test           # run tests
-npm run lint       # oxlint (type-aware)
-npm run format     # oxfmt
+npm run dev              # web dev server (browser)
+npm test                 # run tests
+npm run lint             # oxlint (type-aware)
+npm run format           # oxfmt
+npm run tauri:dev        # native desktop window with hot reload
+npm run tauri:build      # build desktop installer
+npm run tauri:android-dev    # launch on Android device/emulator
+npm run tauri:android-build  # build Android APK
 ```
 
 Contributions, ideas, and discussions are welcome.
+
+### Releasing Native Builds
+
+Native builds are triggered by pushing a version tag. Before the first release, set up signing keys:
+
+**1. Desktop updater signing key:**
+
+```bash
+npx tauri signer generate -w ~/.tauri/grimorium.key
+```
+
+This prints a public key — update `src-tauri/tauri.conf.json` → `plugins.updater.pubkey` with it.
+
+**2. Android keystore:**
+
+```bash
+keytool -genkey -v -keystore grimorium.jks -keyalg RSA -keysize 2048 -validity 10000 -alias grimorium
+```
+
+**3. Add GitHub Secrets** (repo Settings → Secrets and variables → Actions):
+
+| Secret                               | Value                                |
+| ------------------------------------ | ------------------------------------ |
+| `TAURI_SIGNING_PRIVATE_KEY`          | Contents of `~/.tauri/grimorium.key` |
+| `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | Password from step 1 (empty if none) |
+| `ANDROID_KEY_BASE64`                 | `base64 -w 0 grimorium.jks` output   |
+| `ANDROID_KEY_ALIAS`                  | `grimorium`                          |
+| `ANDROID_KEY_PASSWORD`               | Password from step 2                 |
+
+**4. Tag and release:**
+
+```bash
+git tag v0.1.0
+git push --tags
+```
+
+The release workflow builds Windows (.msi/.exe), Mac (.dmg), and Android (.apk) installers and attaches them to a draft GitHub Release. Delete the local `grimorium.jks` after uploading — it only needs to exist in GitHub Secrets.
 
 ---
 

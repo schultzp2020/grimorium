@@ -4,7 +4,9 @@ export function createLocalStorageBackend(): StorageBackend {
   return {
     async get<T>(key: string): Promise<T | null> {
       const data = localStorage.getItem(key)
-      if (data === null) return null
+      if (data === null) {
+        return null
+      }
       try {
         return JSON.parse(data) as T
       } catch {

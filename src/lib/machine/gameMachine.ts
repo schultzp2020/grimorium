@@ -20,6 +20,7 @@ import {
   applySkipNightAction,
   applyStartDay,
   applyStartNight,
+  applyTransitionToNight,
   applyUpdateEffect,
   applyVote,
   autoSkipNightAction,
@@ -296,6 +297,9 @@ export const gameMachine = setup({
       }
 
       return { game: afterExecGame }
+    }),
+    transitionToNight: assign({
+      game: ({ context }) => applyTransitionToNight(context.game),
     }),
 
     setActiveDayAction: assign({
@@ -707,9 +711,11 @@ export const gameMachine = setup({
             {
               target: 'death_reveal_to_night',
               guard: 'hasPendingDeathReveals',
+              actions: ['transitionToNight', 'persistGame'],
             },
             {
               target: 'night.dashboard',
+              actions: ['transitionToNight', 'persistGame'],
             },
           ],
         },

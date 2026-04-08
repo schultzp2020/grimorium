@@ -78,7 +78,11 @@ export default defineConfig({
 
   // Tauri: WebView engine differs per platform
   build: {
-    target: process.env.TAURI_ENV_PLATFORM === 'windows' ? 'chrome105' : 'safari13',
+    ...(isTauri && {
+      target: process.env.TAURI_ENV_PLATFORM === 'windows' ? 'chrome105' : 'safari13',
+      minify: !process.env.TAURI_ENV_DEBUG ? 'esbuild' : false,
+      sourcemap: !!process.env.TAURI_ENV_DEBUG,
+    }),
   },
 
   server: {

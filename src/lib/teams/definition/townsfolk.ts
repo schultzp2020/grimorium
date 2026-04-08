@@ -5,7 +5,7 @@ const definition: TeamDefinition = {
   icon: 'users',
   isEvil: false,
   colors: {
-    cardBg: 'bg-gradient-to-b from-parchment-100 to-parchment-200',
+    cardBg: 'bg-linear-to-b from-parchment-100 to-parchment-200',
     cardBorder: 'border-mystic-gold/40',
     cardText: 'text-grimoire-dark',
     cardGlow: 'rgba(212, 175, 55, 0.35)',

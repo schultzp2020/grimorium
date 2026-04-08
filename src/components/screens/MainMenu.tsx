@@ -384,7 +384,7 @@ export function MainMenu({ onNewGame, onContinue, onLoadGame, onRolesLibrary, on
                     <button
                       type='button'
                       onClick={() => onContinue(currentGame.id)}
-                      className='card-border-glow group relative w-full rounded-xl border border-mystic-gold/25 bg-gradient-to-r from-mystic-gold/15 to-mystic-bronze/10 p-5 transition-all'
+                      className='card-border-glow group relative w-full rounded-xl border border-mystic-gold/25 bg-linear-to-r from-mystic-gold/15 to-mystic-bronze/10 p-5 transition-all'
                       style={
                         {
                           '--glow-color': 'rgba(212, 175, 55, 0.3)',
@@ -422,7 +422,7 @@ export function MainMenu({ onNewGame, onContinue, onLoadGame, onRolesLibrary, on
                   <button
                     type='button'
                     onClick={onNewGame}
-                    className='card-border-glow group relative w-full rounded-xl border border-indigo-500/25 bg-gradient-to-r from-indigo-900/40 to-purple-900/30 p-5 transition-all'
+                    className='card-border-glow group relative w-full rounded-xl border border-indigo-500/25 bg-linear-to-r from-indigo-900/40 to-purple-900/30 p-5 transition-all'
                     style={
                       {
                         '--glow-color': 'rgba(99, 102, 241, 0.25)',

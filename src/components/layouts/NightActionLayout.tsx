@@ -62,12 +62,12 @@ export function NightActionLayout({ player, title, description, children, audien
   const iconColors = getIconColors()
 
   return (
-    <div className={cn('min-h-app flex flex-col bg-gradient-to-b', getBackgroundClass())}>
+    <div className={cn('min-h-app flex flex-col bg-linear-to-b', getBackgroundClass())}>
       {/* Audience Banner */}
       {audience === 'narrator' && (
         <div className='mx-4 mt-4 mb-0 w-full max-w-lg self-center'>
           <div className='flex items-center gap-2 rounded-lg border border-blue-500/30 bg-blue-900/30 px-3 py-2'>
-            <Icon name='eye' size='sm' className='flex-shrink-0 text-blue-400' />
+            <Icon name='eye' size='sm' className='shrink-0 text-blue-400' />
             <span className='text-xs text-blue-300'>{t.game.storytellerDecision}</span>
           </div>
         </div>
@@ -75,7 +75,7 @@ export function NightActionLayout({ player, title, description, children, audien
       {audience === 'player_choice' && (
         <div className='mx-4 mt-4 mb-0 w-full max-w-lg self-center'>
           <div className='flex items-center gap-2 rounded-lg border border-amber-500/40 bg-amber-900/40 px-3 py-2'>
-            <Icon name='userRound' size='sm' className='flex-shrink-0 text-amber-400' />
+            <Icon name='userRound' size='sm' className='shrink-0 text-amber-400' />
             <span className='text-xs font-medium text-amber-300'>
               {interpolate(t.game.wakePlayerPrompt, {
                 player: player.name,

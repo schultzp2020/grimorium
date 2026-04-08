@@ -56,7 +56,7 @@ export function MalfunctionConfigStep(props: Props) {
       {/* Malfunction warning banner */}
       <div className='mb-4 rounded-xl border border-amber-500/30 bg-amber-900/20 p-3'>
         <div className='flex items-center gap-2'>
-          <Icon name='flask' size='md' className='flex-shrink-0 text-amber-400' />
+          <Icon name='flask' size='md' className='shrink-0 text-amber-400' />
           <p className='text-sm font-medium text-amber-300'>{t.game.malfunctionWarning}</p>
         </div>
         <p className='mt-1 ml-7 text-xs text-amber-400/70'>{t.game.playerIsMalfunctioning}</p>

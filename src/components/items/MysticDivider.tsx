@@ -15,9 +15,9 @@ export function MysticDivider({
 }: MysticDividerProps) {
   return (
     <div className={cn('flex items-center gap-4 my-4', className)}>
-      <div className='h-px flex-1 bg-gradient-to-r from-transparent via-mystic-gold/30 to-transparent' />
+      <div className='h-px flex-1 bg-linear-to-r from-transparent via-mystic-gold/30 to-transparent' />
       <Icon name={icon} size='sm' className={iconClassName} />
-      <div className='h-px flex-1 bg-gradient-to-r from-transparent via-mystic-gold/30 to-transparent' />
+      <div className='h-px flex-1 bg-linear-to-r from-transparent via-mystic-gold/30 to-transparent' />
     </div>
   )
 }

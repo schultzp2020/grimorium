@@ -30,7 +30,7 @@ export function StarpassSelectUI({ state, onComplete }: PipelineInputProps) {
   )
 
   return (
-    <div className='flex min-h-app flex-col items-center justify-center bg-gradient-to-b from-red-950 via-grimoire-purple to-grimoire-darker p-6'>
+    <div className='flex min-h-app flex-col items-center justify-center bg-linear-to-b from-red-950 via-grimoire-purple to-grimoire-darker p-6'>
       <div className='w-full max-w-sm'>
         {/* Header */}
         <div className='mb-6 text-center'>

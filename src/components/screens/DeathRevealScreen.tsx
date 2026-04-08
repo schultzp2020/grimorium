@@ -57,7 +57,7 @@ export function DeathRevealScreen({ deaths, onContinue }: Props) {
   return (
     <TeamBackground teamId={teamId}>
       {/* Header */}
-      <div className='pointer-events-none absolute inset-x-0 top-0 z-10 bg-gradient-to-b from-grimoire-dark/80 to-transparent p-6 text-center'>
+      <div className='pointer-events-none absolute inset-x-0 top-0 z-10 bg-linear-to-b from-grimoire-dark/80 to-transparent p-6 text-center'>
         <div className='mb-2 flex justify-center'>
           <Icon name='skull' size='3xl' className='text-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]' />
         </div>
@@ -86,7 +86,7 @@ export function DeathRevealScreen({ deaths, onContinue }: Props) {
                 }}
               >
                 <div className='absolute inset-0 bg-red-950/40 mix-blend-multiply' />
-                <div className='absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40' />
+                <div className='absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-black/40' />
 
                 <div className='relative z-10 flex flex-col items-center'>
                   <div className='mb-6 flex h-20 w-20 items-center justify-center rounded-full border-2 border-red-500/30 bg-red-950/80 shadow-[0_0_30px_rgba(239,68,68,0.2)]'>
@@ -106,7 +106,7 @@ export function DeathRevealScreen({ deaths, onContinue }: Props) {
 
                 {/* Death Vignette Overlay */}
                 <div
-                  className='pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-b from-red-950/20 via-transparent to-red-950/80'
+                  className='pointer-events-none absolute inset-0 rounded-xl bg-linear-to-b from-red-950/20 via-transparent to-red-950/80'
                   style={{ boxShadow: 'inset 0 0 60px rgba(153, 27, 27, 0.4)' }}
                 />
 

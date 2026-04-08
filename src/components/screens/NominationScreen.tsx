@@ -80,7 +80,7 @@ export function NominationScreen({ state, nominatorsToday, nomineesToday, onNomi
   }, [nomineesToday])
 
   return (
-    <div className='flex min-h-app flex-col bg-gradient-to-b from-red-950 via-grimoire-blood to-grimoire-darker'>
+    <div className='flex min-h-app flex-col bg-linear-to-b from-red-950 via-grimoire-blood to-grimoire-darker'>
       {/* Header */}
       <div className='sticky top-0 z-10 border-b border-red-500/30 bg-grimoire-dark/95 px-4 py-3 backdrop-blur-xs'>
         <div className='mx-auto flex max-w-lg items-center gap-3'>

@@ -61,9 +61,9 @@ export function SetupActionsScreen({ game, state, onOpenSetupAction, onContinue 
   const allDone = setupItems.length === 0
 
   return (
-    <div className='flex min-h-app flex-col bg-gradient-to-b from-grimoire-purple via-grimoire-dark to-grimoire-darker'>
+    <div className='flex min-h-app flex-col bg-linear-to-b from-grimoire-purple via-grimoire-dark to-grimoire-darker'>
       {/* Header */}
-      <div className='bg-gradient-to-b from-mystic-gold/10 to-transparent px-4 py-4'>
+      <div className='bg-linear-to-b from-mystic-gold/10 to-transparent px-4 py-4'>
         <div className='mx-auto max-w-lg'>
           <div className='text-center'>
             <div className='mb-2 flex justify-center'>
@@ -90,7 +90,7 @@ export function SetupActionsScreen({ game, state, onOpenSetupAction, onContinue 
                 'bg-amber-900/10 hover:bg-amber-900/20 border border-amber-700/30 hover:border-amber-600/50',
               )}
             >
-              <div className='flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-amber-700/50 bg-amber-900/30'>
+              <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-amber-700/50 bg-amber-900/30'>
                 <Icon name={item.roleIcon} size='md' className='text-amber-400' />
               </div>
               <div className='min-w-0 flex-1'>

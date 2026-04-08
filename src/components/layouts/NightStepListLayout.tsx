@@ -77,7 +77,7 @@ export function NightStepListLayout({ icon, roleName, playerName, isEvil, steps,
   return (
     <div
       className={cn(
-        'min-h-app flex flex-col bg-gradient-to-b',
+        'min-h-app flex flex-col bg-linear-to-b',
         isEvil
           ? 'from-red-950 via-grimoire-blood to-grimoire-darker'
           : 'from-indigo-950 via-grimoire-purple to-grimoire-darker',
@@ -145,7 +145,7 @@ export function NightStepListLayout({ icon, roleName, playerName, isEvil, steps,
                 {/* Order number */}
                 <div
                   className={cn(
-                    'w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold',
+                    'w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs font-bold',
                     isNext
                       ? isEvil
                         ? 'bg-red-500/30 text-red-300 border border-red-400/40'
@@ -161,7 +161,7 @@ export function NightStepListLayout({ icon, roleName, playerName, isEvil, steps,
                 {/* Icon */}
                 <div
                   className={cn(
-                    'w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 border',
+                    'w-10 h-10 rounded-full flex items-center justify-center shrink-0 border',
                     isNext
                       ? isEvil
                         ? 'bg-red-900/30 border-red-600/30'

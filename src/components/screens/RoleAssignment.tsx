@@ -121,7 +121,7 @@ export function RoleAssignment({ players, selectedRoles, onStart, onBack }: Prop
   const impWillBeAssigned = impManuallyAssigned || (willBeRandomlyAssigned > 0 && impInRandomPool)
 
   return (
-    <div className='flex min-h-app flex-col bg-gradient-to-b from-grimoire-purple via-grimoire-dark to-grimoire-darker'>
+    <div className='flex min-h-app flex-col bg-linear-to-b from-grimoire-purple via-grimoire-dark to-grimoire-darker'>
       {/* Header */}
       <div className='sticky top-0 z-10 border-b border-mystic-gold/20 bg-grimoire-dark/95 px-4 py-3 backdrop-blur-xs'>
         <div className='mx-auto flex max-w-lg items-center gap-3'>
@@ -137,7 +137,7 @@ export function RoleAssignment({ players, selectedRoles, onStart, onBack }: Prop
       {!impWillBeAssigned && selectedRoles.includes('imp') && (
         <div className='border-b border-red-500/30 bg-mystic-crimson/20 px-4 py-3'>
           <div className='mx-auto flex max-w-lg items-start gap-2'>
-            <Icon name='alertTriangle' size='sm' className='mt-0.5 flex-shrink-0 text-red-400' />
+            <Icon name='alertTriangle' size='sm' className='mt-0.5 shrink-0 text-red-400' />
             <p className='text-xs text-red-200'>{t.newGame.impNotAssignedWarning}</p>
           </div>
         </div>
@@ -154,7 +154,7 @@ export function RoleAssignment({ players, selectedRoles, onStart, onBack }: Prop
 
           {/* Players list */}
           <div className='mb-2 flex items-start gap-2'>
-            <Icon name='users' size='sm' className='mt-0.5 flex-shrink-0 text-parchment-500' />
+            <Icon name='users' size='sm' className='mt-0.5 shrink-0 text-parchment-500' />
             <span className='line-clamp-2 text-xs text-parchment-400'>{players.join(', ')}</span>
           </div>
 

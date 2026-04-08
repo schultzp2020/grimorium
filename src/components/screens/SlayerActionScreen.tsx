@@ -91,9 +91,9 @@ export function SlayerActionScreen({ state, playerId, onComplete, onBack }: DayA
   }
 
   return (
-    <div className='flex min-h-app flex-col bg-gradient-to-b from-amber-950 via-orange-950 to-grimoire-dark'>
+    <div className='flex min-h-app flex-col bg-linear-to-b from-amber-950 via-orange-950 to-grimoire-dark'>
       {/* Header */}
-      <div className='bg-gradient-to-b from-amber-900/50 to-transparent px-4 py-4'>
+      <div className='bg-linear-to-b from-amber-900/50 to-transparent px-4 py-4'>
         <div className='mx-auto max-w-lg'>
           <div className='mb-4 flex items-center'>
             <BackButton onClick={onBack} />

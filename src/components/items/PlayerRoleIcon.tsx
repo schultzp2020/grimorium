@@ -105,7 +105,7 @@ export function PlayerRoleIcon({ player, size = 'md', circleClassName, iconClass
   }
 
   return (
-    <div className='relative flex-shrink-0'>
+    <div className='relative shrink-0'>
       <div className={cn('rounded-full flex items-center justify-center', cfg.circle, cfg.border, circleBg)}>
         <Icon name={iconName} size={cfg.iconSize} className={iconColor} />
       </div>

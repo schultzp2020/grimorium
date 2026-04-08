@@ -534,14 +534,14 @@ const definition: RoleDefinition = {
                   return (
                     <div
                       key={role.id}
-                      className='rounded-xl border-2 border-indigo-500/30 bg-gradient-to-b from-indigo-900/30 to-blue-900/20 p-4'
+                      className='rounded-xl border-2 border-indigo-500/30 bg-linear-to-b from-indigo-900/30 to-blue-900/20 p-4'
                       style={{
                         boxShadow: '0 0 16px rgba(99,102,241,0.15), inset 0 1px 0 rgba(255,255,255,0.06)',
                       }}
                     >
                       <div className='flex items-start gap-3'>
                         {/* Role icon medallion */}
-                        <div className='flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-indigo-500/30 bg-indigo-800/40'>
+                        <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-indigo-500/30 bg-indigo-800/40'>
                           <Icon name={role.icon} size='md' className='text-indigo-300' />
                         </div>
                         <div className='min-w-0 flex-1'>

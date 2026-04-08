@@ -10,7 +10,7 @@ export function HandDeviceScreen({ playerName, onReady }: Props) {
   const { t } = useI18n()
 
   return (
-    <div className='flex min-h-app flex-col items-center justify-center bg-gradient-to-b from-indigo-950 via-grimoire-purple to-grimoire-darker px-6'>
+    <div className='flex min-h-app flex-col items-center justify-center bg-linear-to-b from-indigo-950 via-grimoire-purple to-grimoire-darker px-6'>
       <div className='max-w-sm text-center'>
         <div className='mb-6'>
           <Icon name='smartphone' size='4xl' className='mx-auto text-indigo-400/80' />

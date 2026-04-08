@@ -9,7 +9,7 @@ export function ReturnDeviceScreen({ onReady }: Props) {
   const { t } = useI18n()
 
   return (
-    <div className='flex min-h-app flex-col items-center justify-center bg-gradient-to-b from-grimoire-purple via-grimoire-dark to-grimoire-darker px-6'>
+    <div className='flex min-h-app flex-col items-center justify-center bg-linear-to-b from-grimoire-purple via-grimoire-dark to-grimoire-darker px-6'>
       <div className='max-w-sm text-center'>
         <div className='mb-6'>
           <Icon name='smartphone' size='4xl' className='mx-auto text-mystic-gold/80' />

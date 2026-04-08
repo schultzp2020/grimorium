@@ -70,7 +70,7 @@ function FortuneTellerSetupAction({ player, state, onComplete }: SetupActionProp
   }
 
   return (
-    <div className='flex min-h-app flex-col bg-gradient-to-b from-grimoire-purple via-grimoire-dark to-grimoire-darker'>
+    <div className='flex min-h-app flex-col bg-linear-to-b from-grimoire-purple via-grimoire-dark to-grimoire-darker'>
       {/* Header */}
       <div className='sticky top-0 z-10 border-b border-mystic-gold/20 bg-grimoire-dark/95 px-4 py-3 backdrop-blur-xs'>
         <div className='mx-auto flex max-w-lg items-center gap-3'>

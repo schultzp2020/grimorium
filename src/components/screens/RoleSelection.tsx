@@ -168,7 +168,7 @@ export function RoleSelection({ players, scriptId, onNext, onBack }: Props) {
   // ── Render ─────────────────────────────────────────────────────────
 
   return (
-    <div className='flex min-h-app flex-col bg-gradient-to-b from-grimoire-purple via-grimoire-dark to-grimoire-darker'>
+    <div className='flex min-h-app flex-col bg-linear-to-b from-grimoire-purple via-grimoire-dark to-grimoire-darker'>
       {/* Header */}
       <div className='sticky top-0 z-10 border-b border-mystic-gold/20 bg-grimoire-dark/95 px-4 py-3 backdrop-blur-xs'>
         <div className='mx-auto flex max-w-lg items-center gap-3'>
@@ -248,7 +248,7 @@ export function RoleSelection({ players, scriptId, onNext, onBack }: Props) {
           <div className='sticky top-0 z-20 animate-toast-in px-4 pt-2 pb-0'>
             <div className='mx-auto max-w-lg'>
               <div className='flex items-center gap-2 rounded-lg border border-green-400/30 bg-green-500/15 px-3 py-2 backdrop-blur-xs'>
-                <div className='flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-green-400/20'>
+                <div className='flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-400/20'>
                   <Icon name='check' size='xs' className='text-green-300' />
                 </div>
                 <span className='text-xs font-medium text-green-200'>
@@ -765,7 +765,7 @@ function RoleCard({ role, team, count, isCustomMode, language, onToggle, onIncre
       className={cn(
         'rounded-xl border-2 transition-all relative flex flex-col',
         isSelected
-          ? cn(team.colors.cardBorder, 'bg-gradient-to-b from-white/10 to-white/5')
+          ? cn(team.colors.cardBorder, 'bg-linear-to-b from-white/10 to-white/5')
           : 'border-white/10 bg-white/5 hover:bg-white/[0.08]',
       )}
       style={

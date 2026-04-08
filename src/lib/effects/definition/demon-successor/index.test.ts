@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { assert, describe, it, expect, beforeEach } from 'vitest'
 import definition from '.'
 import type { KillIntent, ExecuteIntent } from '../../../pipeline/types'
 import { makePlayer, makeState, addEffectTo, makeGame, resetPlayerCounter } from '../../../__tests__/helpers'
@@ -177,9 +177,8 @@ describe('DemonSuccessor effect', () => {
       }
 
       const result = handler.handle(intent, sw, state, game)
-      if (result.action === 'allow') {
-        expect(result.stateChanges?.changeRoles).toEqual({ sw: 'imp' })
-      }
+      assert(result.action === 'allow')
+      expect(result.stateChanges?.changeRoles).toEqual({ sw: 'imp' })
     })
 
     it('removes the demon_successor effect and adds pending_role_reveal', () => {
@@ -191,14 +190,13 @@ describe('DemonSuccessor effect', () => {
       }
 
       const result = handler.handle(intent, sw, state, game)
-      if (result.action === 'allow') {
-        expect(result.stateChanges?.removeEffects).toEqual({
-          sw: ['demon_successor'],
-        })
-        expect(result.stateChanges?.addEffects).toEqual({
-          sw: [{ type: 'pending_role_reveal', expiresAt: 'never' }],
-        })
-      }
+      assert(result.action === 'allow')
+      expect(result.stateChanges?.removeEffects).toEqual({
+        sw: ['demon_successor'],
+      })
+      expect(result.stateChanges?.addEffects).toEqual({
+        sw: [{ type: 'pending_role_reveal', expiresAt: 'never' }],
+      })
     })
 
     it('generates a role_changed history entry', () => {
@@ -210,15 +208,14 @@ describe('DemonSuccessor effect', () => {
       }
 
       const result = handler.handle(intent, sw, state, game)
-      if (result.action === 'allow') {
-        expect(result.stateChanges?.entries).toHaveLength(1)
-        expect(result.stateChanges!.entries[0].type).toBe('role_changed')
-        expect(result.stateChanges!.entries[0].data).toEqual({
-          playerId: 'sw',
-          fromRole: 'scarlet_woman',
-          toRole: 'imp',
-        })
-      }
+      assert(result.action === 'allow')
+      expect(result.stateChanges?.entries).toHaveLength(1)
+      expect(result.stateChanges!.entries[0].type).toBe('role_changed')
+      expect(result.stateChanges!.entries[0].data).toEqual({
+        playerId: 'sw',
+        fromRole: 'scarlet_woman',
+        toRole: 'imp',
+      })
     })
 
     it('inherits the specific Demon role (not hardcoded to imp)', () => {
@@ -235,9 +232,8 @@ describe('DemonSuccessor effect', () => {
       }
 
       const result = handler.handle(intent, sw, state, game)
-      if (result.action === 'allow') {
-        expect(result.stateChanges?.changeRoles?.sw).toBe('imp')
-      }
+      assert(result.action === 'allow')
+      expect(result.stateChanges?.changeRoles?.sw).toBe('imp')
     })
 
     it('works for kill intents (Imp self-kill)', () => {
@@ -250,10 +246,9 @@ describe('DemonSuccessor effect', () => {
       }
 
       const result = handler.handle(intent, sw, state, game)
-      if (result.action === 'allow') {
-        expect(result.action).toBe('allow')
-        expect(result.stateChanges?.changeRoles).toEqual({ sw: 'imp' })
-      }
+      assert(result.action === 'allow')
+      expect(result.action).toBe('allow')
+      expect(result.stateChanges?.changeRoles).toEqual({ sw: 'imp' })
     })
   })
 })

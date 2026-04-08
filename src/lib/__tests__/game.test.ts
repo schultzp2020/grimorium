@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { assert, describe, it, expect, beforeEach } from 'vitest'
 import {
   createGame,
   addHistoryEntry,
@@ -247,9 +247,8 @@ describe('getNextStep', () => {
 
     const step = getNextStep(game)
     expect(step.type).toBe('role_reveal')
-    if (step.type === 'role_reveal') {
-      expect(step.playerId).toBe('p1')
-    }
+    assert(step.type === 'role_reveal')
+    expect(step.playerId).toBe('p1')
   })
 
   it('returns night_waiting after all roles revealed in setup', () => {

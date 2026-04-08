@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { assert, describe, it, expect, beforeEach, vi } from 'vitest'
 import { getAvailableNightFollowUps } from '../pipeline'
 import { getNightRolesStatus } from '../game'
 import { makePlayer, makeState, makeGame, makeGameWithHistory, addEffectTo, resetPlayerCounter } from './helpers'
@@ -237,30 +237,29 @@ describe('Demon Successor → pending_role_reveal integration', () => {
     const result = handler.handle(intent, sw, state, game)
 
     expect(result.action).toBe('allow')
-    if (result.action === 'allow') {
-      // Adds pending_role_reveal
-      expect(result.stateChanges?.addEffects).toEqual({
-        sw: [{ type: 'pending_role_reveal', expiresAt: 'never' }],
-      })
+    assert(result.action === 'allow')
+    // Adds pending_role_reveal
+    expect(result.stateChanges?.addEffects).toEqual({
+      sw: [{ type: 'pending_role_reveal', expiresAt: 'never' }],
+    })
 
-      // Removes demon_successor
-      expect(result.stateChanges?.removeEffects).toEqual({
-        sw: ['demon_successor'],
-      })
+    // Removes demon_successor
+    expect(result.stateChanges?.removeEffects).toEqual({
+      sw: ['demon_successor'],
+    })
 
-      // The pending_role_reveal effect should produce a follow-up
-      // Simulate: apply the changes, then check for follow-ups
-      const swWithEffect = addEffectTo({ ...sw, roleId: 'imp', effects: [] }, 'pending_role_reveal')
-      const newState = makeState({
-        phase: 'night',
-        round: 2,
-        players: [addEffectTo(demon, 'dead'), swWithEffect, ...others],
-      })
+    // The pending_role_reveal effect should produce a follow-up
+    // Simulate: apply the changes, then check for follow-ups
+    const swWithEffect = addEffectTo({ ...sw, roleId: 'imp', effects: [] }, 'pending_role_reveal')
+    const newState = makeState({
+      phase: 'night',
+      round: 2,
+      players: [addEffectTo(demon, 'dead'), swWithEffect, ...others],
+    })
 
-      const followUps = getAvailableNightFollowUps(newState, game, mockT)
-      expect(followUps).toHaveLength(1)
-      expect(followUps[0].playerId).toBe('sw')
-      expect(followUps[0].label).toBe('Your role has changed!')
-    }
+    const followUps = getAvailableNightFollowUps(newState, game, mockT)
+    expect(followUps).toHaveLength(1)
+    expect(followUps[0].playerId).toBe('sw')
+    expect(followUps[0].label).toBe('Your role has changed!')
   })
 })

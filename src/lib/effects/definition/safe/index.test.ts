@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { assert, describe, it, expect, beforeEach } from 'vitest'
 import definition from '.'
 import type { KillIntent } from '../../../pipeline/types'
 import { makePlayer, makeState, addEffectTo, makeGame, resetPlayerCounter } from '../../../__tests__/helpers'
@@ -72,9 +72,8 @@ describe('Safe effect', () => {
       }
 
       const result = handler.handle(intent, protectedPlayer, state, game)
-      if (result.action === 'prevent') {
-        expect(result.reason).toBe('protected')
-      }
+      assert(result.action === 'prevent')
+      expect(result.reason).toBe('protected')
     })
 
     it('generates a history entry about the failed kill', () => {
@@ -89,11 +88,10 @@ describe('Safe effect', () => {
       }
 
       const result = handler.handle(intent, protectedPlayer, state, game)
-      if (result.action === 'prevent') {
-        expect(result.stateChanges?.entries).toHaveLength(1)
-        expect(result.stateChanges!.entries![0].data.reason).toBe('safe')
-        expect(result.stateChanges!.entries![0].data.targetId).toBe('p2')
-      }
+      assert(result.action === 'prevent')
+      expect(result.stateChanges?.entries).toHaveLength(1)
+      expect(result.stateChanges!.entries![0].data.reason).toBe('safe')
+      expect(result.stateChanges!.entries![0].data.targetId).toBe('p2')
     })
   })
 })

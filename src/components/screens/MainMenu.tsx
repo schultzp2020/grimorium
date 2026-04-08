@@ -483,6 +483,7 @@ export function MainMenu({ onNewGame, onContinue, onLoadGame, onRolesLibrary, on
         <div className='fixed inset-0 z-50'>
           {/* Overlay */}
           <div
+            role='presentation'
             className={cn(
               'absolute inset-0 bg-black/60',
               pastGamesClosing ? 'animate-overlay-out' : 'animate-overlay-in',

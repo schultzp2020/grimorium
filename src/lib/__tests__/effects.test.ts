@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { assert, describe, it, expect, beforeEach } from 'vitest'
 import { resolveIntent } from '../pipeline'
 import { getAvailableDayActions } from '../pipeline/index'
 import { isMalfunctioning } from '../effects'
@@ -31,12 +31,11 @@ describe('Safe effect', () => {
 
     const result = resolveIntent(intent, state, game)
     expect(result.type).toBe('prevented')
-    if (result.type === 'prevented') {
-      // Should have a history entry recording the failed kill
-      const failEntry = result.stateChanges.entries.find((e) => e.data.action === 'kill_failed')
-      expect(failEntry).toBeDefined()
-      expect(failEntry!.data.reason).toBe('safe')
-    }
+    assert(result.type === 'prevented')
+    // Should have a history entry recording the failed kill
+    const failEntry = result.stateChanges.entries.find((e) => e.data.action === 'kill_failed')
+    expect(failEntry).toBeDefined()
+    expect(failEntry!.data.reason).toBe('safe')
   })
 
   it('does NOT prevent kill intent targeting a different player', () => {
@@ -57,10 +56,9 @@ describe('Safe effect', () => {
 
     const result = resolveIntent(intent, state, game)
     expect(result.type).toBe('resolved')
-    if (result.type === 'resolved') {
-      expect(result.stateChanges.addEffects?.['p1']).toBeDefined()
-      expect(result.stateChanges.addEffects!['p1'][0].type).toBe('dead')
-    }
+    assert(result.type === 'resolved')
+    expect(result.stateChanges.addEffects?.['p1']).toBeDefined()
+    expect(result.stateChanges.addEffects!['p1'][0].type).toBe('dead')
   })
 })
 
@@ -107,21 +105,19 @@ describe('Deflect effect', () => {
 
     const result = resolveIntent(intent, state, game)
     expect(result.type).toBe('needs_input')
-    if (result.type === 'needs_input') {
-      const afterResume = result.resume('p3')
-      expect(afterResume.type).toBe('resolved')
-      if (afterResume.type === 'resolved') {
-        // p3 gets dead effect, not p1
-        expect(afterResume.stateChanges.addEffects?.['p3']).toBeDefined()
-        expect(afterResume.stateChanges.addEffects?.['p1']).toBeUndefined()
+    assert(result.type === 'needs_input')
+    const afterResume = result.resume('p3')
+    expect(afterResume.type).toBe('resolved')
+    assert(afterResume.type === 'resolved')
+    // p3 gets dead effect, not p1
+    expect(afterResume.stateChanges.addEffects?.['p3']).toBeDefined()
+    expect(afterResume.stateChanges.addEffects?.['p1']).toBeUndefined()
 
-        // Should have a redirect history entry
-        const redirectEntry = afterResume.stateChanges.entries.find((e) => e.data.action === 'kill_redirected')
-        expect(redirectEntry).toBeDefined()
-        expect(redirectEntry!.data.originalTargetId).toBe('p1')
-        expect(redirectEntry!.data.redirectTargetId).toBe('p3')
-      }
-    }
+    // Should have a redirect history entry
+    const redirectEntry = afterResume.stateChanges.entries.find((e) => e.data.action === 'kill_redirected')
+    expect(redirectEntry).toBeDefined()
+    expect(redirectEntry!.data.originalTargetId).toBe('p1')
+    expect(redirectEntry!.data.redirectTargetId).toBe('p3')
   })
 
   it('allows kill on original target if narrator chooses same target', () => {
@@ -141,16 +137,14 @@ describe('Deflect effect', () => {
 
     const result = resolveIntent(intent, state, game)
     expect(result.type).toBe('needs_input')
-    if (result.type === 'needs_input') {
-      // Resume with the same target — no redirect
-      const afterResume = result.resume('p1')
-      expect(afterResume.type).toBe('resolved')
-      if (afterResume.type === 'resolved') {
-        // p1 dies (default resolver applies)
-        expect(afterResume.stateChanges.addEffects?.['p1']).toBeDefined()
-        expect(afterResume.stateChanges.addEffects!['p1'][0].type).toBe('dead')
-      }
-    }
+    assert(result.type === 'needs_input')
+    // Resume with the same target — no redirect
+    const afterResume = result.resume('p1')
+    expect(afterResume.type).toBe('resolved')
+    assert(afterResume.type === 'resolved')
+    // p1 dies (default resolver applies)
+    expect(afterResume.stateChanges.addEffects?.['p1']).toBeDefined()
+    expect(afterResume.stateChanges.addEffects!['p1'][0].type).toBe('dead')
   })
 
   it('deflect runs before safe (priority 5 < 10)', () => {
@@ -172,10 +166,9 @@ describe('Deflect effect', () => {
 
     const result = resolveIntent(intent, state, game)
     expect(result.type).toBe('needs_input') // Deflect fires first
-    if (result.type === 'needs_input') {
-      const afterResume = result.resume('p3') // Redirect to safe player
-      expect(afterResume.type).toBe('prevented') // Safe prevents it
-    }
+    assert(result.type === 'needs_input')
+    const afterResume = result.resume('p3') // Redirect to safe player
+    expect(afterResume.type).toBe('prevented') // Safe prevents it
   })
 })
 
@@ -201,18 +194,17 @@ describe('Pure effect', () => {
 
     const result = resolveIntent(intent, state, game)
     expect(result.type).toBe('prevented')
-    if (result.type === 'prevented') {
-      // Nominator (p1) gets dead effect
-      expect(result.stateChanges.addEffects?.['p1']).toBeDefined()
-      expect(result.stateChanges.addEffects!['p1'][0].type).toBe('dead')
+    assert(result.type === 'prevented')
+    // Nominator (p1) gets dead effect
+    expect(result.stateChanges.addEffects?.['p1']).toBeDefined()
+    expect(result.stateChanges.addEffects!['p1'][0].type).toBe('dead')
 
-      // Pure effect removed from p2
-      expect(result.stateChanges.removeEffects?.['p2']).toContain('pure')
+    // Pure effect removed from p2
+    expect(result.stateChanges.removeEffects?.['p2']).toContain('pure')
 
-      // History entry for virgin execution
-      const virginEntry = result.stateChanges.entries.find((e) => e.type === 'virgin_execution')
-      expect(virginEntry).toBeDefined()
-    }
+    // History entry for virgin execution
+    const virginEntry = result.stateChanges.entries.find((e) => e.type === 'virgin_execution')
+    expect(virginEntry).toBeDefined()
   })
 
   it('allows nomination but removes pure when non-townsfolk nominates', () => {
@@ -232,15 +224,14 @@ describe('Pure effect', () => {
     const result = resolveIntent(intent, state, game)
     // Should be resolved — nomination proceeds (allow + default resolver)
     expect(result.type).toBe('resolved')
-    if (result.type === 'resolved') {
-      // Pure effect removed
-      expect(result.stateChanges.removeEffects?.['p2']).toContain('pure')
-      // Nominator NOT killed
-      expect(result.stateChanges.addEffects?.['p1']).toBeUndefined()
-      // Nomination entry from default resolver
-      const nomEntry = result.stateChanges.entries.find((e) => e.type === 'nomination')
-      expect(nomEntry).toBeDefined()
-    }
+    assert(result.type === 'resolved')
+    // Pure effect removed
+    expect(result.stateChanges.removeEffects?.['p2']).toContain('pure')
+    // Nominator NOT killed
+    expect(result.stateChanges.addEffects?.['p1']).toBeUndefined()
+    // Nomination entry from default resolver
+    const nomEntry = result.stateChanges.entries.find((e) => e.type === 'nomination')
+    expect(nomEntry).toBeDefined()
   })
 
   it('does not fire for player without pure effect', () => {
@@ -259,11 +250,10 @@ describe('Pure effect', () => {
 
     const result = resolveIntent(intent, state, game)
     expect(result.type).toBe('resolved')
-    if (result.type === 'resolved') {
-      expect(result.stateChanges.entries[0].type).toBe('nomination')
-      // Phase stays 'day' — no transition to voting phase
-      expect(result.stateChanges.stateUpdates?.phase).toBeUndefined()
-    }
+    assert(result.type === 'resolved')
+    expect(result.stateChanges.entries[0].type).toBe('nomination')
+    // Phase stays 'day' — no transition to voting phase
+    expect(result.stateChanges.stateUpdates?.phase).toBeUndefined()
   })
 })
 
@@ -363,10 +353,9 @@ describe('Malfunction — handler bypass', () => {
 
     const result = resolveIntent(intent, state, game)
     expect(result.type).toBe('resolved')
-    if (result.type === 'resolved') {
-      expect(result.stateChanges.addEffects?.['p1']).toBeDefined()
-      expect(result.stateChanges.addEffects!['p1'][0].type).toBe('dead')
-    }
+    assert(result.type === 'resolved')
+    expect(result.stateChanges.addEffects?.['p1']).toBeDefined()
+    expect(result.stateChanges.addEffects!['p1'][0].type).toBe('dead')
   })
 
   it('pure handler is bypassed when the virgin is poisoned', () => {
@@ -386,12 +375,11 @@ describe('Malfunction — handler bypass', () => {
 
     const result = resolveIntent(intent, state, game)
     expect(result.type).toBe('resolved')
-    if (result.type === 'resolved') {
-      // Nomination succeeds normally — no virgin execution
-      expect(result.stateChanges.entries[0].type).toBe('nomination')
-      // Nominator is NOT killed
-      expect(result.stateChanges.addEffects?.['p1']).toBeUndefined()
-    }
+    assert(result.type === 'resolved')
+    // Nomination succeeds normally — no virgin execution
+    expect(result.stateChanges.entries[0].type).toBe('nomination')
+    // Nominator is NOT killed
+    expect(result.stateChanges.addEffects?.['p1']).toBeUndefined()
   })
 
   it('deflect handler is bypassed when the mayor is poisoned', () => {
@@ -413,10 +401,9 @@ describe('Malfunction — handler bypass', () => {
     const result = resolveIntent(intent, state, game)
     // Should resolve directly (no needs_input from deflect)
     expect(result.type).toBe('resolved')
-    if (result.type === 'resolved') {
-      expect(result.stateChanges.addEffects?.['p1']).toBeDefined()
-      expect(result.stateChanges.addEffects!['p1'][0].type).toBe('dead')
-    }
+    assert(result.type === 'resolved')
+    expect(result.stateChanges.addEffects?.['p1']).toBeDefined()
+    expect(result.stateChanges.addEffects!['p1'][0].type).toBe('dead')
   })
 
   it("drunk player's handlers are bypassed too", () => {
@@ -437,9 +424,8 @@ describe('Malfunction — handler bypass', () => {
 
     const result = resolveIntent(intent, state, game)
     expect(result.type).toBe('resolved')
-    if (result.type === 'resolved') {
-      expect(result.stateChanges.addEffects?.['p1']).toBeDefined()
-      expect(result.stateChanges.addEffects!['p1'][0].type).toBe('dead')
-    }
+    assert(result.type === 'resolved')
+    expect(result.stateChanges.addEffects?.['p1']).toBeDefined()
+    expect(result.stateChanges.addEffects!['p1'][0].type).toBe('dead')
   })
 })

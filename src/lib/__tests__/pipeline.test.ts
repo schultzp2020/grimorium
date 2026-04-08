@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { assert, describe, it, expect, beforeEach } from 'vitest'
 import { resolveIntent, applyPipelineChanges, emptyStateChanges, mergeStateChanges } from '../pipeline'
 import { type KillIntent, type NominateIntent, type ExecuteIntent, type StateChanges } from '../pipeline/types'
 import { getCurrentState, hasEffect } from '../types'
@@ -27,10 +27,9 @@ describe('default resolvers', () => {
 
     const result = resolveIntent(intent, state, game)
     expect(result.type).toBe('resolved')
-    if (result.type === 'resolved') {
-      expect(result.stateChanges.addEffects?.['p1']).toBeDefined()
-      expect(result.stateChanges.addEffects!['p1'][0].type).toBe('dead')
-    }
+    assert(result.type === 'resolved')
+    expect(result.stateChanges.addEffects?.['p1']).toBeDefined()
+    expect(result.stateChanges.addEffects!['p1'][0].type).toBe('dead')
   })
 
   it('nominate intent creates nomination entry (no phase transition)', () => {
@@ -46,11 +45,10 @@ describe('default resolvers', () => {
 
     const result = resolveIntent(intent, state, game)
     expect(result.type).toBe('resolved')
-    if (result.type === 'resolved') {
-      expect(result.stateChanges.entries).toHaveLength(1)
-      expect(result.stateChanges.entries[0].type).toBe('nomination')
-      expect(result.stateChanges.stateUpdates?.phase).toBeUndefined()
-    }
+    assert(result.type === 'resolved')
+    expect(result.stateChanges.entries).toHaveLength(1)
+    expect(result.stateChanges.entries[0].type).toBe('nomination')
+    expect(result.stateChanges.stateUpdates?.phase).toBeUndefined()
   })
 
   it('execute intent creates execution entry and adds dead effect', () => {
@@ -66,11 +64,10 @@ describe('default resolvers', () => {
 
     const result = resolveIntent(intent, state, game)
     expect(result.type).toBe('resolved')
-    if (result.type === 'resolved') {
-      expect(result.stateChanges.entries[0].type).toBe('execution')
-      expect(result.stateChanges.addEffects?.['p1']).toBeDefined()
-      expect(result.stateChanges.addEffects!['p1'][0].type).toBe('dead')
-    }
+    assert(result.type === 'resolved')
+    expect(result.stateChanges.entries[0].type).toBe('execution')
+    expect(result.stateChanges.addEffects?.['p1']).toBeDefined()
+    expect(result.stateChanges.addEffects!['p1'][0].type).toBe('dead')
   })
 })
 
@@ -98,9 +95,8 @@ describe('handler behavior', () => {
 
     const result = resolveIntent(intent, state, game)
     expect(result.type).toBe('resolved')
-    if (result.type === 'resolved') {
-      expect(result.stateChanges.addEffects?.['p1']).toBeDefined()
-    }
+    assert(result.type === 'resolved')
+    expect(result.stateChanges.addEffects?.['p1']).toBeDefined()
   })
 
   it('prevent handler stops pipeline and returns prevented', () => {
@@ -142,10 +138,9 @@ describe('handler behavior', () => {
 
     const result = resolveIntent(intent, state, game)
     expect(result.type).toBe('needs_input')
-    if (result.type === 'needs_input') {
-      expect(result.UIComponent).toBeDefined()
-      expect(result.resume).toBeInstanceOf(Function)
-    }
+    assert(result.type === 'needs_input')
+    expect(result.UIComponent).toBeDefined()
+    expect(result.resume).toBeInstanceOf(Function)
   })
 
   it('request_ui resume continues pipeline', () => {
@@ -166,16 +161,14 @@ describe('handler behavior', () => {
 
     const result = resolveIntent(intent, state, game)
     expect(result.type).toBe('needs_input')
-    if (result.type === 'needs_input') {
-      // Resume with redirect to p3
-      const afterResume = result.resume('p3')
-      expect(afterResume.type).toBe('resolved')
-      if (afterResume.type === 'resolved') {
-        // p3 should get the dead effect, not p1
-        expect(afterResume.stateChanges.addEffects?.['p3']).toBeDefined()
-        expect(afterResume.stateChanges.addEffects?.['p1']).toBeUndefined()
-      }
-    }
+    assert(result.type === 'needs_input')
+    // Resume with redirect to p3
+    const afterResume = result.resume('p3')
+    expect(afterResume.type).toBe('resolved')
+    assert(afterResume.type === 'resolved')
+    // p3 should get the dead effect, not p1
+    expect(afterResume.stateChanges.addEffects?.['p3']).toBeDefined()
+    expect(afterResume.stateChanges.addEffects?.['p1']).toBeUndefined()
   })
 
   it('redirect restarts pipeline with new intent', () => {
@@ -198,12 +191,11 @@ describe('handler behavior', () => {
     // First: needs_input for deflect
     const result = resolveIntent(intent, state, game)
     expect(result.type).toBe('needs_input')
-    if (result.type === 'needs_input') {
-      // Resume — redirect to p3 who has safe
-      const afterResume = result.resume('p3')
-      // Safe handler should prevent the redirected kill
-      expect(afterResume.type).toBe('prevented')
-    }
+    assert(result.type === 'needs_input')
+    // Resume — redirect to p3 who has safe
+    const afterResume = result.resume('p3')
+    // Safe handler should prevent the redirected kill
+    expect(afterResume.type).toBe('prevented')
   })
 })
 

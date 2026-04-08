@@ -70,7 +70,7 @@ export function EvilTeamReveal({ state, viewer, viewerType }: EvilTeamRevealProp
     })
 
     return members
-  }, [state.players, viewer.id, viewerType, t, language])
+  }, [state.players, viewer.id, viewerType, t])
 
   if (teamMembers.length === 0) {
     return <div className='p-4 text-center text-parchment-500'>{t.game.noEvilTeammates}</div>

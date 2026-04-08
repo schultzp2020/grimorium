@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { assert, describe, it, expect, beforeEach } from 'vitest'
 import definition from '.'
 import type { KillIntent } from '../../../pipeline/types'
 import { makePlayer, makeState, addEffectTo, makeGame, resetPlayerCounter } from '../../../__tests__/helpers'
@@ -72,10 +72,9 @@ describe('Deflect effect', () => {
       }
 
       const result = handler.handle(intent, mayor, state, game)
-      if (result.action === 'request_ui') {
-        expect(result.resume).toBeDefined()
-        expect(typeof result.resume).toBe('function')
-      }
+      assert(result.action === 'request_ui')
+      expect(result.resume).toBeDefined()
+      expect(typeof result.resume).toBe('function')
     })
   })
 
@@ -96,13 +95,11 @@ describe('Deflect effect', () => {
       }
 
       const result = handler.handle(intent, mayor, state, game)
-      if (result.action === 'request_ui') {
-        const resumed = result.resume!('p3') // narrator chose p3
-        expect(resumed.action).toBe('redirect')
-        if (resumed.action === 'redirect') {
-          expect((resumed.newIntent as KillIntent).targetId).toBe('p3')
-        }
-      }
+      assert(result.action === 'request_ui')
+      const resumed = result.resume!('p3') // narrator chose p3
+      expect(resumed.action).toBe('redirect')
+      assert(resumed.action === 'redirect')
+      expect((resumed.newIntent as KillIntent).targetId).toBe('p3')
     })
 
     it('generates a redirect history entry', () => {
@@ -117,15 +114,13 @@ describe('Deflect effect', () => {
       }
 
       const result = handler.handle(intent, mayor, state, game)
-      if (result.action === 'request_ui') {
-        const resumed = result.resume!('p3')
-        if (resumed.action === 'redirect') {
-          expect(resumed.stateChanges?.entries).toHaveLength(1)
-          expect(resumed.stateChanges!.entries![0].data.action).toBe('kill_redirected')
-          expect(resumed.stateChanges!.entries![0].data.originalTargetId).toBe('p2')
-          expect(resumed.stateChanges!.entries![0].data.redirectTargetId).toBe('p3')
-        }
-      }
+      assert(result.action === 'request_ui')
+      const resumed = result.resume!('p3')
+      assert(resumed.action === 'redirect')
+      expect(resumed.stateChanges?.entries).toHaveLength(1)
+      expect(resumed.stateChanges!.entries![0].data.action).toBe('kill_redirected')
+      expect(resumed.stateChanges!.entries![0].data.originalTargetId).toBe('p2')
+      expect(resumed.stateChanges!.entries![0].data.redirectTargetId).toBe('p3')
     })
   })
 
@@ -146,10 +141,9 @@ describe('Deflect effect', () => {
       }
 
       const result = handler.handle(intent, mayor, state, game)
-      if (result.action === 'request_ui') {
-        const resumed = result.resume!('p2') // same target
-        expect(resumed.action).toBe('allow')
-      }
+      assert(result.action === 'request_ui')
+      const resumed = result.resume!('p2') // same target
+      expect(resumed.action).toBe('allow')
     })
   })
 

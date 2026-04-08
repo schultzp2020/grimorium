@@ -19,9 +19,14 @@ function CardHeader({
 function CardTitle({
   className,
   ref,
+  children,
   ...props
 }: React.HTMLAttributes<HTMLHeadingElement> & { ref?: React.Ref<HTMLHeadingElement> }) {
-  return <h3 ref={ref} className={cn('text-2xl font-bold leading-none tracking-tight', className)} {...props} />
+  return (
+    <h3 ref={ref} className={cn('text-2xl font-bold leading-none tracking-tight', className)} {...props}>
+      {children}
+    </h3>
+  )
 }
 
 function CardDescription({

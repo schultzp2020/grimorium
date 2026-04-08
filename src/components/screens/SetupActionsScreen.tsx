@@ -51,7 +51,7 @@ export function SetupActionsScreen({ game, state, onOpenSetupAction, onContinue 
     }
 
     return items
-  }, [state.players, completedSetupPlayerIds, t])
+  }, [state.players, completedSetupPlayerIds, language])
 
   const allDone = setupItems.length === 0
 

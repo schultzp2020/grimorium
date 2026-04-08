@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { assert, describe, it, expect, beforeEach } from 'vitest'
 import definition from '.'
 import type { KillIntent } from '../../../pipeline/types'
 import { makePlayer, makeState, addEffectTo, makeGame, resetPlayerCounter } from '../../../__tests__/helpers'
@@ -155,10 +155,9 @@ describe('ImpStarpassPending effect', () => {
       }
 
       const result = handler.handle(intent, imp, state, game)
-      if (result.action === 'request_ui') {
-        expect(result.UIComponent).toBeDefined()
-        expect(result.resume).toBeDefined()
-      }
+      assert(result.action === 'request_ui')
+      expect(result.UIComponent).toBeDefined()
+      expect(result.resume).toBeDefined()
     })
   })
 
@@ -177,17 +176,14 @@ describe('ImpStarpassPending effect', () => {
       }
 
       const result = handler.handle(intent, imp, state, game)
-      if (result.action !== 'request_ui') {
-        throw new Error('Expected request_ui')
-      }
+      assert(result.action === 'request_ui')
 
       const resumed = result.resume('minion0')
       expect(resumed.action).toBe('allow')
-      if (resumed.action === 'allow') {
-        expect(resumed.stateChanges?.changeRoles).toEqual({
-          minion0: 'imp',
-        })
-      }
+      assert(resumed.action === 'allow')
+      expect(resumed.stateChanges?.changeRoles).toEqual({
+        minion0: 'imp',
+      })
     })
 
     it('adds pending_role_reveal to the new Imp', () => {
@@ -200,16 +196,13 @@ describe('ImpStarpassPending effect', () => {
       }
 
       const result = handler.handle(intent, imp, state, game)
-      if (result.action !== 'request_ui') {
-        throw new Error('Expected request_ui')
-      }
+      assert(result.action === 'request_ui')
 
       const resumed = result.resume('minion0')
-      if (resumed.action === 'allow') {
-        expect(resumed.stateChanges?.addEffects?.['minion0']).toEqual([
-          { type: 'pending_role_reveal', expiresAt: 'never' },
-        ])
-      }
+      assert(resumed.action === 'allow')
+      expect(resumed.stateChanges?.addEffects?.['minion0']).toEqual([
+        { type: 'pending_role_reveal', expiresAt: 'never' },
+      ])
     })
 
     it('removes the imp_starpass_pending effect from the old Imp', () => {
@@ -222,14 +215,11 @@ describe('ImpStarpassPending effect', () => {
       }
 
       const result = handler.handle(intent, imp, state, game)
-      if (result.action !== 'request_ui') {
-        throw new Error('Expected request_ui')
-      }
+      assert(result.action === 'request_ui')
 
       const resumed = result.resume('minion0')
-      if (resumed.action === 'allow') {
-        expect(resumed.stateChanges?.removeEffects?.['imp']).toContain('imp_starpass_pending')
-      }
+      assert(resumed.action === 'allow')
+      expect(resumed.stateChanges?.removeEffects?.['imp']).toContain('imp_starpass_pending')
     })
 
     it('creates a role_changed history entry', () => {
@@ -242,20 +232,17 @@ describe('ImpStarpassPending effect', () => {
       }
 
       const result = handler.handle(intent, imp, state, game)
-      if (result.action !== 'request_ui') {
-        throw new Error('Expected request_ui')
-      }
+      assert(result.action === 'request_ui')
 
       const resumed = result.resume('minion0')
-      if (resumed.action === 'allow') {
-        expect(resumed.stateChanges?.entries).toHaveLength(1)
-        expect(resumed.stateChanges!.entries[0].type).toBe('role_changed')
-        expect(resumed.stateChanges!.entries[0].data).toEqual({
-          playerId: 'minion0',
-          fromRole: 'poisoner',
-          toRole: 'imp',
-        })
-      }
+      assert(resumed.action === 'allow')
+      expect(resumed.stateChanges?.entries).toHaveLength(1)
+      expect(resumed.stateChanges!.entries[0].type).toBe('role_changed')
+      expect(resumed.stateChanges!.entries[0].data).toEqual({
+        playerId: 'minion0',
+        fromRole: 'poisoner',
+        toRole: 'imp',
+      })
     })
 
     it('cleans up effects sourced by the converting minion', () => {
@@ -270,15 +257,12 @@ describe('ImpStarpassPending effect', () => {
       }
 
       const result = handler.handle(intent, imp, state, game)
-      if (result.action !== 'request_ui') {
-        throw new Error('Expected request_ui')
-      }
+      assert(result.action === 'request_ui')
 
       const resumed = result.resume('minion0')
-      if (resumed.action === 'allow') {
-        // The poisoned effect on the villager should be removed
-        expect(resumed.stateChanges?.removeEffects?.['villager']).toContain('poisoned')
-      }
+      assert(resumed.action === 'allow')
+      // The poisoned effect on the villager should be removed
+      expect(resumed.stateChanges?.removeEffects?.['villager']).toContain('poisoned')
     })
   })
 })

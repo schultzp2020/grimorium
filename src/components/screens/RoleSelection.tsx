@@ -796,6 +796,7 @@ function RoleCard({ role, team, count, isCustomMode, language, onToggle, onIncre
       {/* +/- Controls (only when selected, only in custom mode) */}
       {isSelected && isCustomMode && (
         <div
+          role='presentation'
           className='flex items-center justify-center gap-2 border-t border-white/10 pt-2 pb-2.5'
           onClick={(e) => e.stopPropagation()}
         >

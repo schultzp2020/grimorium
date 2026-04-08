@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { assert, describe, it, expect, beforeEach } from 'vitest'
 import definition from '.'
 import type { NominateIntent } from '../../../pipeline/types'
 import { makePlayer, makeState, addEffectTo, makeGame, resetPlayerCounter } from '../../../__tests__/helpers'
@@ -78,10 +78,9 @@ describe('Pure effect', () => {
       }
 
       const result = handler.handle(intent, virgin, state, game)
-      if (result.action === 'prevent') {
-        expect(result.stateChanges?.addEffects?.['p1']).toBeDefined()
-        expect(result.stateChanges!.addEffects!['p1'][0].type).toBe('dead')
-      }
+      assert(result.action === 'prevent')
+      expect(result.stateChanges?.addEffects?.['p1']).toBeDefined()
+      expect(result.stateChanges!.addEffects!['p1'][0].type).toBe('dead')
     })
 
     it('removes the pure effect from the virgin', () => {
@@ -100,9 +99,8 @@ describe('Pure effect', () => {
       }
 
       const result = handler.handle(intent, virgin, state, game)
-      if (result.action === 'prevent') {
-        expect(result.stateChanges?.removeEffects?.['p2']).toContain('pure')
-      }
+      assert(result.action === 'prevent')
+      expect(result.stateChanges?.removeEffects?.['p2']).toContain('pure')
     })
 
     it('generates a virgin_execution history entry', () => {
@@ -121,9 +119,8 @@ describe('Pure effect', () => {
       }
 
       const result = handler.handle(intent, virgin, state, game)
-      if (result.action === 'prevent') {
-        expect(result.stateChanges?.entries?.[0].type).toBe('virgin_execution')
-      }
+      assert(result.action === 'prevent')
+      expect(result.stateChanges?.entries?.[0].type).toBe('virgin_execution')
     })
   })
 
@@ -172,11 +169,10 @@ describe('Pure effect', () => {
       }
 
       const result = handler.handle(intent, virgin, state, game)
-      if (result.action === 'allow') {
-        expect(result.stateChanges?.removeEffects?.['p2']).toContain('pure')
-        expect(result.stateChanges?.addEffects?.['p1']).toBeUndefined()
-        expect(result.stateChanges?.entries?.[0].type).toBe('virgin_spent')
-      }
+      assert(result.action === 'allow')
+      expect(result.stateChanges?.removeEffects?.['p2']).toContain('pure')
+      expect(result.stateChanges?.addEffects?.['p1']).toBeUndefined()
+      expect(result.stateChanges?.entries?.[0].type).toBe('virgin_spent')
     })
   })
 
@@ -220,9 +216,8 @@ describe('Pure effect', () => {
       }
 
       const result = handler.handle(intent, virgin, state, game)
-      if (result.action === 'allow') {
-        expect(result.stateChanges?.removeEffects?.['p2']).toContain('pure')
-      }
+      assert(result.action === 'allow')
+      expect(result.stateChanges?.removeEffects?.['p2']).toContain('pure')
     })
 
     it('does not kill the nominator', () => {
@@ -241,9 +236,8 @@ describe('Pure effect', () => {
       }
 
       const result = handler.handle(intent, virgin, state, game)
-      if (result.action === 'allow') {
-        expect(result.stateChanges?.addEffects?.['p1']).toBeUndefined()
-      }
+      assert(result.action === 'allow')
+      expect(result.stateChanges?.addEffects?.['p1']).toBeUndefined()
     })
 
     it('generates a virgin_spent history entry', () => {
@@ -262,9 +256,8 @@ describe('Pure effect', () => {
       }
 
       const result = handler.handle(intent, virgin, state, game)
-      if (result.action === 'allow') {
-        expect(result.stateChanges?.entries?.[0].type).toBe('virgin_spent')
-      }
+      assert(result.action === 'allow')
+      expect(result.stateChanges?.entries?.[0].type).toBe('virgin_spent')
     })
   })
 })

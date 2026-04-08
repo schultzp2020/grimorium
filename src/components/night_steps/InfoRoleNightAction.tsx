@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import type { GameState, PlayerState } from '../../lib/types'
 import type { RoleDefinition, NightActionResult } from '../../lib/roles/types'
 import { getRole, getAllRoles } from '../../lib/roles/index'
@@ -83,20 +83,29 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
   )
 
   // All defined roles of target team (for malfunction role picker)
-  const targetTeamAllRoles = getAllRoles().filter((r) => r.team === config.targetTeam)
+  const targetTeamAllRoles = useMemo(
+    () => getAllRoles().filter((r) => r.team === config.targetTeam),
+    [config.targetTeam],
+  )
 
   // ================================================================
   // Player classification for smart grouping
   // ================================================================
 
   /** Players whose actual team or canRegisterAs includes the target team */
-  const isTargetTeamPlayer = (p: PlayerState): boolean => {
-    const perception = perceive(p, player, 'team', state)
-    return perception.team === config.targetTeam || canRegisterAsTeam(p, config.targetTeam)
-  }
+  const isTargetTeamPlayer = useCallback(
+    (p: PlayerState): boolean => {
+      const perception = perceive(p, player, 'team', state)
+      return perception.team === config.targetTeam || canRegisterAsTeam(p, config.targetTeam)
+    },
+    [player, state, config.targetTeam],
+  )
 
-  const targetGroupPlayers = useMemo(() => allPlayers.filter(isTargetTeamPlayer), [allPlayers, state])
-  const otherGroupPlayers = useMemo(() => allPlayers.filter((p) => !isTargetTeamPlayer(p)), [allPlayers, state])
+  const targetGroupPlayers = useMemo(() => allPlayers.filter(isTargetTeamPlayer), [allPlayers, isTargetTeamPlayer])
+  const otherGroupPlayers = useMemo(
+    () => allPlayers.filter((p) => !isTargetTeamPlayer(p)),
+    [allPlayers, isTargetTeamPlayer],
+  )
 
   // Is there at least one player who could be perceived as the target team?
   const hasTargetTeam = targetGroupPlayers.length > 0
@@ -170,7 +179,7 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
       }
     }
     return { roles, roleToPlayers }
-  }, [targetsInSelection, state, config.targetTeam])
+  }, [targetsInSelection, state, config.targetTeam, player, targetTeamAllRoles])
 
   // ================================================================
   // Completion checks

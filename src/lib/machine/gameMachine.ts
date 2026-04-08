@@ -551,27 +551,22 @@ export const gameMachine = setup({
             },
             action: {
               on: {
-                NIGHT_ACTION_COMPLETE: [
-                  {
-                    target: '#game.game_over',
-                    actions: 'applyNightActionDirect',
-                    guard: 'isGameOver',
-                  },
-                  {
-                    target: 'pipeline_input',
-                    actions: 'applyNightActionDirect',
-                    guard: 'hasPipelineNeedsInput',
-                  },
-                  {
-                    target: 'dashboard',
-                    actions: 'applyNightActionDirect',
-                  },
-                ],
+                NIGHT_ACTION_COMPLETE: {
+                  target: 'resolving_night_action',
+                  actions: 'applyNightActionDirect',
+                },
                 NIGHT_ACTION_SKIP: {
                   target: 'dashboard',
                   actions: 'skipNightAction',
                 },
               },
+            },
+            resolving_night_action: {
+              always: [
+                { target: '#game.game_over', guard: 'isGameOver' },
+                { target: 'pipeline_input', guard: 'hasPipelineNeedsInput' },
+                { target: 'dashboard' },
+              ],
             },
             follow_up: {
               on: {
@@ -583,23 +578,18 @@ export const gameMachine = setup({
             },
             pipeline_input: {
               on: {
-                PIPELINE_INPUT_COMPLETE: [
-                  {
-                    target: '#game.game_over',
-                    actions: 'processPipelineInput',
-                    guard: 'isGameOver',
-                  },
-                  {
-                    target: 'pipeline_input',
-                    actions: 'processPipelineInput',
-                    guard: 'hasPipelineNeedsInput',
-                  },
-                  {
-                    target: 'dashboard',
-                    actions: 'processPipelineInput',
-                  },
-                ],
+                PIPELINE_INPUT_COMPLETE: {
+                  target: 'resolving_pipeline',
+                  actions: 'processPipelineInput',
+                },
               },
+            },
+            resolving_pipeline: {
+              always: [
+                { target: '#game.game_over', guard: 'isGameOver' },
+                { target: 'pipeline_input', guard: 'hasPipelineNeedsInput' },
+                { target: 'dashboard' },
+              ],
             },
           },
         },
@@ -657,26 +647,21 @@ export const gameMachine = setup({
             },
             nomination: {
               on: {
-                NOMINATE: [
-                  {
-                    target: '#game.game_over',
-                    actions: 'applyNomination',
-                    guard: 'isGameOver',
-                  },
-                  {
-                    target: '#game.playing.death_reveal',
-                    actions: 'applyNomination',
-                    guard: 'hasPendingDeathReveals',
-                  },
-                  {
-                    target: 'voting',
-                    actions: 'applyNomination',
-                  },
-                ],
+                NOMINATE: {
+                  target: 'resolving_nomination',
+                  actions: 'applyNomination',
+                },
                 BACK_FROM_NOMINATION: {
                   target: 'main',
                 },
               },
+            },
+            resolving_nomination: {
+              always: [
+                { target: '#game.game_over', guard: 'isGameOver' },
+                { target: '#game.playing.death_reveal', guard: 'hasPendingDeathReveals' },
+                { target: 'voting' },
+              ],
             },
             voting: {
               on: {
@@ -691,27 +676,22 @@ export const gameMachine = setup({
             },
             day_action: {
               on: {
-                DAY_ACTION_COMPLETE: [
-                  {
-                    target: '#game.game_over',
-                    actions: 'applyDayAction',
-                    guard: 'isGameOver',
-                  },
-                  {
-                    target: '#game.playing.death_reveal',
-                    actions: 'applyDayAction',
-                    guard: 'hasPendingDeathReveals',
-                  },
-                  {
-                    target: 'main',
-                    actions: 'applyDayAction',
-                  },
-                ],
+                DAY_ACTION_COMPLETE: {
+                  target: 'resolving_day_action',
+                  actions: 'applyDayAction',
+                },
                 BACK_FROM_DAY_ACTION: {
                   target: 'main',
                   actions: 'clearDayAction',
                 },
               },
+            },
+            resolving_day_action: {
+              always: [
+                { target: '#game.game_over', guard: 'isGameOver' },
+                { target: '#game.playing.death_reveal', guard: 'hasPendingDeathReveals' },
+                { target: 'main' },
+              ],
             },
           },
         },

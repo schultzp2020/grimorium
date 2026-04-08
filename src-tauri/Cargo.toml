@@ -1,0 +1,28 @@
+[package]
+name = "grimorium"
+version = "0.1.0"
+description = "A companion app for Blood on the Clocktower"
+authors = ["Paul Schultz"]
+license = ""
+repository = ""
+default-run = "grimorium"
+edition = "2021"
+
+[lib]
+name = "grimorium_lib"
+crate-type = ["staticlib", "cdylib", "lib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+serde_json = "1"
+serde = { version = "1", features = ["derive"] }
+tauri = { version = "2", features = [] }
+tauri-plugin-store = "2"
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1
+panic = "abort"

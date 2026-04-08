@@ -1,14 +1,10 @@
 {
   "languages": {
     "TypeScript": {
-      "language_servers": ["typescript-language-server"]
-    }
-  },
-  "lsp": {
-    "typescript-language-server": {
-      "binary": {
-        "path": "node_modules/@typescript/native-preview/bin/tsgo.js"
-      }
+      "language_servers": ["tsgo", "vtsls"]
+    },
+    "CSS": {
+      "language_servers": ["tailwindcss-language-server", "!vscode-css-language-server"]
     }
   }
 }

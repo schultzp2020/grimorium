@@ -12,7 +12,6 @@ const definition: RoleDefinition = {
   team: 'townsfolk',
   icon: 'user',
   nightOrder: null, // Doesn't wake at night
-  chaos: 0,
 
   RoleReveal: DefaultRoleReveal,
   NightAction: null,

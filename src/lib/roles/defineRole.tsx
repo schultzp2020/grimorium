@@ -293,16 +293,16 @@ export function defineRole(schema: BaseRoleFields & RoleSchema): RoleDefinition 
 
   switch (schema.category) {
     case 'passive': {
-      return buildPassiveRole(base, schema as BaseRoleFields & PassiveSchema)
+      return buildPassiveRole(base, schema)
     }
     case 'target-action': {
-      return buildTargetActionRole(base, schema as BaseRoleFields & TargetActionSchema)
+      return buildTargetActionRole(base, schema)
     }
     case 'info-narrator-setup': {
-      return buildInfoNarratorSetupRole(base, schema as BaseRoleFields & InfoNarratorSetupSchema)
+      return buildInfoNarratorSetupRole(base, schema)
     }
     case 'custom': {
-      return buildCustomRole(base, schema as BaseRoleFields & CustomSchema)
+      return buildCustomRole(base, schema)
     }
   }
 }

@@ -75,7 +75,6 @@ const definition: RoleDefinition = {
   team: 'townsfolk',
   icon: 'birdHouse',
   nightOrder: 35,
-  chaos: 30,
 
   shouldWake: (game: Game, player: PlayerState) => {
     const round = game.history.at(-1)?.stateAfter.round ?? 0

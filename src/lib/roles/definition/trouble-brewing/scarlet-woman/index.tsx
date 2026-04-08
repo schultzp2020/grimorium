@@ -38,7 +38,6 @@ const definition: RoleDefinition = {
   team: 'minion',
   icon: 'rose',
   nightOrder: 4, // Very early — just show info, before action roles
-  chaos: 50,
 
   shouldWake: (game) => {
     const state = game.history.at(-1)?.stateAfter

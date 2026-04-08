@@ -47,13 +47,11 @@ export function selectPresetPools(pools: GeneratedPool[]): Record<GeneratorPrese
     return null
   }
 
-  const sorted = [...pools].sort((a, b) => a.totalChaos - b.totalChaos)
-
   return {
-    simple: sorted[0],
-    interesting: sorted[Math.floor(sorted.length / 2)],
+    simple: pools[0],
+    interesting: pools[Math.floor(pools.length / 2)],
     // eslint-disable-next-line typescript/no-non-null-assertion -- length >= 3 guaranteed above
-    chaotic: sorted.at(-1)!,
+    chaotic: pools.at(-1)!,
   }
 }
 
@@ -122,15 +120,8 @@ function tryGenerateValidPool(
     return null
   }
 
-  // Compute chaos
-  const totalChaos = roles.reduce((sum, roleId) => {
-    const role = getRole(roleId)
-    return sum + (role?.chaos ?? 0)
-  }, 0)
-
   return {
     roles,
-    totalChaos,
     distribution: {
       townsfolk: townsfolk.length,
       outsider: outsiders.length,

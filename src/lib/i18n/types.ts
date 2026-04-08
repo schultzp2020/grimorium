@@ -350,7 +350,6 @@ export interface Translations {
     interestingDescription: string
     chaotic: string
     chaoticDescription: string
-    chaos: string
     selectThisPool: string
     regenerate: string
     orPickManually: string

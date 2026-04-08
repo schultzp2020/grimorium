@@ -32,7 +32,6 @@ const definition: RoleDefinition = {
   team: 'townsfolk',
   icon: 'shirt',
   nightOrder: 10,
-  chaos: 10,
   shouldWake: (game, player) => isAlive(player) && game.history.at(-1)?.stateAfter.round === 1,
 
   RoleReveal: DefaultRoleReveal,

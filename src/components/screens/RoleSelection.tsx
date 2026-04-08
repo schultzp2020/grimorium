@@ -525,17 +525,11 @@ function GenerateView({
           className={cn('rounded-xl border-2 overflow-hidden', activeConfig.borderColor)}
           style={{ boxShadow: `0 0 16px ${activeConfig.glowColor}` }}
         >
-          {/* Chaos score header */}
+          {/* Preset header */}
           <div className={cn('px-4 py-2.5 flex items-center justify-between', activeConfig.bgColor)}>
             <span className={cn('text-sm font-tarot tracking-wider uppercase', activeConfig.activeColor)}>
               {presetName}
             </span>
-            <div className='flex items-center gap-1.5'>
-              <span className='text-[10px] tracking-wider text-parchment-500 uppercase'>{t.scripts.chaos}</span>
-              <span className={cn('text-sm font-bold tabular-nums', activeConfig.activeColor)}>
-                {activePool.totalChaos}
-              </span>
-            </div>
           </div>
 
           {/* Role pills grouped by team */}

@@ -40,7 +40,6 @@ const definition: RoleDefinition = {
   team: 'minion',
   icon: 'flask',
   nightOrder: 5, // Very early — before all info roles
-  chaos: 45,
 
   shouldWake: (_game, player) => isAlive(player),
 

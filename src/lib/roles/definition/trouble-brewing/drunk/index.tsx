@@ -118,7 +118,6 @@ const definition: RoleDefinition = {
   team: 'outsider',
   icon: 'beer',
   nightOrder: null, // Never wakes as "Drunk"
-  chaos: 60,
 
   RoleReveal: DefaultRoleReveal, // Never shown — player sees their believed role
 

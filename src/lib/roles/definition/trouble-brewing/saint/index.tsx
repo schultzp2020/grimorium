@@ -12,7 +12,6 @@ const definition: RoleDefinition = {
   team: 'outsider',
   icon: 'starNorth',
   nightOrder: null, // Doesn't wake at night — passive ability
-  chaos: 50,
 
   // Saint gets Martyrdom effect at game start (evil wins if executed)
   initialEffects: [{ type: 'martyrdom', expiresAt: 'never' }],

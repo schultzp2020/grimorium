@@ -205,14 +205,15 @@ describe('defineRole', () => {
         },
       })
 
-      expect(role.nightSteps).toBeDefined()
+      assert(role.nightSteps)
       expect(role.nightSteps).toHaveLength(2)
-      expect(role.nightSteps?.[0].id).toBe('show_team')
-      assert(role.nightSteps?.[0].condition)
+      const [firstStep] = role.nightSteps
+      expect(firstStep.id).toBe('show_team')
+      assert(firstStep.condition)
       const p = makePlayer({ roleId: 'poisoner' })
       const g = makeGame(makeState({ round: 1, players: [p] }))
-      expect(role.nightSteps?.[0].condition(g, p, makeState({ round: 1 }))).toBeTruthy()
-      expect(role.nightSteps?.[0].condition(g, p, makeState({ round: 2 }))).toBeFalsy()
+      expect(firstStep.condition(g, p, makeState({ round: 1 }))).toBeTruthy()
+      expect(firstStep.condition(g, p, makeState({ round: 2 }))).toBeFalsy()
     })
   })
 
@@ -234,12 +235,12 @@ describe('defineRole', () => {
             noTarget: 'roles.washerwoman.history.noTownsfolk',
           },
           getLabels: (roleT) => ({
-            infoTitle: roleT.washerwomanInfo ?? '',
-            noTargetTitle: roleT.noTownsfolkInGame ?? '',
-            noTargetMessage: roleT.noTownsfolkMessage ?? '',
-            noTargetConfirm: roleT.confirmNoTownsfolk ?? '',
-            showNoTargetLink: roleT.showNoTownsfolk ?? '',
-            mustIncludeTarget: roleT.mustIncludeTownsfolk ?? '',
+            infoTitle: roleT.washerwomanInfo,
+            noTargetTitle: roleT.noTownsfolkInGame,
+            noTargetMessage: roleT.noTownsfolkMessage,
+            noTargetConfirm: roleT.confirmNoTownsfolk,
+            showNoTargetLink: roleT.showNoTownsfolk,
+            mustIncludeTarget: roleT.mustIncludeTownsfolk,
           }),
         },
       })
@@ -314,7 +315,7 @@ describe('defineRole', () => {
         id: 'ravenkeeper',
         category: 'custom',
         team: 'townsfolk',
-        icon: 'bird',
+        icon: 'birdHouse',
         nightOrder: 25,
         wakeCondition: (_game, player) => player.effects.some((e) => e.type === 'dead'),
         NightAction: () => null,

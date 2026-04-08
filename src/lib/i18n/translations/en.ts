@@ -339,7 +339,6 @@ const en: Translations = {
     interestingDescription: 'A balanced mix of complexity',
     chaotic: 'Chaotic',
     chaoticDescription: 'Maximum deception and surprises',
-    chaos: 'Chaos',
     selectThisPool: 'Select',
     regenerate: 'Regenerate',
     orPickManually: 'or pick manually',

@@ -42,7 +42,6 @@ const definition: RoleDefinition = {
   team: 'minion',
   icon: 'hatGlasses',
   nightOrder: 36, // Late — sees up-to-date state after most actions
-  chaos: 55,
 
   shouldWake: (_game, player) => isAlive(player),
 

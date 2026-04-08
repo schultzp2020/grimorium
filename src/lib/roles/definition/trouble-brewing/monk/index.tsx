@@ -20,7 +20,6 @@ const definition: RoleDefinition = {
   team: 'townsfolk',
   icon: 'church',
   nightOrder: 20, // Monk wakes before the Demon
-  chaos: 25,
   shouldWake: (game, player) => isAlive(player) && (game.history.at(-1)?.stateAfter.round ?? 0) > 1,
 
   nightSteps: [

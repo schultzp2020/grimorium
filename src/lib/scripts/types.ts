@@ -23,6 +23,5 @@ export type GeneratorPreset = 'simple' | 'interesting' | 'chaotic'
 
 export interface GeneratedPool {
   roles: RoleId[]
-  totalChaos: number
   distribution: RoleDistribution
 }

@@ -29,7 +29,6 @@ const definition: RoleDefinition = {
   team: 'townsfolk',
   icon: 'handHeart',
   nightOrder: 14,
-  chaos: 25,
   shouldWake: (_game, player) => isAlive(player),
 
   nightSteps: [

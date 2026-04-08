@@ -12,7 +12,6 @@ const definition: RoleDefinition = {
   team: 'townsfolk',
   icon: 'flower',
   nightOrder: null, // Doesn't wake at night - passive ability
-  chaos: 35,
 
   // Virgin gets Pure effect at game start (used once when nominated)
   initialEffects: [{ type: 'pure', expiresAt: 'never' }],

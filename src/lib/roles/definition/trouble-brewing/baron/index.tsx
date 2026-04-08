@@ -37,7 +37,6 @@ const definition: RoleDefinition = {
   team: 'minion',
   icon: 'hatTop',
   nightOrder: 4, // Very early — just show info, before action roles
-  chaos: 40,
   distributionModifier: { outsider: 2, townsfolk: -2 },
 
   shouldWake: (game) => {

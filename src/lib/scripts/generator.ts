@@ -52,7 +52,8 @@ export function selectPresetPools(pools: GeneratedPool[]): Record<GeneratorPrese
   return {
     simple: sorted[0],
     interesting: sorted[Math.floor(sorted.length / 2)],
-    chaotic: sorted[sorted.length - 1],
+    // eslint-disable-next-line typescript/no-non-null-assertion -- length >= 3 guaranteed above
+    chaotic: sorted.at(-1)!,
   }
 }
 

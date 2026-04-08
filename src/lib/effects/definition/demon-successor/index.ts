@@ -74,7 +74,10 @@ const demonSuccessorHandler: IntentHandler = {
       targetId = (intent as ExecuteIntent).playerId
     }
 
-    const target = state.players.find((p) => p.id === targetId)!
+    const target = state.players.find((p) => p.id === targetId)
+    if (!target) {
+      return { action: 'allow' as const }
+    }
 
     return {
       action: 'allow',

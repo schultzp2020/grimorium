@@ -50,7 +50,7 @@ const definition: RoleDefinition = {
         }
         const [left, right] = getAliveNeighbors(state, player.id)
         const neighbors = [left, right].filter(
-          (n): n is NonNullable<typeof n> => (n != null && n.id !== left?.id) || n === left,
+          (n): n is NonNullable<typeof n> => (n !== null && n.id !== left?.id) || n === left,
         )
         return getAmbiguousPlayers(neighbors, 'alignment').length > 0
       },

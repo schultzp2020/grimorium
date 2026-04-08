@@ -151,7 +151,10 @@ export function getAmbiguousPlayers(players: PlayerState[], context: PerceptionC
  * This is used locally within NightAction components — no game events are emitted.
  * The overrides are ephemeral and only affect the current calculation.
  */
-export function applyPerceptionOverrides(state: GameState, overrides: Record<string, Partial<Perception>>): GameState {
+export function applyPerceptionOverrides(
+  state: GameState,
+  overrides: Partial<Record<string, Partial<Perception>>>,
+): GameState {
   if (Object.keys(overrides).length === 0) {
     return state
   }

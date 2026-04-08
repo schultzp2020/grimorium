@@ -18,9 +18,8 @@ function isBot(): boolean {
 
 // Typed reference to the global gtag function
 declare global {
-  interface Window {
-    gtag?: (...args: unknown[]) => void
-  }
+  // eslint-disable-next-line no-var
+  var gtag: ((...args: unknown[]) => void) | undefined
 }
 
 /**
@@ -31,9 +30,9 @@ export function trackEvent(eventName: string, params?: Record<string, string | n
   if (isBot()) {
     return
   }
-  if (typeof window === 'undefined' || !window.gtag) {
+  if (typeof globalThis === 'undefined' || !globalThis.gtag) {
     return
   }
 
-  window.gtag('event', eventName, params)
+  globalThis.gtag('event', eventName, params)
 }

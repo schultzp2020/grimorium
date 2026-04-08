@@ -13,6 +13,7 @@ interface SelectableRoleItemProps {
 export function SelectableRoleItem({ playerName, roleName, roleIcon, isSelected, onClick }: SelectableRoleItemProps) {
   return (
     <button
+      type='button'
       onClick={onClick}
       className={cn(
         'w-full p-3 rounded-lg border flex items-center justify-between transition-all',

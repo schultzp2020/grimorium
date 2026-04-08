@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, assert, beforeEach, describe, expect, it } from 'vitest'
 
 import definition from '.'
 import {
@@ -13,7 +13,7 @@ import type { EffectDefinition, EffectId } from '../../../../effects/types'
 import { perceive } from '../../../../pipeline/perception'
 
 // Track registered test effects so we can restore originals after each test
-const originalEffects: Map<EffectId, EffectDefinition | undefined> = new Map()
+const originalEffects = new Map<EffectId, EffectDefinition | undefined>()
 
 function registerTestEffect(def: EffectDefinition) {
   if (!originalEffects.has(def.id)) {
@@ -59,7 +59,8 @@ describe('Ravenkeeper', () => {
         ],
         makeState({ round: 1, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBeFalsy()
+      assert(definition.shouldWake)
+      expect(definition.shouldWake(game, player)).toBeFalsy()
     })
 
     it('does not wake if not killed this night', () => {
@@ -74,7 +75,8 @@ describe('Ravenkeeper', () => {
         ],
         makeState({ round: 2, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBeFalsy()
+      assert(definition.shouldWake)
+      expect(definition.shouldWake(game, player)).toBeFalsy()
     })
 
     it('wakes when killed this night (after round 1)', () => {
@@ -100,7 +102,8 @@ describe('Ravenkeeper', () => {
         ],
         makeState({ round: 2, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBeTruthy()
+      assert(definition.shouldWake)
+      expect(definition.shouldWake(game, player)).toBeTruthy()
     })
 
     it('does not wake if a different player was killed', () => {
@@ -127,7 +130,8 @@ describe('Ravenkeeper', () => {
         ],
         makeState({ round: 2, players: [player, other] }),
       )
-      expect(definition.shouldWake!(game, player)).toBeFalsy()
+      assert(definition.shouldWake)
+      expect(definition.shouldWake(game, player)).toBeFalsy()
     })
 
     it('does not wake when kill was prevented (e.g., Monk protection)', () => {
@@ -153,7 +157,8 @@ describe('Ravenkeeper', () => {
         ],
         makeState({ round: 2, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBeFalsy()
+      assert(definition.shouldWake)
+      expect(definition.shouldWake(game, player)).toBeFalsy()
     })
 
     it('does not wake if already dead at the start of the night', () => {
@@ -169,7 +174,8 @@ describe('Ravenkeeper', () => {
         ],
         makeState({ round: 3, players: [deadPlayer] }),
       )
-      expect(definition.shouldWake!(game, deadPlayer)).toBeFalsy()
+      assert(definition.shouldWake)
+      expect(definition.shouldWake(game, deadPlayer)).toBeFalsy()
     })
   })
 

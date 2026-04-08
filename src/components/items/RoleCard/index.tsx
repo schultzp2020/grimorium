@@ -73,7 +73,7 @@ export function RoleCard({ roleId }: Props) {
   const roleName = getRegistryRoleName(role.id, language)
   const roleQuote = getRegistryRoleQuote(role.id, language)
   const roleLines = getRegistryRoleLines(role.id, language)
-  const teamName = teamTranslation?.name ?? teamId
+  const teamName = teamTranslation.name
 
   return (
     <CardShell teamId={teamId} icon={role.icon}>

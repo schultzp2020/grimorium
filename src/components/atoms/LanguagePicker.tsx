@@ -17,6 +17,7 @@ export function LanguagePicker({ variant = 'button', className = '' }: Props) {
       <Popover.Trigger asChild>
         {variant === 'floating' ? (
           <button
+            type='button'
             className={`flex h-12 w-12 items-center justify-center rounded-full border border-mystic-gold/30 bg-grimoire-dark/90 text-sm font-medium text-mystic-gold shadow-lg transition-all hover:border-mystic-gold/50 hover:bg-grimoire-dark active:scale-95 ${className}`}
             title={current?.nativeName}
           >
@@ -24,6 +25,7 @@ export function LanguagePicker({ variant = 'button', className = '' }: Props) {
           </button>
         ) : (
           <button
+            type='button'
             className={`flex min-h-[44px] items-center gap-2 rounded-full border border-mystic-gold/30 px-3 py-2 text-sm text-mystic-gold/70 transition-all hover:border-mystic-gold/50 hover:text-mystic-gold active:scale-95 ${className}`}
           >
             <Icon name='globe' size='sm' />
@@ -46,6 +48,7 @@ export function LanguagePicker({ variant = 'button', className = '' }: Props) {
               return (
                 <Popover.Close key={lang.code} asChild>
                   <button
+                    type='button'
                     onClick={() => setLanguage(lang.code)}
                     className={`flex min-h-[48px] w-full items-center gap-3 px-4 py-3.5 text-left transition-colors ${
                       isActive ? 'bg-mystic-gold/15 text-mystic-gold' : 'text-parchment-300 active:bg-white/10'

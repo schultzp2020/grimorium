@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { assert, beforeEach, describe, expect, it } from 'vitest'
 
 import definition from '.'
 import {
@@ -57,8 +57,8 @@ describe('Butler', () => {
       })
 
       const masterEffect = butler.effects.find((e) => e.type === 'butler_master')
-      expect(masterEffect).toBeDefined()
-      expect(masterEffect!.data?.masterId).toBe('p2')
+      assert(masterEffect)
+      expect(masterEffect.data?.masterId).toBe('p2')
     })
 
     it('butler without butler_master effect has no voting restriction', () => {

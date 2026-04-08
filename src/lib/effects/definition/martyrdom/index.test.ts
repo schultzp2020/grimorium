@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { assert, beforeEach, describe, expect, it } from 'vitest'
 
 import definition from '.'
 import { addEffectTo, makeGameWithHistory, makePlayer, makeState, resetPlayerCounter } from '../../../__tests__/helpers'
@@ -6,7 +6,8 @@ import { addEffectTo, makeGameWithHistory, makePlayer, makeState, resetPlayerCou
 beforeEach(() => resetPlayerCounter())
 
 describe('Martyrdom effect', () => {
-  const winCondition = definition.winConditions![0]
+  assert(definition.winConditions)
+  const [winCondition] = definition.winConditions
 
   // ================================================================
   // WIN CONDITION — EXECUTION OF SAINT

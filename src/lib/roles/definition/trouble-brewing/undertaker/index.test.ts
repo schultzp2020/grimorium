@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, assert, beforeEach, describe, expect, it } from 'vitest'
 
 import definition from '.'
 import {
@@ -13,7 +13,7 @@ import type { EffectDefinition, EffectId } from '../../../../effects/types'
 import { perceive } from '../../../../pipeline/perception'
 
 // Track registered test effects so we can restore originals after each test
-const originalEffects: Map<EffectId, EffectDefinition | undefined> = new Map()
+const originalEffects = new Map<EffectId, EffectDefinition | undefined>()
 
 function registerTestEffect(def: EffectDefinition) {
   if (!originalEffects.has(def.id)) {
@@ -59,7 +59,8 @@ describe('Undertaker', () => {
         ],
         makeState({ round: 1, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBeFalsy()
+      assert(definition.shouldWake)
+      expect(definition.shouldWake(game, player)).toBeFalsy()
     })
 
     it('does not wake when dead', () => {
@@ -80,7 +81,8 @@ describe('Undertaker', () => {
         ],
         makeState({ round: 2, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBeFalsy()
+      assert(definition.shouldWake)
+      expect(definition.shouldWake(game, player)).toBeFalsy()
     })
 
     it('does not wake if no execution happened', () => {
@@ -100,7 +102,8 @@ describe('Undertaker', () => {
         ],
         makeState({ round: 2, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBeFalsy()
+      assert(definition.shouldWake)
+      expect(definition.shouldWake(game, player)).toBeFalsy()
     })
 
     it('wakes when alive, after first night, and execution occurred', () => {
@@ -121,7 +124,8 @@ describe('Undertaker', () => {
         ],
         makeState({ round: 2, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBeTruthy()
+      assert(definition.shouldWake)
+      expect(definition.shouldWake(game, player)).toBeTruthy()
     })
   })
 

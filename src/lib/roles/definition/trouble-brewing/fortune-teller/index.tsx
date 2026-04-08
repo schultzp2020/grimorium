@@ -299,9 +299,6 @@ const definition: RoleDefinition = {
 
       // Check if either selected player registers as a Demon
       const registersDemon = (p: typeof player1) => {
-        if (!p) {
-          return false
-        }
         const perception = perceive(p, effectiveObserver, 'team', effectiveState)
         return perception.team === 'demon'
       }

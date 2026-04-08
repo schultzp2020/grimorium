@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 
 import { EFFECT_TYPE_BADGE_VARIANT, getEffect, getEffectType } from '../../lib/effects/registry'
 import {
+  type Language,
   type Translations,
   getEffectTranslations,
   getEffectName as getRegistryEffectName,
@@ -9,7 +10,6 @@ import {
   getRoleTranslations,
   useI18n,
 } from '../../lib/i18n'
-import type { Language } from '../../lib/i18n'
 import { getRole } from '../../lib/roles/registry'
 import { type GameState, type RichMessage as RichMessageType, getPlayer } from '../../lib/types'
 import { Badge, Icon } from '../atoms'
@@ -20,12 +20,11 @@ interface Props {
 }
 
 // Helper to resolve a dot-notation key by walking an object
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function resolveNestedKey(obj: any, parts: string[]): string | undefined {
-  let value = obj
+function resolveNestedKey(obj: unknown, parts: string[]): string | undefined {
+  let value: unknown = obj
   for (const part of parts) {
     if (value && typeof value === 'object' && part in value) {
-      value = value[part]
+      value = (value as Record<string, unknown>)[part]
     } else {
       return undefined
     }
@@ -47,14 +46,14 @@ function getTranslation(t: Translations, key: string, lang: Language): string | 
 
   // Fallback: check role registry for keys like "roles.<roleId>.xxx"
   if (parts[0] === 'roles' && parts.length >= 3) {
-    const roleId = parts[1]
+    const [, roleId] = parts
     const roleT = getRoleTranslations(roleId, lang)
     return resolveNestedKey(roleT, parts.slice(2))
   }
 
   // Fallback: check effect registry for keys like "effects.<effectId>.xxx"
   if (parts[0] === 'effects' && parts.length >= 3) {
-    const effectId = parts[1]
+    const [, effectId] = parts
     const effectT = getEffectTranslations(effectId, lang)
     return resolveNestedKey(effectT, parts.slice(2))
   }
@@ -75,9 +74,9 @@ const PLAYER_PARAM_KEYS = new Set([
   'redHerring',
 ])
 // Param keys that represent role IDs
-const ROLE_PARAM_KEYS = ['role']
+const ROLE_PARAM_KEYS = new Set(['role'])
 // Param keys that represent effect IDs
-const EFFECT_PARAM_KEYS = ['effect']
+const EFFECT_PARAM_KEYS = new Set(['effect'])
 
 export function RichMessage({ message, state }: Props) {
   const { t, language } = useI18n()
@@ -89,7 +88,9 @@ export function RichMessage({ message, state }: Props) {
   // Render a player badge with their role icon
   const renderPlayerBadge = (playerId: string, key: string | number) => {
     const player = getPlayer(state, playerId)
-    if (!player) return <span key={key}>{t.ui.unknownPlayer}</span>
+    if (!player) {
+      return <span key={key}>{t.ui.unknownPlayer}</span>
+    }
     const role = getRole(player.roleId)
     return (
       <Badge key={key} variant='player' className='inline-flex items-center gap-1'>
@@ -102,7 +103,9 @@ export function RichMessage({ message, state }: Props) {
   // Render a role badge
   const renderRoleBadge = (roleId: string, key: string | number) => {
     const role = getRole(roleId)
-    if (!role) return <span key={key}>{t.ui.unknownRole}</span>
+    if (!role) {
+      return <span key={key}>{t.ui.unknownRole}</span>
+    }
     const teamVariant = role.team as 'townsfolk' | 'outsider' | 'minion' | 'demon'
     return (
       <Badge key={key} variant={teamVariant} className='inline-flex items-center gap-1'>
@@ -114,7 +117,7 @@ export function RichMessage({ message, state }: Props) {
   // Parse a template with params and render with badges
   const renderI18nWithParams = (
     template: string,
-    params: Record<string, string | number>,
+    params: Partial<Record<string, string | number>>,
     baseKey: string,
   ): ReactNode[] => {
     const result: ReactNode[] = []
@@ -129,17 +132,17 @@ export function RichMessage({ message, state }: Props) {
         result.push(<span key={`${baseKey}-text-${lastIndex}`}>{template.slice(lastIndex, match.index)}</span>)
       }
 
-      const paramKey = match[1]
+      const [, paramKey] = match
       const paramValue = params[paramKey]
 
       if (paramValue !== undefined) {
         if (PLAYER_PARAM_KEYS.has(paramKey)) {
           // Render as player badge
           result.push(renderPlayerBadge(String(paramValue), `${baseKey}-player-${paramKey}`))
-        } else if (ROLE_PARAM_KEYS.includes(paramKey)) {
+        } else if (ROLE_PARAM_KEYS.has(paramKey)) {
           // Render as role badge
           result.push(renderRoleBadge(String(paramValue), `${baseKey}-role-${paramKey}`))
-        } else if (EFFECT_PARAM_KEYS.includes(paramKey)) {
+        } else if (EFFECT_PARAM_KEYS.has(paramKey)) {
           // Render as effect badge (use default type when no instance)
           const effectTypeId = String(paramValue)
           const effect = getEffect(effectTypeId)

@@ -179,6 +179,7 @@ export function RoleAssignment({ players, selectedRoles, onStart, onBack }: Prop
 
         {/* Customize toggle */}
         <button
+          type='button'
           onClick={() => {
             setShowCustomize(!showCustomize)
             if (showCustomize) {
@@ -198,6 +199,7 @@ export function RoleAssignment({ players, selectedRoles, onStart, onBack }: Prop
               <p className='text-xs text-parchment-500'>{t.newGame.tapToAssign}</p>
               {manuallyAssignedCount > 0 && (
                 <button
+                  type='button'
                   onClick={handleRandomizeAll}
                   className='flex items-center gap-1 text-xs text-mystic-gold/70 transition-colors hover:text-mystic-gold'
                 >
@@ -281,8 +283,8 @@ export function RoleAssignment({ players, selectedRoles, onStart, onBack }: Prop
 
                               return (
                                 <button
-                                  key={roleId}
                                   type='button'
+                                  key={roleId}
                                   onClick={() => {
                                     handleAssignment(playerName, roleId)
                                     setExpandedPlayer(null)

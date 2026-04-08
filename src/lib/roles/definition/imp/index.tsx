@@ -5,13 +5,13 @@ import { PlayerPickerList, RolePickerGrid } from '../../../../components/inputs'
 import { EvilTeamReveal, MysticDivider, RoleCard, StepSection } from '../../../../components/items'
 import { DefaultRoleReveal } from '../../../../components/items/DefaultRoleReveal'
 import {
+  HandbackButton,
   NarratorSetupLayout,
   NightActionLayout,
   NightStepListLayout,
   PlayerFacingScreen,
+  type NightStep,
 } from '../../../../components/layouts'
-import type { NightStep } from '../../../../components/layouts'
-import { HandbackButton } from '../../../../components/layouts'
 import { isMalfunctioning } from '../../../effects/registry'
 import {
   getRoleDescription,

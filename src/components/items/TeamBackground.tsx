@@ -527,6 +527,7 @@ interface CardLinkProps {
 export function CardLink({ onClick, isEvil, children }: CardLinkProps) {
   return (
     <button
+      type='button'
       onClick={onClick}
       className={cn(
         'mt-5 text-sm underline underline-offset-4 decoration-1 transition-colors',

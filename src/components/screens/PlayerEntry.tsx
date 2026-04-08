@@ -251,6 +251,7 @@ export function PlayerEntry({ onNext, onBack }: Props) {
               />
               {players.length > MIN_PLAYERS && (
                 <button
+                  type='button'
                   onClick={() => removePlayer(index)}
                   className='rounded-lg p-3 text-red-400/70 transition-colors hover:bg-red-500/10 hover:text-red-400'
                 >
@@ -264,6 +265,7 @@ export function PlayerEntry({ onNext, onBack }: Props) {
         {/* Add Player Button */}
         {!maxPlayersReached && (
           <button
+            type='button'
             onClick={addPlayer}
             className='flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-parchment-500/30 py-3 text-parchment-400 transition-colors hover:border-parchment-400/50 hover:text-parchment-300'
           >

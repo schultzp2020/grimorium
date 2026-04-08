@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
 
-import { PerceptionConfigStep } from '../../../../../components/items'
-import { MalfunctionConfigStep } from '../../../../../components/items'
+import { MalfunctionConfigStep, PerceptionConfigStep } from '../../../../../components/items'
 import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
 import { RoleCard } from '../../../../../components/items/RoleCard'
 import { TeamBackground } from '../../../../../components/items/TeamBackground'

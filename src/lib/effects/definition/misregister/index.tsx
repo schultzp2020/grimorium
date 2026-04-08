@@ -35,15 +35,15 @@ function MisregisterDescription({ instance, language }: EffectDescriptionProps) 
 
   return (
     <span className='inline-flex flex-wrap items-center gap-1'>
-      <span>{t.mightRegisterAs as string}</span>
+      <span>{t.mightRegisterAs}</span>
       {alignments.map((a) => (
         <Badge key={`alignment-${a}`} variant={ALIGNMENT_BADGE_VARIANT[a] ?? 'default'}>
-          {(t[`alignment_${a}`] as string) ?? a}
+          {(t[`alignment_${a}`] as string | undefined) ?? a}
         </Badge>
       ))}
       {teams.map((team) => (
         <Badge key={`team-${team}`} variant={team as TeamId}>
-          {(t[`team_${team}`] as string) ?? team}
+          {(t[`team_${team}`] as string | undefined) ?? team}
         </Badge>
       ))}
     </span>
@@ -101,14 +101,13 @@ function MisregisterConfigEditor({ data, language, onSave, onCancel }: EffectCon
     <div className='space-y-4'>
       {/* Alignments */}
       <div>
-        <p className='mb-2 text-xs font-bold tracking-wider text-parchment-300 uppercase'>
-          {t.configAlignments as string}
-        </p>
+        <p className='mb-2 text-xs font-bold tracking-wider text-parchment-300 uppercase'>{t.configAlignments}</p>
         <div className='flex gap-2'>
           {ALL_ALIGNMENTS.map((alignment) => {
             const isSelected = selectedAlignments.has(alignment)
             return (
               <button
+                type='button'
                 key={alignment}
                 onClick={() => toggleAlignment(alignment)}
                 className={`flex flex-1 items-center justify-center gap-2 rounded-lg border p-3 text-sm font-medium transition-colors ${
@@ -120,7 +119,7 @@ function MisregisterConfigEditor({ data, language, onSave, onCancel }: EffectCon
                 }`}
               >
                 <Icon name={isSelected ? 'checkSquare' : 'square'} size='sm' />
-                {(t[`alignment_${alignment}`] as string) ?? alignment}
+                {(t[`alignment_${alignment}`] as string | undefined) ?? alignment}
               </button>
             )
           })}
@@ -129,12 +128,13 @@ function MisregisterConfigEditor({ data, language, onSave, onCancel }: EffectCon
 
       {/* Teams */}
       <div>
-        <p className='mb-2 text-xs font-bold tracking-wider text-parchment-300 uppercase'>{t.configTeams as string}</p>
+        <p className='mb-2 text-xs font-bold tracking-wider text-parchment-300 uppercase'>{t.configTeams}</p>
         <div className='grid grid-cols-2 gap-2'>
           {ALL_TEAMS.map((team) => {
             const isSelected = selectedTeams.has(team)
             return (
               <button
+                type='button'
                 key={team}
                 onClick={() => toggleTeam(team)}
                 className={`flex items-center gap-2 rounded-lg border p-3 text-sm transition-colors ${
@@ -144,7 +144,7 @@ function MisregisterConfigEditor({ data, language, onSave, onCancel }: EffectCon
                 }`}
               >
                 <Icon name={isSelected ? 'checkSquare' : 'square'} size='sm' />
-                <Badge variant={team}>{(t[`team_${team}`] as string) ?? team}</Badge>
+                <Badge variant={team}>{(t[`team_${team}`] as string | undefined) ?? team}</Badge>
               </button>
             )
           })}
@@ -154,10 +154,10 @@ function MisregisterConfigEditor({ data, language, onSave, onCancel }: EffectCon
       {/* Buttons */}
       <div className='flex gap-2 pt-2'>
         <Button onClick={onCancel} variant='ghost' className='flex-1'>
-          {t.configCancel as string}
+          {t.configCancel}
         </Button>
         <Button onClick={handleSave} variant='primary' className='flex-1' disabled={!hasSelection}>
-          {t.configSave as string}
+          {t.configSave}
         </Button>
       </div>
     </div>

@@ -62,6 +62,7 @@ export function useShaderBackground(
     }
 
     const program = gl.createProgram()
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- WebGL can return null
     if (!program) {
       return
     }

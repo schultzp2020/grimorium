@@ -82,6 +82,7 @@ export function SetupActionsScreen({ game, state, onOpenSetupAction, onContinue 
         <div className='space-y-2'>
           {setupItems.map((item) => (
             <button
+              type='button'
               key={item.playerId}
               onClick={() => onOpenSetupAction(item.playerId, item.roleId)}
               className={cn(

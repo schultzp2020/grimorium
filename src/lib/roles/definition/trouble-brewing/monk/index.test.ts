@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { assert, beforeEach, describe, expect, it } from 'vitest'
 
 import definition from '.'
 import {
@@ -29,7 +29,8 @@ describe('Monk', () => {
         ],
         makeState({ round: 1, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBeFalsy()
+      assert(definition.shouldWake)
+      expect(definition.shouldWake(game, player)).toBeFalsy()
     })
 
     it('wakes on subsequent nights when alive', () => {
@@ -44,7 +45,8 @@ describe('Monk', () => {
         ],
         makeState({ round: 2, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBeTruthy()
+      assert(definition.shouldWake)
+      expect(definition.shouldWake(game, player)).toBeTruthy()
     })
 
     it('does not wake when dead', () => {
@@ -59,7 +61,8 @@ describe('Monk', () => {
         ],
         makeState({ round: 2, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBeFalsy()
+      assert(definition.shouldWake)
+      expect(definition.shouldWake(game, player)).toBeFalsy()
     })
   })
 

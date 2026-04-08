@@ -7,7 +7,8 @@ import type { NominateIntent } from '../../../pipeline/types'
 beforeEach(() => resetPlayerCounter())
 
 describe('Pure effect', () => {
-  const handler = definition.handlers![0]
+  assert(definition.handlers)
+  const [handler] = definition.handlers
 
   // ================================================================
   // HANDLER — APPLIES TO
@@ -80,8 +81,8 @@ describe('Pure effect', () => {
 
       const result = handler.handle(intent, virgin, state, game)
       assert(result.action === 'prevent')
-      expect(result.stateChanges?.addEffects?.['p1']).toBeDefined()
-      expect(result.stateChanges!.addEffects!['p1'][0].type).toBe('dead')
+      assert(result.stateChanges?.addEffects?.['p1'])
+      expect(result.stateChanges.addEffects['p1'][0].type).toBe('dead')
     })
 
     it('removes the pure effect from the virgin', () => {
@@ -121,7 +122,7 @@ describe('Pure effect', () => {
 
       const result = handler.handle(intent, virgin, state, game)
       assert(result.action === 'prevent')
-      expect(result.stateChanges?.entries?.[0].type).toBe('virgin_execution')
+      expect(result.stateChanges?.entries[0].type).toBe('virgin_execution')
     })
   })
 
@@ -173,7 +174,7 @@ describe('Pure effect', () => {
       assert(result.action === 'allow')
       expect(result.stateChanges?.removeEffects?.['p2']).toContain('pure')
       expect(result.stateChanges?.addEffects?.['p1']).toBeUndefined()
-      expect(result.stateChanges?.entries?.[0].type).toBe('virgin_spent')
+      expect(result.stateChanges?.entries[0].type).toBe('virgin_spent')
     })
   })
 
@@ -258,7 +259,7 @@ describe('Pure effect', () => {
 
       const result = handler.handle(intent, virgin, state, game)
       assert(result.action === 'allow')
-      expect(result.stateChanges?.entries?.[0].type).toBe('virgin_spent')
+      expect(result.stateChanges?.entries[0].type).toBe('virgin_spent')
     })
   })
 })

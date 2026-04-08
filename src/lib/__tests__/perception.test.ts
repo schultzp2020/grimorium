@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, assert, beforeEach, describe, expect, it } from 'vitest'
 
 import { getEffect, registerEffect, unregisterEffect } from '../effects/registry'
 import type { EffectDefinition, EffectId } from '../effects/types'
@@ -13,7 +13,7 @@ import type { Perception, PerceptionModifier } from '../pipeline/types'
 import { addEffectTo, makePlayer, makeState, resetPlayerCounter } from './helpers'
 
 // Track registered test effects so we can restore originals after each test
-const originalEffects: Map<EffectId, EffectDefinition | undefined> = new Map()
+const originalEffects = new Map<EffectId, EffectDefinition | undefined>()
 
 function registerTestEffect(def: EffectDefinition) {
   // Save original before overwriting
@@ -464,8 +464,10 @@ describe('applyPerceptionOverrides', () => {
     })
 
     // The misregister effect should now have perceiveAs data
-    const overriddenPlayer = overridden.players.find((p) => p.id === 'p1')!
-    const misregisterEffect = overriddenPlayer.effects.find((e) => e.type === 'misregister')!
+    const overriddenPlayer = overridden.players.find((p) => p.id === 'p1')
+    assert(overriddenPlayer)
+    const misregisterEffect = overriddenPlayer.effects.find((e) => e.type === 'misregister')
+    assert(misregisterEffect)
     expect(misregisterEffect.data?.perceiveAs).toEqual({
       alignment: 'evil',
     })
@@ -487,8 +489,10 @@ describe('applyPerceptionOverrides', () => {
       p1: { alignment: 'evil' },
     })
 
-    const overriddenPlayer = overridden.players.find((p) => p.id === 'p1')!
-    const safeEffect = overriddenPlayer.effects.find((e) => e.type === 'safe')!
+    const overriddenPlayer = overridden.players.find((p) => p.id === 'p1')
+    assert(overriddenPlayer)
+    const safeEffect = overriddenPlayer.effects.find((e) => e.type === 'safe')
+    assert(safeEffect)
     expect(safeEffect.data).toBeUndefined()
   })
 
@@ -522,7 +526,8 @@ describe('applyPerceptionOverrides', () => {
     const overridden = applyPerceptionOverrides(state, {
       p1: { alignment: 'evil' },
     })
-    const overriddenRecluse = overridden.players.find((p) => p.id === 'p1')!
+    const overriddenRecluse = overridden.players.find((p) => p.id === 'p1')
+    assert(overriddenRecluse)
     const afterResult = perceive(overriddenRecluse, observer, 'alignment', overridden)
     expect(afterResult.alignment).toBe('evil')
   })

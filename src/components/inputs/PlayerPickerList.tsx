@@ -85,7 +85,7 @@ export function PlayerPickerList({
   const { t, language } = useI18n()
   const styles = variantStyles[variant]
 
-  const isAtMax = selectionCount !== null && selectionCount !== undefined && selected.length >= selectionCount
+  const isAtMax = selectionCount !== null && selected.length >= selectionCount
 
   const getRoleName = (roleId: string) => getRegistryRoleName(roleId, language)
 
@@ -99,8 +99,8 @@ export function PlayerPickerList({
 
     return (
       <button
-        key={player.id}
         type='button'
+        key={player.id}
         disabled={isDisabled}
         onClick={() => onSelect(player.id)}
         className={cn(

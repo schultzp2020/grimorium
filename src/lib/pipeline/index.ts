@@ -1,4 +1,5 @@
 import { getEffect, isMalfunctioning } from '../effects/registry'
+import type { Translations } from '../i18n/types'
 import type { EffectToAdd } from '../roles/types'
 import { type Game, type GameState, type HistoryEntry, type PlayerState, generateId } from '../types'
 import { getDefaultResolver } from './resolvers'
@@ -9,6 +10,7 @@ import {
   type IntentHandler,
   type PipelineResult,
   type StateChanges,
+  type WinConditionCheck,
   type WinConditionTrigger,
 } from './types'
 
@@ -157,12 +159,13 @@ function runPipeline(
             const afterUI = result.resume(uiResult)
 
             switch (afterUI.action) {
-              case 'allow':
+              case 'allow': {
                 if (afterUI.stateChanges) {
                   accumulated = mergeStateChanges(accumulated, afterUI.stateChanges)
                 }
                 return runPipeline(intent, handlers, state, game, accumulated, i + 1)
-              case 'prevent':
+              }
+              case 'prevent': {
                 if (afterUI.stateChanges) {
                   accumulated = mergeStateChanges(accumulated, afterUI.stateChanges)
                 }
@@ -170,6 +173,7 @@ function runPipeline(
                   type: 'prevented' as const,
                   stateChanges: accumulated,
                 }
+              }
               case 'redirect': {
                 if (afterUI.stateChanges) {
                   accumulated = mergeStateChanges(accumulated, afterUI.stateChanges)
@@ -178,9 +182,10 @@ function runPipeline(
                 newHandlers.sort((a, b) => a.handler.priority - b.handler.priority)
                 return runPipeline(afterUI.newIntent, newHandlers, state, game, accumulated, 0)
               }
-              default:
+              case 'request_ui': {
                 // request_ui after request_ui — continue pipeline
                 return runPipeline(intent, handlers, state, game, accumulated, i + 1)
+              }
             }
           },
         }
@@ -329,7 +334,7 @@ function applyPlayerChanges(
 /**
  * Collect all available day actions from players' active effects.
  */
-export function getAvailableDayActions(state: GameState, t: Record<string, any>): AvailableDayAction[] {
+export function getAvailableDayActions(state: GameState, t: Translations): AvailableDayAction[] {
   const actions: AvailableDayAction[] = []
 
   for (const player of state.players) {
@@ -368,11 +373,7 @@ export function getAvailableDayActions(state: GameState, t: Record<string, any>)
  * Follow-ups appear as items in the Night Dashboard when their condition
  * is met (e.g., a player has a pending role change to reveal).
  */
-export function getAvailableNightFollowUps(
-  state: GameState,
-  game: Game,
-  t: Record<string, any>,
-): AvailableNightFollowUp[] {
+export function getAvailableNightFollowUps(state: GameState, game: Game, t: Translations): AvailableNightFollowUp[] {
   const followUps: AvailableNightFollowUp[] = []
 
   for (const player of state.players) {
@@ -411,7 +412,7 @@ export function checkDynamicWinConditions(
   state: GameState,
   game: Game,
   triggers: WinConditionTrigger[],
-  getRole: (roleId: string) => { winConditions?: import('./types').WinConditionCheck[] } | undefined,
+  getRole: (roleId: string) => { winConditions?: WinConditionCheck[] } | undefined,
 ): 'townsfolk' | 'demon' | null {
   // Check effect-based win conditions
   // Skip win conditions from malfunctioning players (e.g., poisoned Saint's

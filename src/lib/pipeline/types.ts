@@ -1,6 +1,7 @@
 import type { FC } from 'react'
 
 import type { IconName } from '../../components/atoms/icon'
+import type { Translations } from '../i18n/types'
 import type { EffectToAdd } from '../roles/types'
 import type { TeamId } from '../teams/types'
 import type { Game, GameState, HistoryEntry, PlayerState } from '../types'
@@ -108,8 +109,8 @@ export interface DayActionDefinition {
   id: string
   icon: IconName
   // Functions receive the translations object and return localized strings
-  getLabel: (t: Record<string, any>) => string
-  getDescription: (t: Record<string, any>) => string
+  getLabel: (t: Translations) => string
+  getDescription: (t: Translations) => string
   condition: (player: PlayerState, state: GameState) => boolean
   ActionComponent: FC<DayActionProps>
 }
@@ -163,7 +164,7 @@ export interface NightFollowUpResult {
 export interface NightFollowUpDefinition {
   id: string
   icon: IconName
-  getLabel: (t: Record<string, any>) => string
+  getLabel: (t: Translations) => string
   condition: (player: PlayerState, state: GameState, game: Game) => boolean
   ActionComponent: FC<NightFollowUpProps>
 }

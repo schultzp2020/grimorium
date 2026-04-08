@@ -88,7 +88,10 @@ export function EditEffectsModal({ player, state, open, onClose, onAddEffect, on
   // Config editor screen (add or edit)
   if (mode.type === 'add_config' || mode.type === 'edit_config') {
     const { effectDef } = mode
-    const ConfigEditor = effectDef.ConfigEditor!
+    const { ConfigEditor } = effectDef
+    if (!ConfigEditor) {
+      return null
+    }
     const existingData = mode.type === 'edit_config' ? mode.effectInstance.data : undefined
     const isEditing = mode.type === 'edit_config'
     const effectName = getEffectName(effectDef.id)
@@ -220,6 +223,7 @@ export function EditEffectsModal({ player, state, open, onClose, onAddEffect, on
 
                 return (
                   <button
+                    type='button'
                     key={effect.id}
                     onClick={() => handleAddEffect(effect)}
                     disabled={alreadyHas}

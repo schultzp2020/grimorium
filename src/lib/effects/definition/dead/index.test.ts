@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { assert, beforeEach, describe, expect, it } from 'vitest'
 
 import definition from '.'
 import { addEffectTo, makePlayer, makeState, resetPlayerCounter } from '../../../__tests__/helpers'
@@ -32,14 +32,16 @@ describe('Dead effect', () => {
     it('dead player can vote once (no used_dead_vote yet)', () => {
       const player = addEffectTo(makePlayer({ id: 'p1' }), 'dead')
       const state = makeState({ players: [player] })
-      expect(definition.canVote!(player, state)).toBeTruthy()
+      assert(definition.canVote)
+      expect(definition.canVote(player, state)).toBeTruthy()
     })
 
     it('dead player cannot vote after using dead vote', () => {
       let player = addEffectTo(makePlayer({ id: 'p1' }), 'dead')
       player = addEffectTo(player, 'used_dead_vote')
       const state = makeState({ players: [player] })
-      expect(definition.canVote!(player, state)).toBeFalsy()
+      assert(definition.canVote)
+      expect(definition.canVote(player, state)).toBeFalsy()
     })
   })
 
@@ -51,7 +53,8 @@ describe('Dead effect', () => {
     it('dead player can never nominate', () => {
       const player = addEffectTo(makePlayer({ id: 'p1' }), 'dead')
       const state = makeState({ players: [player] })
-      expect(definition.canNominate!(player, state)).toBeFalsy()
+      assert(definition.canNominate)
+      expect(definition.canNominate(player, state)).toBeFalsy()
     })
   })
 })

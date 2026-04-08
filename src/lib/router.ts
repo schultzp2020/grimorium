@@ -19,10 +19,10 @@ function getBasePath(): string {
 /** Returns the current path relative to the base path. Always starts with '/'. */
 function getPath(): string {
   const base = getBasePath()
-  const fullPath = window.location.pathname
+  const fullPath = globalThis.location.pathname
   if (base && fullPath.startsWith(base)) {
     const path = fullPath.slice(base.length)
-    return path.startsWith('/') ? path : '/' + path
+    return path.startsWith('/') ? path : `/${path}`
   }
   return fullPath || '/'
 }
@@ -30,14 +30,14 @@ function getPath(): string {
 /** Navigate to a new path, pushing a history entry. */
 function navigate(path: string): void {
   const fullPath = getBasePath() + path
-  window.history.pushState(null, '', fullPath)
+  globalThis.history.pushState(null, '', fullPath)
   notify()
 }
 
 /** Replace the current path without adding a history entry. */
 function replace(path: string): void {
   const fullPath = getBasePath() + path
-  window.history.replaceState(null, '', fullPath)
+  globalThis.history.replaceState(null, '', fullPath)
   notify()
 }
 
@@ -55,6 +55,6 @@ function notify(): void {
 }
 
 // Listen to browser back/forward
-window.addEventListener('popstate', notify)
+globalThis.addEventListener('popstate', notify)
 
 export const router = { getPath, navigate, replace, subscribe }

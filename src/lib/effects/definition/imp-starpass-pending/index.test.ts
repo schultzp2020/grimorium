@@ -7,7 +7,8 @@ import type { KillIntent } from '../../../pipeline/types'
 beforeEach(() => resetPlayerCounter())
 
 describe('ImpStarpassPending effect', () => {
-  const handler = definition.handlers![0]
+  assert(definition.handlers)
+  const [handler] = definition.handlers
 
   // Helper to create a state with an Imp and alive minions
   function makeScenario(overrides?: {
@@ -237,9 +238,10 @@ describe('ImpStarpassPending effect', () => {
 
       const resumed = result.resume('minion0')
       assert(resumed.action === 'allow')
-      expect(resumed.stateChanges?.entries).toHaveLength(1)
-      expect(resumed.stateChanges!.entries[0].type).toBe('role_changed')
-      expect(resumed.stateChanges!.entries[0].data).toEqual({
+      assert(resumed.stateChanges?.entries)
+      expect(resumed.stateChanges.entries).toHaveLength(1)
+      expect(resumed.stateChanges.entries[0].type).toBe('role_changed')
+      expect(resumed.stateChanges.entries[0].data).toEqual({
         playerId: 'minion0',
         fromRole: 'poisoner',
         toRole: 'imp',

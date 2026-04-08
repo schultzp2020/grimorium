@@ -26,6 +26,7 @@ export function SelectablePlayerItem({
 }: SelectablePlayerItemProps) {
   return (
     <button
+      type='button'
       onClick={onClick}
       disabled={isDisabled}
       className={cn(

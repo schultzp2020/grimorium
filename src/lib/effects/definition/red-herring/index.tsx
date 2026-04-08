@@ -12,7 +12,9 @@ registerEffectTranslations('red_herring', 'es', es)
 
 function RedHerringConfigEditor({ data, state, language, onSave, onCancel }: EffectConfigEditorProps) {
   const t = getEffectTranslations('red_herring', language as Language)
-  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>((data?.fortuneTellerId as string) ?? null)
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(
+    (data?.fortuneTellerId as string | undefined) ?? null,
+  )
 
   // Show all players as potential Fortune Tellers (narrator picks the right one)
   const { players } = state
@@ -26,14 +28,13 @@ function RedHerringConfigEditor({ data, state, language, onSave, onCancel }: Eff
 
   return (
     <div className='space-y-4'>
-      <p className='text-xs font-bold tracking-wider text-parchment-300 uppercase'>
-        {t.configSelectFortuneTeller as string}
-      </p>
+      <p className='text-xs font-bold tracking-wider text-parchment-300 uppercase'>{t.configSelectFortuneTeller}</p>
       <div className='max-h-48 space-y-1 overflow-y-auto'>
         {players.map((p) => {
           const isSelected = selectedPlayerId === p.id
           return (
             <button
+              type='button'
               key={p.id}
               onClick={() => setSelectedPlayerId(p.id)}
               className={`flex w-full items-center gap-3 rounded-lg border p-3 text-left text-sm transition-colors ${
@@ -55,10 +56,10 @@ function RedHerringConfigEditor({ data, state, language, onSave, onCancel }: Eff
 
       <div className='flex gap-2 pt-2'>
         <Button onClick={onCancel} variant='ghost' className='flex-1'>
-          {t.configCancel as string}
+          {t.configCancel}
         </Button>
         <Button onClick={handleSave} variant='primary' className='flex-1' disabled={!selectedPlayerId}>
-          {t.configSave as string}
+          {t.configSave}
         </Button>
       </div>
     </div>

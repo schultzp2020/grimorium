@@ -9,6 +9,7 @@ interface BackButtonProps {
 export function BackButton({ onClick, label }: BackButtonProps) {
   return (
     <button
+      type='button'
       onClick={onClick}
       className={cn(
         'p-3 -ml-3 text-parchment-400 hover:text-parchment-100 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center',

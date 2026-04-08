@@ -25,7 +25,7 @@ function getButlerMaster(player: PlayerState, state: GameState): PlayerState | n
   if (!butlerEffect?.data?.masterId) {
     return null
   }
-  return state.players.find((p) => p.id === butlerEffect.data!.masterId) ?? null
+  return state.players.find((p) => p.id === butlerEffect.data?.masterId) ?? null
 }
 
 export function VotingPhase({ state, nomineeId, blockStatus, onVoteComplete, onCancel }: Props) {
@@ -240,7 +240,7 @@ export function VotingPhase({ state, nomineeId, blockStatus, onVoteComplete, onC
                   <div className='mb-2 flex items-center gap-1.5 rounded-sm border border-amber-500/30 bg-amber-900/30 px-2 py-1'>
                     <Icon name='handHeart' size='sm' className='text-amber-400' />
                     <span className='text-xs font-medium text-amber-300'>
-                      {interpolate(butlerT.masterLabel ?? '', {
+                      {interpolate(butlerT.masterLabel, {
                         player: butlerMaster.name,
                       })}
                     </span>
@@ -255,6 +255,7 @@ export function VotingPhase({ state, nomineeId, blockStatus, onVoteComplete, onC
                 )}
                 {!isNominee && (
                   <button
+                    type='button'
                     onClick={() => handleToggleVote(player.id)}
                     disabled={!canVote}
                     className={cn(

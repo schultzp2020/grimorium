@@ -58,6 +58,7 @@ export function RolesLibrary({ selectedRoleId, onBack, onSelectRole, onDeselectR
       <TeamBackground teamId={selectedTeamId}>
         {/* Navigation arrows */}
         <button
+          type='button'
           onClick={goToPrev}
           className={cn(
             'absolute left-1 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full flex items-center justify-center transition-colors',
@@ -69,6 +70,7 @@ export function RolesLibrary({ selectedRoleId, onBack, onSelectRole, onDeselectR
           <Icon name='chevronLeft' size='xl' />
         </button>
         <button
+          type='button'
           onClick={goToNext}
           className={cn(
             'absolute right-1 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full flex items-center justify-center transition-colors',
@@ -122,7 +124,7 @@ export function RolesLibrary({ selectedRoleId, onBack, onSelectRole, onDeselectR
                       isEvil ? 'text-red-400' : 'text-mystic-gold',
                     )}
                   >
-                    {teamTranslation?.name ?? teamId}
+                    {teamTranslation.name}
                   </span>
                   <span className='text-xs text-parchment-500'>({roles.length})</span>
                 </div>
@@ -135,6 +137,7 @@ export function RolesLibrary({ selectedRoleId, onBack, onSelectRole, onDeselectR
 
                     return (
                       <button
+                        type='button'
                         key={role.id}
                         onClick={() => onSelectRole(role.id)}
                         className={cn(

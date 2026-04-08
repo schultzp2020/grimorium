@@ -84,6 +84,7 @@ export function RoleRevelationScreen({ game, state, onRevealRole, onStartNight, 
         </Button>
         {!allRevealed && (
           <button
+            type='button'
             onClick={onStartNight}
             className='text-parchment-600 mt-2 flex min-h-[44px] w-full items-center justify-center py-2 text-center text-xs transition-colors hover:text-parchment-400'
           >
@@ -112,6 +113,7 @@ function PlayerRevealRow({
 
   return (
     <button
+      type='button'
       onClick={onClick}
       className={cn(
         'w-full flex items-center gap-3 p-3 rounded-lg transition-colors text-left group',

@@ -38,7 +38,7 @@ export interface InfoRoleConfig {
     noTarget: string
   }
   /** Getter for role-specific labels from role translations */
-  getLabels: (roleT: Record<string, any>) => {
+  getLabels: (roleT: Record<string, string>) => {
     infoTitle: string
     noTargetTitle: string
     noTargetMessage: string
@@ -119,7 +119,7 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
     const disabled = new Set<string>()
 
     if (selectedPlayers.length === 1) {
-      const selectedId = selectedPlayers[0]
+      const [selectedId] = selectedPlayers
       const selectedIsTarget = targetGroupPlayers.some((p) => p.id === selectedId)
 
       if (!selectedIsTarget) {
@@ -177,11 +177,12 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
           : targetTeamAllRoles
 
       for (const role of pRoles) {
+        const existing = roleToPlayers.get(role.id) ?? []
         if (!roleToPlayers.has(role.id)) {
-          roleToPlayers.set(role.id, [])
+          roleToPlayers.set(role.id, existing)
         }
-        if (!roleToPlayers.get(role.id)!.includes(pid)) {
-          roleToPlayers.get(role.id)!.push(pid)
+        if (!existing.includes(pid)) {
+          existing.push(pid)
         }
         if (!seen.has(role.id)) {
           seen.add(role.id)
@@ -247,10 +248,8 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
       if (!canCompleteMalfunctionSelect) {
         return
       }
-    } else {
-      if (!canCompleteHealthySetup) {
-        return
-      }
+    } else if (!canCompleteHealthySetup) {
+      return
     }
     setSelectPlayersDone(true)
     setPhase('step_list')
@@ -336,8 +335,8 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
 
   const getPlayerName = (playerId: string) => state.players.find((p) => p.id === playerId)?.name ?? t.ui.unknown
 
-  const targetTeamName = t.teams[config.targetTeam as keyof typeof t.teams]?.name ?? config.targetTeam
-  const otherGroupLabel = t.game.otherPlayers ?? 'Other Players'
+  const targetTeamName = t.teams[config.targetTeam as keyof typeof t.teams].name
+  const otherGroupLabel = t.game.otherPlayers
 
   // ================================================================
   // Build steps
@@ -511,6 +510,7 @@ export function InfoRoleNightAction({ config, state, player, onComplete }: Props
 
         <div className='border-parchment-700/30 mt-4 border-t pt-4 text-center'>
           <button
+            type='button'
             onClick={() => setPhase('no_target_view')}
             className='text-sm text-amber-400 underline underline-offset-2 hover:text-amber-300'
           >

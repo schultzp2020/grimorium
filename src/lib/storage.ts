@@ -92,9 +92,9 @@ export function getLastGamePlayers(): string[] {
   }
 
   const sorted = [...games].sort((a, b) => b.createdAt - a.createdAt)
-  const lastGame = sorted[0]
+  const [lastGame] = sorted
   const lastEntry = lastGame.history.at(-1)
-  if (!lastEntry?.stateAfter?.players) {
+  if (!lastEntry) {
     return []
   }
 

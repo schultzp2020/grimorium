@@ -6,7 +6,11 @@ import App from './App.tsx'
 import './index.css'
 import { I18nProvider } from './lib/i18n'
 
-createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById('root')
+if (!rootElement) {
+  throw new Error('Root element not found')
+}
+createRoot(rootElement).render(
   <StrictMode>
     <I18nProvider>
       <App />

@@ -7,7 +7,8 @@ import type { KillIntent } from '../../../pipeline/types'
 beforeEach(() => resetPlayerCounter())
 
 describe('Deflect effect', () => {
-  const handler = definition.handlers![0]
+  assert(definition.handlers)
+  const [handler] = definition.handlers
 
   // ================================================================
   // HANDLER — APPLIES TO
@@ -118,10 +119,11 @@ describe('Deflect effect', () => {
       assert(result.action === 'request_ui')
       const resumed = result.resume('p3')
       assert(resumed.action === 'redirect')
-      expect(resumed.stateChanges?.entries).toHaveLength(1)
-      expect(resumed.stateChanges!.entries[0].data.action).toBe('kill_redirected')
-      expect(resumed.stateChanges!.entries[0].data.originalTargetId).toBe('p2')
-      expect(resumed.stateChanges!.entries[0].data.redirectTargetId).toBe('p3')
+      assert(resumed.stateChanges?.entries)
+      expect(resumed.stateChanges.entries).toHaveLength(1)
+      expect(resumed.stateChanges.entries[0].data.action).toBe('kill_redirected')
+      expect(resumed.stateChanges.entries[0].data.originalTargetId).toBe('p2')
+      expect(resumed.stateChanges.entries[0].data.redirectTargetId).toBe('p3')
     })
   })
 

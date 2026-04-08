@@ -8,8 +8,8 @@ import { getRole } from '../../lib/roles/registry'
 import { getTeam } from '../../lib/teams'
 import type { Game, GameState, PlayerState, RichMessage } from '../../lib/types'
 import { cn } from '../../lib/utils'
-import { Button, Icon } from '../atoms'
-import { Dialog, DialogBody, DialogContent, DialogHeader, DialogTitle } from '../atoms'
+import { Button, Dialog, DialogBody, DialogContent, DialogHeader, DialogTitle, Icon } from '../atoms'
+import type { IconName } from '../atoms/icon'
 import { MysticDivider } from '../items'
 import { Grimoire } from '../items/Grimoire'
 import { RichMessage as RichMessageDisplay } from '../items/RichMessage'
@@ -100,6 +100,7 @@ export function NightDashboard({
           {/* Menu button row */}
           <div className='mb-4 flex items-center'>
             <button
+              type='button'
               onClick={onMainMenu}
               className='-ml-3 flex min-h-[44px] min-w-[44px] items-center justify-center p-3 text-parchment-500 transition-colors hover:text-parchment-200'
             >
@@ -168,6 +169,7 @@ export function NightDashboard({
         {/* Grimoire Section (collapsible, default collapsed) */}
         <div className='mb-6'>
           <button
+            type='button'
             onClick={() => setGrimoireExpanded(!grimoireExpanded)}
             className='group mb-2 flex w-full items-center gap-2 px-1'
           >
@@ -327,7 +329,7 @@ function DashboardRow({
   index: number
   isNext: boolean
   isDone: boolean
-  icon: string
+  icon: IconName
   label: string
   sublabel: string
   isEvil?: boolean
@@ -368,6 +370,7 @@ function DashboardRow({
 
   return (
     <button
+      type='button'
       onClick={isClickable ? handleClick : undefined}
       disabled={!isClickable}
       className={cn(
@@ -413,7 +416,7 @@ function DashboardRow({
         )}
       >
         <Icon
-          name={icon as any}
+          name={icon}
           size='md'
           className={cn(
             isNext

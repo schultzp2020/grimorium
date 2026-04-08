@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { assert, beforeEach, describe, expect, it } from 'vitest'
 
 import definition from '.'
 import {
@@ -17,7 +17,8 @@ describe('Mayor', () => {
   // ================================================================
 
   describe('peaceful victory win condition', () => {
-    const winCheck = definition.winConditions![0]
+    assert(definition.winConditions)
+    const [winCheck] = definition.winConditions
 
     it('good wins when exactly 3 alive, no execution today, and Mayor alive', () => {
       const players = [
@@ -182,8 +183,8 @@ describe('Mayor', () => {
 
   describe('deflect ability', () => {
     it('declares deflect as an initial effect', () => {
-      expect(definition.initialEffects).toBeDefined()
-      expect(definition.initialEffects!.some((e) => e.type === 'deflect')).toBeTruthy()
+      assert(definition.initialEffects)
+      expect(definition.initialEffects.some((e) => e.type === 'deflect')).toBeTruthy()
     })
   })
 })

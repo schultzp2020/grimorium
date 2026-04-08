@@ -13,8 +13,7 @@ import { getRole } from '../../lib/roles/registry'
 import { getTeam } from '../../lib/teams'
 import { type EffectInstance, type GameState, type PlayerState, getPlayer, hasEffect } from '../../lib/types'
 import { cn } from '../../lib/utils'
-import { Badge, Button, Dialog, DialogBody, DialogContent, DialogHeader, DialogTitle, Icon } from '../atoms'
-import { BackButton } from '../atoms'
+import { BackButton, Badge, Button, Dialog, DialogBody, DialogContent, DialogHeader, DialogTitle, Icon } from '../atoms'
 import { Grimoire } from './Grimoire'
 import { PlayerRoleIcon, filterVisibleEffects } from './PlayerRoleIcon'
 
@@ -101,7 +100,7 @@ export function GrimoireModal({
       setView({ type: 'list' })
     } else if (view.type === 'edit_effects') {
       setView({ type: 'player_detail', player: view.player })
-    } else if (view.type === 'effect_config') {
+    } else {
       setView({ type: 'edit_effects', player: view.player })
     }
   }, [view, handleClose])
@@ -346,7 +345,7 @@ function PlayerDetailContent({
       )}
 
       <div className='space-y-2'>
-        {role && onShowRoleCard && (
+        {role && (
           <Button
             onClick={onShowRoleCard}
             fullWidth
@@ -490,6 +489,7 @@ function EditEffectsContent({
 
             return (
               <button
+                type='button'
                 key={effect.id}
                 onClick={() => handleAddEffect(effect)}
                 disabled={alreadyHas}
@@ -542,7 +542,10 @@ function EffectConfigContent({
   onCancel: () => void
 }) {
   const { language } = useI18n()
-  const ConfigEditor = effectDef.ConfigEditor!
+  const { ConfigEditor } = effectDef
+  if (!ConfigEditor) {
+    return null
+  }
   const existingData = effectInstance?.data
 
   return (

@@ -14,7 +14,7 @@ const SCRIPT_ORDER: ScriptId[] = ['trouble-brewing', 'custom']
 export function ScriptSelection({ players, onSelect, onBack }: Props) {
   const { t } = useI18n()
 
-  const getScriptName = (id: ScriptId) => t.scripts[id as keyof typeof t.scripts] ?? id
+  const getScriptName = (id: ScriptId) => t.scripts[id as keyof typeof t.scripts]
 
   return (
     <div className='flex min-h-app flex-col bg-gradient-to-b from-grimoire-purple via-grimoire-dark to-grimoire-darker'>
@@ -48,8 +48,8 @@ export function ScriptSelection({ players, onSelect, onBack }: Props) {
 
             return (
               <button
-                key={scriptId}
                 type='button'
+                key={scriptId}
                 onClick={() => onSelect(scriptId)}
                 className={cn(
                   'w-full rounded-2xl border-2 transition-all',

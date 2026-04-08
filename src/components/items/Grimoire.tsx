@@ -35,13 +35,14 @@ function PlayerRow({ player, onClick }: { player: PlayerState; onClick: () => vo
         const icon = effect ? effect.icon : 'x'
         const effectType = getEffectType(e, effect)
         const variant = EFFECT_TYPE_BADGE_VARIANT[effectType]
-        return { id: e.id, icon: icon, variant }
+        return { id: e.id, icon, variant }
       }),
     [player.effects],
   )
 
   return (
     <button
+      type='button'
       key={player.id}
       onClick={onClick}
       className={cn(

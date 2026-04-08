@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { assert, beforeEach, describe, expect, it } from 'vitest'
 
 import definition from '.'
 import {
@@ -33,7 +33,8 @@ describe('Spy', () => {
         makeState({ round: 1, players: [player] }),
       )
 
-      expect(definition.shouldWake!(game, player)).toBeTruthy()
+      assert(definition.shouldWake)
+      expect(definition.shouldWake(game, player)).toBeTruthy()
     })
 
     it('wakes on subsequent nights', () => {
@@ -49,7 +50,8 @@ describe('Spy', () => {
         makeState({ round: 3, players: [player] }),
       )
 
-      expect(definition.shouldWake!(game, player)).toBeTruthy()
+      assert(definition.shouldWake)
+      expect(definition.shouldWake(game, player)).toBeTruthy()
     })
 
     it('does not wake when dead', () => {
@@ -65,7 +67,8 @@ describe('Spy', () => {
         makeState({ round: 1, players: [player] }),
       )
 
-      expect(definition.shouldWake!(game, player)).toBeFalsy()
+      assert(definition.shouldWake)
+      expect(definition.shouldWake(game, player)).toBeFalsy()
     })
   })
 
@@ -129,9 +132,9 @@ describe('Spy', () => {
 
   describe('initialEffects', () => {
     it('has misregister as initial effect with canRegisterAs data', () => {
-      expect(definition.initialEffects).toBeDefined()
-      expect(definition.initialEffects![0].type).toBe('misregister')
-      expect(definition.initialEffects![0].data).toEqual({
+      assert(definition.initialEffects)
+      expect(definition.initialEffects[0].type).toBe('misregister')
+      expect(definition.initialEffects[0].data).toEqual({
         canRegisterAs: {
           teams: ['townsfolk', 'outsider'],
           alignments: ['good'],

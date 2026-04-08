@@ -8,7 +8,7 @@ interface Props {
   onClose: () => void
 }
 
-const eventIcons: Record<string, { name: IconName; className: string }> = {
+const eventIcons: Partial<Record<string, { name: IconName; className: string }>> = {
   game_created: { name: 'sparkles', className: 'text-mystic-gold' },
   night_started: { name: 'moon', className: 'text-indigo-400' },
   role_revealed: { name: 'eye', className: 'text-purple-400' },

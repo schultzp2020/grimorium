@@ -133,7 +133,8 @@ describe('addHistoryEntry', () => {
     )
 
     const state = getCurrentState(updated)
-    const p1 = state.players.find((p) => p.id === 'p1')!
+    const p1 = state.players.find((p) => p.id === 'p1')
+    assert(p1)
     expect(hasEffect(p1, 'safe')).toBeTruthy()
   })
 
@@ -155,7 +156,8 @@ describe('addHistoryEntry', () => {
     )
 
     const state = getCurrentState(updated)
-    const p1 = state.players.find((p) => p.id === 'p1')!
+    const p1 = state.players.find((p) => p.id === 'p1')
+    assert(p1)
     expect(hasEffect(p1, 'safe')).toBeFalsy()
   })
 })
@@ -215,7 +217,8 @@ describe('startDay', () => {
 
     const updated = startDay(withNight)
     const state = getCurrentState(updated)
-    const p1 = state.players.find((p) => p.id === 'p1')!
+    const p1 = state.players.find((p) => p.id === 'p1')
+    assert(p1)
     expect(hasEffect(p1, 'safe')).toBeFalsy()
   })
 
@@ -232,7 +235,8 @@ describe('startDay', () => {
 
     const updated = startDay(withNight)
     const state = getCurrentState(updated)
-    const p1 = state.players.find((p) => p.id === 'p1')!
+    const p1 = state.players.find((p) => p.id === 'p1')
+    assert(p1)
     expect(hasEffect(p1, 'safe')).toBeTruthy()
   })
 })
@@ -328,7 +332,8 @@ describe('applyNightAction', () => {
     })
 
     const state = getCurrentState(updated)
-    const p1 = state.players.find((p) => p.id === 'p1')!
+    const p1 = state.players.find((p) => p.id === 'p1')
+    assert(p1)
     expect(hasEffect(p1, 'safe')).toBeTruthy()
   })
 })
@@ -361,8 +366,9 @@ describe('nominate', () => {
     // Should have a nomination entry
     const nomEntry = updated.history.find((e) => e.type === 'nomination')
     expect(nomEntry).toBeDefined()
-    expect(nomEntry!.data.nominatorId).toBe('p1')
-    expect(nomEntry!.data.nomineeId).toBe('p5')
+    assert(nomEntry)
+    expect(nomEntry.data.nominatorId).toBe('p1')
+    expect(nomEntry.data.nomineeId).toBe('p5')
   })
 
   it('returns unchanged game for invalid player IDs', () => {
@@ -394,7 +400,8 @@ describe('resolveVote', () => {
     expect(state.phase).toBe('day')
 
     // Player is NOT dead yet — execution deferred to end of day
-    const p5 = state.players.find((p) => p.id === 'p5')!
+    const p5 = state.players.find((p) => p.id === 'p5')
+    assert(p5)
     expect(hasEffect(p5, 'dead')).toBeFalsy()
 
     // Vote entry should show replacesBlock = true
@@ -470,7 +477,8 @@ describe('resolveVote', () => {
     const updated = resolveVote(game, 'p5', 3, ['p1', 'p2', 'p3'])
     const state = getCurrentState(updated)
 
-    const p1 = state.players.find((p) => p.id === 'p1')!
+    const p1 = state.players.find((p) => p.id === 'p1')
+    assert(p1)
     expect(hasEffect(p1, 'used_dead_vote')).toBeTruthy()
   })
 
@@ -483,7 +491,8 @@ describe('resolveVote', () => {
     const updated = resolveVote(game, 'p5', 2, ['p2', 'p3'])
     const state = getCurrentState(updated)
 
-    const p1 = state.players.find((p) => p.id === 'p1')!
+    const p1 = state.players.find((p) => p.id === 'p1')
+    assert(p1)
     expect(hasEffect(p1, 'used_dead_vote')).toBeFalsy()
   })
 })
@@ -499,7 +508,8 @@ describe('manual effect management', () => {
 
     const updated = addEffectToPlayer(game, 'p1', 'safe')
     const state = getCurrentState(updated)
-    const p1 = state.players.find((p) => p.id === 'p1')!
+    const p1 = state.players.find((p) => p.id === 'p1')
+    assert(p1)
     expect(hasEffect(p1, 'safe')).toBeTruthy()
   })
 
@@ -510,7 +520,8 @@ describe('manual effect management', () => {
 
     const updated = removeEffectFromPlayer(game, 'p1', 'safe')
     const state = getCurrentState(updated)
-    const p1 = state.players.find((p) => p.id === 'p1')!
+    const p1 = state.players.find((p) => p.id === 'p1')
+    assert(p1)
     expect(hasEffect(p1, 'safe')).toBeFalsy()
   })
 })

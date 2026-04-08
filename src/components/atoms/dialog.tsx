@@ -90,6 +90,7 @@ function DialogContent({
   }, [])
 
   const bind = useDrag(
+    // eslint-disable-next-line typescript/no-unsafe-return -- useDrag memo is untyped by design
     ({ movement: [, my], velocity: [, vy], direction: [, dy], first, last, cancel, memo }) => {
       if (first) {
         const scrollable = bodyRef.current
@@ -109,12 +110,12 @@ function DialogContent({
         } else {
           setDragY(0)
         }
-        return memo
+        return memo as boolean // eslint-disable-line typescript/no-unsafe-return -- useDrag memo
       }
 
       setIsDragging(true)
       setDragY(clampedY)
-      return memo
+      return memo as boolean // eslint-disable-line typescript/no-unsafe-return -- useDrag memo
     },
     {
       axis: 'y',
@@ -249,7 +250,7 @@ const DialogBody = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement
   const setRef = useCallback(
     (node: HTMLDivElement | null) => {
       if (bodyRef) {
-        ;(bodyRef as React.MutableRefObject<HTMLDivElement | null>).current = node
+        bodyRef.current = node
       }
     },
     [bodyRef],

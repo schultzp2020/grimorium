@@ -247,6 +247,7 @@ export function MainMenu({ onNewGame, onContinue, onLoadGame, onRolesLibrary, on
           {phase !== 'open' ? (
             /* ═══════════ SEALED / BREAKING VIEW ═══════════ */
             <button
+              type='button'
               onClick={handleBreakSeal}
               className='flex flex-col items-center text-center transition-transform focus:outline-hidden active:scale-[0.98]'
               aria-label={t.mainMenu.tapToOpen}
@@ -378,9 +379,10 @@ export function MainMenu({ onNewGame, onContinue, onLoadGame, onRolesLibrary, on
               {/* Action Cards */}
               <div className='mb-10 w-full space-y-4'>
                 {/* Continue Game */}
-                {hasActiveGame && currentGame && (
+                {currentGame && currentGame.phase !== 'ended' && (
                   <div className='grimoire-menu-reveal' style={{ '--reveal-delay': '80ms' } as React.CSSProperties}>
                     <button
+                      type='button'
                       onClick={() => onContinue(currentGame.id)}
                       className='card-border-glow group relative w-full rounded-xl border border-mystic-gold/25 bg-gradient-to-r from-mystic-gold/15 to-mystic-bronze/10 p-5 transition-all'
                       style={
@@ -418,6 +420,7 @@ export function MainMenu({ onNewGame, onContinue, onLoadGame, onRolesLibrary, on
                   }
                 >
                   <button
+                    type='button'
                     onClick={onNewGame}
                     className='card-border-glow group relative w-full rounded-xl border border-indigo-500/25 bg-gradient-to-r from-indigo-900/40 to-purple-900/30 p-5 transition-all'
                     style={
@@ -453,6 +456,7 @@ export function MainMenu({ onNewGame, onContinue, onLoadGame, onRolesLibrary, on
                 }
               >
                 <button
+                  type='button'
                   onClick={onHowToPlay}
                   className='text-sm tracking-wider text-parchment-400 underline decoration-parchment-500/40 decoration-1 underline-offset-4 transition-colors hover:text-parchment-200'
                 >
@@ -462,6 +466,7 @@ export function MainMenu({ onNewGame, onContinue, onLoadGame, onRolesLibrary, on
                 <span className='hidden text-parchment-500/40 sm:inline'>·</span>
 
                 <button
+                  type='button'
                   onClick={onRolesLibrary}
                   className='text-sm tracking-wider text-parchment-400 underline decoration-parchment-500/40 decoration-1 underline-offset-4 transition-colors hover:text-parchment-200'
                 >
@@ -472,6 +477,7 @@ export function MainMenu({ onNewGame, onContinue, onLoadGame, onRolesLibrary, on
                   <>
                     <span className='text-parchment-500/40'>·</span>
                     <button
+                      type='button'
                       onClick={openPastGames}
                       className='text-sm tracking-wider text-parchment-400 underline decoration-parchment-500/40 decoration-1 underline-offset-4 transition-colors hover:text-parchment-200'
                     >
@@ -516,7 +522,11 @@ export function MainMenu({ onNewGame, onContinue, onLoadGame, onRolesLibrary, on
                 <Icon name='history' size='sm' />
                 <span className='font-tarot text-lg tracking-wider uppercase'>{t.mainMenu.previousGames}</span>
               </div>
-              <button onClick={closePastGames} className='-mr-2 rounded-lg p-2 transition-colors hover:bg-white/5'>
+              <button
+                type='button'
+                onClick={closePastGames}
+                className='-mr-2 rounded-lg p-2 transition-colors hover:bg-white/5'
+              >
                 <Icon name='x' size='sm' className='text-parchment-400' />
               </button>
             </div>
@@ -526,6 +536,7 @@ export function MainMenu({ onNewGame, onContinue, onLoadGame, onRolesLibrary, on
               <div className='space-y-1'>
                 {games.map((game) => (
                   <button
+                    type='button'
                     key={game.id}
                     onClick={() => {
                       closePastGames()

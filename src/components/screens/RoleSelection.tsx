@@ -453,9 +453,12 @@ function GenerateView({
 }: GenerateViewProps) {
   const { t } = useI18n()
 
-  const activeConfig = PRESET_CONFIG.find((p) => p.id === selectedPreset)!
+  const activeConfig = PRESET_CONFIG.find((p) => p.id === selectedPreset)
+  if (!activeConfig) {
+    return null
+  }
   const activePool = presetPools?.[selectedPreset]
-  const presetName = t.scripts[selectedPreset as keyof typeof t.scripts] ?? selectedPreset
+  const presetName = t.scripts[selectedPreset as keyof typeof t.scripts]
 
   // Group roles of active pool by team
   const poolRolesByTeam = useMemo(() => {
@@ -483,13 +486,13 @@ function GenerateView({
       <div className='mb-4 flex gap-2'>
         {PRESET_CONFIG.map((preset) => {
           const isActive = selectedPreset === preset.id
-          const name = t.scripts[preset.id as keyof typeof t.scripts] ?? preset.id
-          const desc = t.scripts[`${preset.id}Description` as keyof typeof t.scripts] ?? ''
+          const name = t.scripts[preset.id as keyof typeof t.scripts]
+          const desc = t.scripts[`${preset.id}Description` as keyof typeof t.scripts]
 
           return (
             <button
-              key={preset.id}
               type='button'
+              key={preset.id}
               onClick={() => onSelectPreset(preset.id)}
               className={cn(
                 'flex-1 flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border-2 transition-all',
@@ -555,7 +558,7 @@ function GenerateView({
                         team.colors.badgeText,
                       )}
                     >
-                      <Icon name={getRole(roleId)!.icon} size='xs' />
+                      <Icon name={getRole(roleId)?.icon ?? 'user'} size='xs' />
                       {getRoleName(roleId, language)}
                     </span>
                   ))}
@@ -567,6 +570,7 @@ function GenerateView({
           {/* Use This Pool button */}
           <div className='px-4 pb-3'>
             <button
+              type='button'
               onClick={() => onApply(activePool, String(presetName))}
               className={cn(
                 'w-full rounded-lg border-2 py-2.5 text-sm font-tarot tracking-wider uppercase transition-all',
@@ -586,6 +590,7 @@ function GenerateView({
       {/* Regenerate button */}
       {presetPools && (
         <button
+          type='button'
           onClick={onRegenerate}
           className='mt-3 flex w-full items-center justify-center gap-2 py-3 text-xs text-parchment-400 transition-colors hover:text-parchment-200'
         >
@@ -686,7 +691,7 @@ function TeamSection({
 
   const getTeamName = (tid: string) => {
     const key = tid as keyof typeof t.teams
-    return t.teams[key]?.name ?? tid
+    return t.teams[key].name
   }
 
   const isMatch = recommendedCount !== null && teamCount === recommendedCount

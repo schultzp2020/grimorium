@@ -2,7 +2,7 @@ import { trackEvent } from './analytics'
 import { applyPipelineChanges, checkDynamicWinConditions, resolveIntent } from './pipeline'
 import type { ExecuteIntent, NominateIntent } from './pipeline/types'
 import { getRole } from './roles'
-import type { EffectToAdd, NightActionResult, RoleDefinition } from './roles/types'
+import type { EffectToAdd, NightActionResult, RoleDefinition, SetupActionResult } from './roles/types'
 import {
   type Game,
   type GameState,
@@ -169,8 +169,6 @@ export function addHistoryEntry(
 // ============================================================================
 // SETUP ACTIONS
 // ============================================================================
-
-import type { SetupActionResult } from './roles/types'
 
 /**
  * Apply a setup action result to the game. Used for pre-revelation setup
@@ -972,13 +970,10 @@ export function getNightRolesStatus(game: Game): NightRoleStatus[] {
  */
 export function processAutoSkips(game: Game): Game {
   let updatedGame = game
-  while (true) {
-    const step = getNextStep(updatedGame)
-    if (step.type === 'night_action_skip') {
-      updatedGame = skipNightAction(updatedGame, step.roleId, step.playerId)
-    } else {
-      break
-    }
+  let step = getNextStep(updatedGame)
+  while (step.type === 'night_action_skip') {
+    updatedGame = skipNightAction(updatedGame, step.roleId, step.playerId)
+    step = getNextStep(updatedGame)
   }
   return updatedGame
 }

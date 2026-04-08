@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { assert, beforeEach, describe, expect, it } from 'vitest'
 
 import definition from '.'
 import { addEffectTo, makePlayer, makeState, resetPlayerCounter } from '../../../__tests__/helpers'
@@ -27,7 +27,8 @@ describe('Drunk effect', () => {
     it('has perception modifiers for role and team contexts', () => {
       expect(definition.perceptionModifiers).toBeDefined()
       expect(definition.perceptionModifiers).toHaveLength(1)
-      const modifier = definition.perceptionModifiers![0]
+      assert(definition.perceptionModifiers)
+      const [modifier] = definition.perceptionModifiers
       expect(modifier.context).toContain('role')
       expect(modifier.context).toContain('team')
     })

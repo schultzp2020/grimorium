@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { assert, beforeEach, describe, expect, it } from 'vitest'
 
 import definition from '.'
 import { addEffectTo, makeGame, makePlayer, makeState, resetPlayerCounter } from '../../../__tests__/helpers'
@@ -7,13 +7,14 @@ beforeEach(() => resetPlayerCounter())
 
 describe('PendingRoleReveal effect', () => {
   it('has a nightFollowUps definition', () => {
-    expect(definition.nightFollowUps).toBeDefined()
+    assert(definition.nightFollowUps)
     expect(definition.nightFollowUps).toHaveLength(1)
   })
 
   describe('nightFollowUp condition', () => {
     it('returns true when the effect is present (always pending)', () => {
-      const followUp = definition.nightFollowUps![0]
+      assert(definition.nightFollowUps)
+      const [followUp] = definition.nightFollowUps
       const player = addEffectTo(makePlayer({ roleId: 'imp' }), 'pending_role_reveal')
       const state = makeState({ players: [player] })
       const game = makeGame(state)
@@ -24,16 +25,19 @@ describe('PendingRoleReveal effect', () => {
 
   describe('nightFollowUp metadata', () => {
     it('has the correct id', () => {
-      expect(definition.nightFollowUps![0].id).toBe('role_change_reveal')
+      assert(definition.nightFollowUps)
+      expect(definition.nightFollowUps[0].id).toBe('role_change_reveal')
     })
 
     it('has a sparkles icon', () => {
-      expect(definition.nightFollowUps![0].icon).toBe('sparkles')
+      assert(definition.nightFollowUps)
+      expect(definition.nightFollowUps[0].icon).toBe('sparkles')
     })
 
     it('has an ActionComponent', () => {
-      expect(definition.nightFollowUps![0].ActionComponent).toBeDefined()
-      expect(typeof definition.nightFollowUps![0].ActionComponent).toBe('function')
+      assert(definition.nightFollowUps)
+      expect(definition.nightFollowUps[0].ActionComponent).toBeDefined()
+      expect(typeof definition.nightFollowUps[0].ActionComponent).toBe('function')
     })
   })
 })

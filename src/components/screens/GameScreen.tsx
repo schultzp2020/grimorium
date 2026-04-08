@@ -31,6 +31,7 @@ import {
   type AvailableNightFollowUp,
   type DayActionResult,
   type NightFollowUpResult,
+  type Intent,
   type PipelineInputProps,
   type PipelineResult,
 } from '../../lib/pipeline/types'
@@ -38,8 +39,7 @@ import { getRole } from '../../lib/roles/registry'
 import type { NightActionResult, SetupActionResult } from '../../lib/roles/types'
 import { saveGame } from '../../lib/storage'
 import { getTeam } from '../../lib/teams'
-import { type Game, type PlayerState, getCurrentState, getPlayer } from '../../lib/types'
-import { isAlive } from '../../lib/types'
+import { type Game, type PlayerState, getCurrentState, getPlayer, isAlive } from '../../lib/types'
 import { Icon, LanguagePicker } from '../atoms'
 import { PlayerFacingContext } from '../context/PlayerFacingContext'
 import { type GrimoireIntent, GrimoireModal } from '../items/GrimoireModal'
@@ -93,7 +93,7 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
   // Pipeline UI state — shown when an intent needs narrator input mid-resolution
   const [pipelineUI, setPipelineUI] = useState<{
     Component: FC<PipelineInputProps>
-    intent: import('../../lib/pipeline/types').Intent
+    intent: Intent
     onResult: (result: unknown) => void
   } | null>(null)
 
@@ -124,7 +124,7 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
         updateGame(newGame)
         setPipelineUI(null)
         afterComplete(newGame)
-      } else if (result.type === 'needs_input') {
+      } else {
         const resumeFn = result.resume
         setPipelineUI({
           Component: result.UIComponent,
@@ -279,10 +279,10 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
       setScreen({ type: 'game_over' })
     } else {
       const deaths = getLastNightDeaths(newGame)
-      const deadPlayers = deaths
-        .map((id) => state.players.find((p) => p.id === id))
-        .filter(Boolean)
-        .map((p) => ({ playerId: p!.id, playerName: p!.name, roleId: p!.roleId }))
+      const deadPlayers = deaths.flatMap((id) => {
+        const p = state.players.find((p) => p.id === id)
+        return p ? [{ playerId: p.id, playerName: p.name, roleId: p.roleId }] : []
+      })
 
       if (deadPlayers.length > 0) {
         // Death reveal goes straight to day — dawn announcement is redundant
@@ -325,10 +325,10 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
 
       if (deaths.length > 0) {
         // Virgin triggered — skip voting, go back to day (no further nominations)
-        const deadPlayers = deaths
-          .map((id) => newState.players.find((p) => p.id === id))
-          .filter(Boolean)
-          .map((p) => ({ playerId: p!.id, playerName: p!.name, roleId: p!.roleId }))
+        const deadPlayers = deaths.flatMap((id) => {
+          const p = newState.players.find((p) => p.id === id)
+          return p ? [{ playerId: p.id, playerName: p.name, roleId: p.roleId }] : []
+        })
         setScreen({ type: 'death_reveal', deaths: deadPlayers, next: { type: 'day' } })
       } else {
         // Show voting screen for this nominee
@@ -391,10 +391,10 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
     const nightDashboardScreen: Screen = { type: 'night_dashboard' }
 
     if (deaths.length > 0) {
-      const deadPlayers = deaths
-        .map((id) => postState.players.find((p) => p.id === id))
-        .filter(Boolean)
-        .map((p) => ({ playerId: p!.id, playerName: p!.name, roleId: p!.roleId }))
+      const deadPlayers = deaths.flatMap((id) => {
+        const p = postState.players.find((p) => p.id === id)
+        return p ? [{ playerId: p.id, playerName: p.name, roleId: p.roleId }] : []
+      })
       setScreen({ type: 'death_reveal', deaths: deadPlayers, next: nightDashboardScreen })
     } else {
       setScreen(nightDashboardScreen)
@@ -441,10 +441,10 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
       const nextScreen: Screen = { type: 'day' }
 
       if (deaths.length > 0) {
-        const deadPlayers = deaths
-          .map((id) => newState.players.find((p) => p.id === id))
-          .filter(Boolean)
-          .map((p) => ({ playerId: p!.id, playerName: p!.name, roleId: p!.roleId }))
+        const deadPlayers = deaths.flatMap((id) => {
+          const p = newState.players.find((p) => p.id === id)
+          return p ? [{ playerId: p.id, playerName: p.name, roleId: p.roleId }] : []
+        })
         setScreen({ type: 'death_reveal', deaths: deadPlayers, next: nextScreen })
       } else {
         setScreen(nextScreen)
@@ -767,6 +767,7 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
       {showFloatingButtons && (
         <div className='fixed right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] flex flex-col gap-2'>
           <button
+            type='button'
             onClick={() => {
               setGrimoireIntent({ view: 'list' })
               setShowGrimoire(true)
@@ -778,6 +779,7 @@ export function GameScreen({ initialGame, onMainMenu }: Props) {
           </button>
 
           <button
+            type='button'
             onClick={() => setShowHistory(true)}
             className='flex h-12 w-12 items-center justify-center rounded-full border border-parchment-500/30 bg-grimoire-dark/90 text-parchment-400 shadow-lg transition-colors hover:border-parchment-400/50 hover:bg-grimoire-dark hover:text-parchment-300'
             title={t.common.history}
@@ -814,7 +816,7 @@ function hasSetupActions(game: Game): boolean {
       return false
     }
     const role = getRole(p.roleId)
-    return role?.SetupAction != null
+    return role?.SetupAction !== undefined
   })
 }
 

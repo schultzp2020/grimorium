@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { assert, beforeEach, describe, expect, it } from 'vitest'
 
 import definition from '.'
 import { addEffectTo, makePlayer, makeState, resetPlayerCounter } from '../../../__tests__/helpers'
@@ -6,7 +6,8 @@ import { addEffectTo, makePlayer, makeState, resetPlayerCounter } from '../../..
 beforeEach(() => resetPlayerCounter())
 
 describe('SlayerBullet effect', () => {
-  const dayAction = definition.dayActions![0]
+  assert(definition.dayActions)
+  const [dayAction] = definition.dayActions
 
   // ================================================================
   // DAY ACTION CONDITION

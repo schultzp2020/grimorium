@@ -29,8 +29,8 @@ describe('default resolvers', () => {
     const result = resolveIntent(intent, state, game)
     expect(result.type).toBe('resolved')
     assert(result.type === 'resolved')
-    expect(result.stateChanges.addEffects?.['p1']).toBeDefined()
-    expect(result.stateChanges.addEffects!['p1'][0].type).toBe('dead')
+    assert(result.stateChanges.addEffects?.['p1'])
+    expect(result.stateChanges.addEffects['p1'][0].type).toBe('dead')
   })
 
   it('nominate intent creates nomination entry (no phase transition)', () => {
@@ -67,8 +67,8 @@ describe('default resolvers', () => {
     expect(result.type).toBe('resolved')
     assert(result.type === 'resolved')
     expect(result.stateChanges.entries[0].type).toBe('execution')
-    expect(result.stateChanges.addEffects?.['p1']).toBeDefined()
-    expect(result.stateChanges.addEffects!['p1'][0].type).toBe('dead')
+    assert(result.stateChanges.addEffects?.['p1'])
+    expect(result.stateChanges.addEffects['p1'][0].type).toBe('dead')
   })
 })
 
@@ -228,8 +228,9 @@ describe('mergeStateChanges', () => {
     }
 
     const merged = mergeStateChanges(a, b)
-    expect(merged.addEffects!['p1']).toHaveLength(2)
-    expect(merged.addEffects!['p2']).toHaveLength(1)
+    assert(merged.addEffects)
+    expect(merged.addEffects['p1']).toHaveLength(2)
+    expect(merged.addEffects['p2']).toHaveLength(1)
   })
 
   it('merges removeEffects by combining arrays', () => {
@@ -243,8 +244,9 @@ describe('mergeStateChanges', () => {
     }
 
     const merged = mergeStateChanges(a, b)
-    expect(merged.removeEffects!['p1']).toEqual(['safe', 'pure'])
-    expect(merged.removeEffects!['p2']).toEqual(['deflect'])
+    assert(merged.removeEffects)
+    expect(merged.removeEffects['p1']).toEqual(['safe', 'pure'])
+    expect(merged.removeEffects['p2']).toEqual(['deflect'])
   })
 
   it('returns target unchanged when source is undefined', () => {
@@ -281,7 +283,8 @@ describe('applyPipelineChanges', () => {
     expect(updated.history).toHaveLength(2)
 
     const state = getCurrentState(updated)
-    const p1 = state.players.find((p) => p.id === 'p1')!
+    const p1 = state.players.find((p) => p.id === 'p1')
+    assert(p1)
     expect(hasEffect(p1, 'dead')).toBeTruthy()
   })
 
@@ -299,7 +302,8 @@ describe('applyPipelineChanges', () => {
     expect(updated.history).toHaveLength(1)
 
     const state = getCurrentState(updated)
-    const p1 = state.players.find((p) => p.id === 'p1')!
+    const p1 = state.players.find((p) => p.id === 'p1')
+    assert(p1)
     expect(hasEffect(p1, 'safe')).toBeTruthy()
   })
 

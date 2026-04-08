@@ -60,6 +60,7 @@ export function DayPhase({
           {/* Menu button row */}
           <div className='mb-4 flex items-center'>
             <button
+              type='button'
               onClick={onMainMenu}
               className='-ml-3 flex min-h-[44px] min-w-[44px] items-center justify-center p-3 text-parchment-500 transition-colors hover:text-parchment-200'
             >
@@ -86,6 +87,7 @@ export function DayPhase({
         {nightSummary && (
           <div className='mb-6'>
             <button
+              type='button'
               onClick={() => setSummaryExpanded(!summaryExpanded)}
               className='group mb-2 flex w-full items-center gap-2 px-1'
             >
@@ -154,6 +156,7 @@ export function DayPhase({
           <div className='space-y-2'>
             {/* Nomination Button — disabled when nominations are blocked (e.g., Virgin execution) */}
             <button
+              type='button'
               onClick={nominationsBlocked ? undefined : onNominate}
               disabled={nominationsBlocked}
               className={cn(
@@ -180,6 +183,7 @@ export function DayPhase({
             {/* Dynamic Day Actions from Effects */}
             {dayActions.map((action) => (
               <button
+                type='button'
                 key={action.id}
                 onClick={() => onDayAction(action)}
                 className='group flex w-full items-center gap-4 rounded-xl border border-amber-500/30 bg-gradient-to-r from-amber-900/30 to-orange-800/20 p-4 transition-colors hover:border-amber-500/50'
@@ -207,6 +211,7 @@ export function DayPhase({
         {/* Grimoire Section (collapsible, default collapsed) */}
         <div className='mb-6'>
           <button
+            type='button'
             onClick={() => setGrimoireExpanded(!grimoireExpanded)}
             className='group mb-2 flex w-full items-center gap-2 px-1'
           >

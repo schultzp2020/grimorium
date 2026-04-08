@@ -122,7 +122,7 @@ function App() {
   // ========================================================================
 
   if (routeType === 'game' && segments[1]) {
-    const gameId = segments[1]
+    const [, gameId] = segments
     const game = getGame(gameId)
     if (!game) {
       // The useEffect above will redirect; render nothing until then

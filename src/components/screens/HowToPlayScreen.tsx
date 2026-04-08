@@ -52,6 +52,7 @@ export function HowToPlayScreen({ onBack }: Props) {
         <nav className='space-y-4'>
           {toc.map((item) => (
             <button
+              type='button'
               key={item.id}
               onClick={() => scrollTo(item.id)}
               className='block w-full text-left text-sm font-medium text-parchment-400 transition-colors hover:text-mystic-gold'

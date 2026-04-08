@@ -12,7 +12,9 @@ registerEffectTranslations('butler_master', 'es', es)
 
 function ButlerMasterConfigEditor({ data, state, playerId, language, onSave, onCancel }: EffectConfigEditorProps) {
   const t = getEffectTranslations('butler_master', language as Language)
-  const [selectedMasterId, setSelectedMasterId] = useState<string | null>((data?.masterId as string) ?? null)
+  const [selectedMasterId, setSelectedMasterId] = useState<string | null>(
+    (data?.masterId as string | undefined) ?? null,
+  )
 
   // Show all players except the Butler themselves
   const players = state.players.filter((p) => p.id !== playerId)
@@ -26,12 +28,13 @@ function ButlerMasterConfigEditor({ data, state, playerId, language, onSave, onC
 
   return (
     <div className='space-y-4'>
-      <p className='text-xs font-bold tracking-wider text-parchment-300 uppercase'>{t.configSelectMaster as string}</p>
+      <p className='text-xs font-bold tracking-wider text-parchment-300 uppercase'>{t.configSelectMaster}</p>
       <div className='max-h-48 space-y-1 overflow-y-auto'>
         {players.map((p) => {
           const isSelected = selectedMasterId === p.id
           return (
             <button
+              type='button'
               key={p.id}
               onClick={() => setSelectedMasterId(p.id)}
               className={`flex w-full items-center gap-3 rounded-lg border p-3 text-left text-sm transition-colors ${
@@ -53,10 +56,10 @@ function ButlerMasterConfigEditor({ data, state, playerId, language, onSave, onC
 
       <div className='flex gap-2 pt-2'>
         <Button onClick={onCancel} variant='ghost' className='flex-1'>
-          {t.configCancel as string}
+          {t.configCancel}
         </Button>
         <Button onClick={handleSave} variant='primary' className='flex-1' disabled={!selectedMasterId}>
-          {t.configSave as string}
+          {t.configSave}
         </Button>
       </div>
     </div>

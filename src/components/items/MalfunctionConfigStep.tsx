@@ -83,6 +83,7 @@ function NumberPicker({ numberRange, onComplete }: NumberProps) {
 
       <div className='mb-6 flex items-center justify-center gap-6'>
         <button
+          type='button'
           onClick={() => setValue(Math.max(numberRange.min, value - 1))}
           disabled={value <= numberRange.min}
           className='flex h-14 w-14 items-center justify-center rounded-full border border-white/20 bg-white/10 text-parchment-200 transition-all hover:bg-white/20 active:scale-[0.92] active:bg-white/25 disabled:cursor-not-allowed disabled:opacity-30'
@@ -93,6 +94,7 @@ function NumberPicker({ numberRange, onComplete }: NumberProps) {
         <div className='w-20 text-center font-tarot text-5xl text-amber-300'>{value}</div>
 
         <button
+          type='button'
           onClick={() => setValue(Math.min(numberRange.max, value + 1))}
           disabled={value >= numberRange.max}
           className='flex h-14 w-14 items-center justify-center rounded-full border border-white/20 bg-white/10 text-parchment-200 transition-all hover:bg-white/20 active:scale-[0.92] active:bg-white/25 disabled:cursor-not-allowed disabled:opacity-30'
@@ -123,6 +125,7 @@ function BooleanPicker({ trueLabel, falseLabel, onComplete }: BooleanProps) {
 
       <div className='mb-6 space-y-2'>
         <button
+          type='button'
           onClick={() => setSelected(true)}
           className={cn(
             'w-full p-4 rounded-lg border text-sm font-medium transition-all text-left active:scale-[0.98]',
@@ -135,6 +138,7 @@ function BooleanPicker({ trueLabel, falseLabel, onComplete }: BooleanProps) {
           {trueLabel}
         </button>
         <button
+          type='button'
           onClick={() => setSelected(false)}
           className={cn(
             'w-full p-4 rounded-lg border text-sm font-medium transition-all text-left active:scale-[0.98]',

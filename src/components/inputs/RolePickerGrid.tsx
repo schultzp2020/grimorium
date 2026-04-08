@@ -90,10 +90,10 @@ export function RolePickerGrid({
 
   const getTeamName = (teamId: TeamId) => {
     const key = teamId as keyof typeof t.teams
-    return t.teams[key]?.name ?? teamId
+    return t.teams[key].name
   }
 
-  const isAtMax = selectionCount !== null && selectionCount !== undefined && selected.length >= selectionCount
+  const isAtMax = selectionCount !== null && selected.length >= selectionCount
 
   return (
     <div className='space-y-4'>
@@ -130,8 +130,8 @@ export function RolePickerGrid({
 
                 return (
                   <button
-                    key={role.id}
                     type='button'
+                    key={role.id}
                     disabled={isDisabled}
                     onClick={() => onSelect(role.id)}
                     className={cn(

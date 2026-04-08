@@ -23,21 +23,21 @@ export function useBackButton(onBack: (() => void) | null): void {
     // Push a sentinel history entry to intercept the back button,
     // but only if one isn't already on top (avoids stacking sentinels
     // when transitioning between two active hook instances)
-    if (!(window.history.state as Record<string, unknown> | null)?.__grimoire) {
-      window.history.pushState({ __grimoire: true }, '')
+    if (!(globalThis.history.state as Record<string, unknown> | null)?.__grimoire) {
+      globalThis.history.pushState({ __grimoire: true }, '')
     }
 
     const handlePopState = () => {
       if (handlerRef.current) {
         handlerRef.current()
         // Re-push sentinel so the next back press is also intercepted
-        window.history.pushState({ __grimoire: true }, '')
+        globalThis.history.pushState({ __grimoire: true }, '')
       }
     }
 
-    window.addEventListener('popstate', handlePopState)
+    globalThis.addEventListener('popstate', handlePopState)
     return () => {
-      window.removeEventListener('popstate', handlePopState)
+      globalThis.removeEventListener('popstate', handlePopState)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive])

@@ -3,11 +3,12 @@ import { afterEach, assert, beforeEach, describe, expect, it } from 'vitest'
 import { getEffect, registerEffect, unregisterEffect } from '../effects/registry'
 import type { EffectDefinition, EffectId } from '../effects/types'
 import { getNightRolesStatus } from '../game'
+import type { Translations } from '../i18n/types'
 import { getAvailableNightFollowUps } from '../pipeline'
 import { addEffectTo, makeGame, makeGameWithHistory, makePlayer, makeState, resetPlayerCounter } from './helpers'
 
 // Track registered test effects so we can restore originals after each test
-const originalEffects: Map<EffectId, EffectDefinition | undefined> = new Map()
+const originalEffects = new Map<EffectId, EffectDefinition | undefined>()
 
 function registerTestEffect(def: EffectDefinition) {
   if (!originalEffects.has(def.id)) {
@@ -39,7 +40,7 @@ const mockT = {
   game: {
     yourRoleHasChanged: 'Your role has changed!',
   },
-}
+} as unknown as Translations
 
 // ============================================================================
 // getAvailableNightFollowUps
@@ -105,7 +106,7 @@ describe('getAvailableNightFollowUps', () => {
       nightFollowUps: [
         {
           id: 'test_action',
-          icon: 'star' as any,
+          icon: 'star',
           getLabel: () => 'Test Follow-Up',
           condition: () => true,
           ActionComponent: MockComponent,
@@ -132,7 +133,7 @@ describe('getAvailableNightFollowUps', () => {
       nightFollowUps: [
         {
           id: 'conditional_action',
-          icon: 'star' as any,
+          icon: 'star',
           getLabel: () => 'Conditional',
           // Only applies if the player is alive (no dead effect)
           condition: (player) => !player.effects.some((e) => e.type === 'dead'),
@@ -202,13 +203,15 @@ describe('getNightRolesStatus', () => {
     // Should only contain the washerwoman action (done),
     // and potentially the imp if it should wake.
     // NO role_change_reveal items should be present.
-    const hasRoleChangeReveal = result.some((r: any) => r.actionType === 'role_change_reveal')
+    const hasRoleChangeReveal = result.some(
+      (r) => (r as unknown as Record<string, unknown>).actionType === 'role_change_reveal',
+    )
     expect(hasRoleChangeReveal).toBeFalsy()
 
     // The washerwoman should be "done"
     const washerwoman = result.find((r) => r.roleId === 'washerwoman')
-    expect(washerwoman).toBeDefined()
-    expect(washerwoman!.status).toBe('done')
+    assert(washerwoman)
+    expect(washerwoman.status).toBe('done')
   })
 })
 
@@ -220,7 +223,8 @@ describe('Demon Successor → pending_role_reveal integration', () => {
   it('Demon Successor handler adds pending_role_reveal when Demon dies', async () => {
     // Use the real DemonSuccessor effect
     const { default: successorDef } = await import('../effects/definition/demon-successor')
-    const handler = successorDef.handlers![0]
+    assert(successorDef.handlers)
+    const [handler] = successorDef.handlers
 
     const demon = makePlayer({ id: 'demon', roleId: 'imp' })
     let sw = makePlayer({ id: 'sw', roleId: 'scarlet_woman' })

@@ -44,7 +44,7 @@ function getFrameClass(teamId: TeamId): string {
     case 'outsider': {
       return 'card-frame-outsider'
     }
-    default: {
+    case 'townsfolk': {
       return 'card-frame-townsfolk'
     }
   }

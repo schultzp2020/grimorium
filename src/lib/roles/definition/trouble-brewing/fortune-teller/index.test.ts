@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, assert, beforeEach, describe, expect, it } from 'vitest'
 
 import definition from '.'
 import {
@@ -13,7 +13,7 @@ import type { EffectDefinition, EffectId } from '../../../../effects/types'
 import { applyPerceptionOverrides, getAmbiguousPlayers, perceive } from '../../../../pipeline/perception'
 
 // Track registered test effects so we can restore originals after each test
-const originalEffects: Map<EffectId, EffectDefinition | undefined> = new Map()
+const originalEffects = new Map<EffectId, EffectDefinition | undefined>()
 
 function registerTestEffect(def: EffectDefinition) {
   if (!originalEffects.has(def.id)) {
@@ -70,8 +70,10 @@ describe('FortuneTeller', () => {
         makeState({ round: 4, players: [player] }),
       )
 
-      expect(definition.shouldWake!(round1, player)).toBeTruthy()
-      expect(definition.shouldWake!(round4, player)).toBeTruthy()
+      assert(definition.shouldWake)
+      expect(definition.shouldWake(round1, player)).toBeTruthy()
+      assert(definition.shouldWake)
+      expect(definition.shouldWake(round4, player)).toBeTruthy()
     })
 
     it('does not wake when dead', () => {
@@ -86,7 +88,8 @@ describe('FortuneTeller', () => {
         ],
         makeState({ round: 2, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBeFalsy()
+      assert(definition.shouldWake)
+      expect(definition.shouldWake(game, player)).toBeFalsy()
     })
   })
 
@@ -170,19 +173,24 @@ describe('FortuneTeller', () => {
 
   describe('nightSteps structure', () => {
     it('has 3 step definitions in correct order', () => {
-      const steps = definition.nightSteps!
+      assert(definition.nightSteps)
+      const steps = definition.nightSteps
       expect(steps.map((s) => s.id)).toEqual(['select_players', 'configure_malfunction', 'show_result'])
     })
 
     it('select_players and show_result have no condition (always appear)', () => {
-      const selectPlayers = definition.nightSteps!.find((s) => s.id === 'select_players')!
-      const showResult = definition.nightSteps!.find((s) => s.id === 'show_result')!
+      assert(definition.nightSteps)
+      const selectPlayers = definition.nightSteps.find((s) => s.id === 'select_players')
+      assert(selectPlayers)
+      const showResult = definition.nightSteps.find((s) => s.id === 'show_result')
+      assert(showResult)
       expect(selectPlayers.condition).toBeUndefined()
       expect(showResult.condition).toBeUndefined()
     })
 
     it('does not include a red_herring_setup night step', () => {
-      const redHerringStep = definition.nightSteps!.find((s) => s.id === 'red_herring_setup')
+      assert(definition.nightSteps)
+      const redHerringStep = definition.nightSteps.find((s) => s.id === 'red_herring_setup')
       expect(redHerringStep).toBeUndefined()
     })
   })
@@ -280,8 +288,10 @@ describe('FortuneTeller', () => {
       // With overrides, recluse registers as demon
       const overrides = { [recluse.id]: { team: 'demon' as const } }
       const effectiveState = applyPerceptionOverrides(state, overrides)
-      const effectiveRecluse = effectiveState.players.find((p) => p.id === recluse.id)!
-      const effectiveFt = effectiveState.players.find((p) => p.id === ft.id)!
+      const effectiveRecluse = effectiveState.players.find((p) => p.id === recluse.id)
+      assert(effectiveRecluse)
+      const effectiveFt = effectiveState.players.find((p) => p.id === ft.id)
+      assert(effectiveFt)
       const overriddenPerception = perceive(effectiveRecluse, effectiveFt, 'team', effectiveState)
       expect(overriddenPerception.team).toBe('demon')
     })

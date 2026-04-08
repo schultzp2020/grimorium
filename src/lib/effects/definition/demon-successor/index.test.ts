@@ -7,7 +7,8 @@ import type { ExecuteIntent, KillIntent } from '../../../pipeline/types'
 beforeEach(() => resetPlayerCounter())
 
 describe('DemonSuccessor effect', () => {
-  const handler = definition.handlers![0]
+  assert(definition.handlers)
+  const [handler] = definition.handlers
 
   // Helper to create a standard 5+ player state with an alive successor
   function makeScenario(overrides?: { aliveCount?: number; successorDead?: boolean; targetRole?: string }) {
@@ -210,9 +211,10 @@ describe('DemonSuccessor effect', () => {
 
       const result = handler.handle(intent, sw, state, game)
       assert(result.action === 'allow')
-      expect(result.stateChanges?.entries).toHaveLength(1)
-      expect(result.stateChanges!.entries[0].type).toBe('role_changed')
-      expect(result.stateChanges!.entries[0].data).toEqual({
+      assert(result.stateChanges?.entries)
+      expect(result.stateChanges.entries).toHaveLength(1)
+      expect(result.stateChanges.entries[0].type).toBe('role_changed')
+      expect(result.stateChanges.entries[0].data).toEqual({
         playerId: 'sw',
         fromRole: 'scarlet_woman',
         toRole: 'imp',

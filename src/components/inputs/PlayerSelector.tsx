@@ -81,6 +81,7 @@ export function PlayerSelector({
 
         return (
           <button
+            type='button'
             key={player.id}
             onClick={() => onSelect(player.id)}
             className={cn(

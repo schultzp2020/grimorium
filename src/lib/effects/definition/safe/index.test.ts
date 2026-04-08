@@ -7,7 +7,8 @@ import type { KillIntent } from '../../../pipeline/types'
 beforeEach(() => resetPlayerCounter())
 
 describe('Safe effect', () => {
-  const handler = definition.handlers![0]
+  assert(definition.handlers)
+  const [handler] = definition.handlers
 
   // ================================================================
   // HANDLER — APPLIES TO
@@ -90,9 +91,10 @@ describe('Safe effect', () => {
 
       const result = handler.handle(intent, protectedPlayer, state, game)
       assert(result.action === 'prevent')
-      expect(result.stateChanges?.entries).toHaveLength(1)
-      expect(result.stateChanges!.entries[0].data.reason).toBe('safe')
-      expect(result.stateChanges!.entries[0].data.targetId).toBe('p2')
+      assert(result.stateChanges?.entries)
+      expect(result.stateChanges.entries).toHaveLength(1)
+      expect(result.stateChanges.entries[0].data.reason).toBe('safe')
+      expect(result.stateChanges.entries[0].data.targetId).toBe('p2')
     })
   })
 })

@@ -1,6 +1,7 @@
 import { assert, beforeEach, describe, expect, it } from 'vitest'
 
 import { isMalfunctioning } from '../effects'
+import type { Translations } from '../i18n/types'
 import { resolveIntent } from '../pipeline'
 import { getAvailableDayActions } from '../pipeline/index'
 import type { KillIntent, NominateIntent } from '../pipeline/types'
@@ -35,8 +36,8 @@ describe('Safe effect', () => {
     assert(result.type === 'prevented')
     // Should have a history entry recording the failed kill
     const failEntry = result.stateChanges.entries.find((e) => e.data.action === 'kill_failed')
-    expect(failEntry).toBeDefined()
-    expect(failEntry!.data.reason).toBe('safe')
+    assert(failEntry)
+    expect(failEntry.data.reason).toBe('safe')
   })
 
   it('does NOT prevent kill intent targeting a different player', () => {
@@ -59,7 +60,8 @@ describe('Safe effect', () => {
     expect(result.type).toBe('resolved')
     assert(result.type === 'resolved')
     expect(result.stateChanges.addEffects?.['p1']).toBeDefined()
-    expect(result.stateChanges.addEffects!['p1'][0].type).toBe('dead')
+    assert(result.stateChanges.addEffects?.['p1'])
+    expect(result.stateChanges.addEffects['p1'][0].type).toBe('dead')
   })
 })
 
@@ -116,9 +118,9 @@ describe('Deflect effect', () => {
 
     // Should have a redirect history entry
     const redirectEntry = afterResume.stateChanges.entries.find((e) => e.data.action === 'kill_redirected')
-    expect(redirectEntry).toBeDefined()
-    expect(redirectEntry!.data.originalTargetId).toBe('p1')
-    expect(redirectEntry!.data.redirectTargetId).toBe('p3')
+    assert(redirectEntry)
+    expect(redirectEntry.data.originalTargetId).toBe('p1')
+    expect(redirectEntry.data.redirectTargetId).toBe('p3')
   })
 
   it('allows kill on original target if narrator chooses same target', () => {
@@ -145,7 +147,8 @@ describe('Deflect effect', () => {
     assert(afterResume.type === 'resolved')
     // p1 dies (default resolver applies)
     expect(afterResume.stateChanges.addEffects?.['p1']).toBeDefined()
-    expect(afterResume.stateChanges.addEffects!['p1'][0].type).toBe('dead')
+    assert(afterResume.stateChanges.addEffects?.['p1'])
+    expect(afterResume.stateChanges.addEffects['p1'][0].type).toBe('dead')
   })
 
   it('deflect runs before safe (priority 5 < 10)', () => {
@@ -198,7 +201,8 @@ describe('Pure effect', () => {
     assert(result.type === 'prevented')
     // Nominator (p1) gets dead effect
     expect(result.stateChanges.addEffects?.['p1']).toBeDefined()
-    expect(result.stateChanges.addEffects!['p1'][0].type).toBe('dead')
+    assert(result.stateChanges.addEffects?.['p1'])
+    expect(result.stateChanges.addEffects['p1'][0].type).toBe('dead')
 
     // Pure effect removed from p2
     expect(result.stateChanges.removeEffects?.['p2']).toContain('pure')
@@ -269,7 +273,7 @@ describe('SlayerBullet day action', () => {
 
     const actions = getAvailableDayActions(state, {
       game: { slayerAction: 'Slay', slayerActionDescription: 'desc' },
-    })
+    } as unknown as Translations)
     expect(actions).toHaveLength(1)
     expect(actions[0].id).toContain('slayer_shot')
   })
@@ -281,7 +285,7 @@ describe('SlayerBullet day action', () => {
 
     const actions = getAvailableDayActions(state, {
       game: { slayerAction: 'Slay', slayerActionDescription: 'desc' },
-    })
+    } as unknown as Translations)
     expect(actions).toHaveLength(0)
   })
 
@@ -291,7 +295,7 @@ describe('SlayerBullet day action', () => {
 
     const actions = getAvailableDayActions(state, {
       game: { slayerAction: 'Slay', slayerActionDescription: 'desc' },
-    })
+    } as unknown as Translations)
     expect(actions).toHaveLength(0)
   })
 })
@@ -356,7 +360,8 @@ describe('Malfunction — handler bypass', () => {
     expect(result.type).toBe('resolved')
     assert(result.type === 'resolved')
     expect(result.stateChanges.addEffects?.['p1']).toBeDefined()
-    expect(result.stateChanges.addEffects!['p1'][0].type).toBe('dead')
+    assert(result.stateChanges.addEffects?.['p1'])
+    expect(result.stateChanges.addEffects['p1'][0].type).toBe('dead')
   })
 
   it('pure handler is bypassed when the virgin is poisoned', () => {
@@ -404,7 +409,8 @@ describe('Malfunction — handler bypass', () => {
     expect(result.type).toBe('resolved')
     assert(result.type === 'resolved')
     expect(result.stateChanges.addEffects?.['p1']).toBeDefined()
-    expect(result.stateChanges.addEffects!['p1'][0].type).toBe('dead')
+    assert(result.stateChanges.addEffects?.['p1'])
+    expect(result.stateChanges.addEffects['p1'][0].type).toBe('dead')
   })
 
   it("drunk player's handlers are bypassed too", () => {
@@ -427,6 +433,7 @@ describe('Malfunction — handler bypass', () => {
     expect(result.type).toBe('resolved')
     assert(result.type === 'resolved')
     expect(result.stateChanges.addEffects?.['p1']).toBeDefined()
-    expect(result.stateChanges.addEffects!['p1'][0].type).toBe('dead')
+    assert(result.stateChanges.addEffects?.['p1'])
+    expect(result.stateChanges.addEffects['p1'][0].type).toBe('dead')
   })
 })

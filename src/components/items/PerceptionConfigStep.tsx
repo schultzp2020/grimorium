@@ -8,6 +8,7 @@ import type { TeamId } from '../../lib/teams'
 import type { GameState, PlayerState } from '../../lib/types'
 import { cn } from '../../lib/utils'
 import { Icon } from '../atoms'
+import type { IconName } from '../atoms/icon'
 import { RolePickerGrid } from '../inputs/RolePickerGrid'
 import { NarratorSetupLayout } from '../layouts'
 
@@ -19,7 +20,7 @@ interface Props {
   /** Current game state (for display purposes). */
   state: GameState
   /** Role icon for the layout header. */
-  roleIcon: string
+  roleIcon: IconName
   /** Role name for the layout header. */
   roleName: string
   /** Player name (the role's owner) for the layout header. */
@@ -92,11 +93,11 @@ export function PerceptionConfigStep({
 
   const getRoleName = (roleId: string) => getRegistryRoleName(roleId, language)
 
-  const getTeamName = (teamId: TeamId) => t.teams[teamId]?.name ?? teamId
+  const getTeamName = (teamId: TeamId) => t.teams[teamId].name
 
   return (
     <NarratorSetupLayout
-      icon={roleIcon as any}
+      icon={roleIcon}
       roleName={roleName}
       playerName={playerName}
       onShowToPlayer={handleConfirm}
@@ -179,6 +180,7 @@ export function PerceptionConfigStep({
               {context === 'alignment' && (
                 <div className='flex gap-2'>
                   <button
+                    type='button'
                     onClick={() => handleToggleAlignment(player.id, false)}
                     className={cn(
                       'flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors border',
@@ -191,6 +193,7 @@ export function PerceptionConfigStep({
                     {t.game.registerAsGood}
                   </button>
                   <button
+                    type='button'
                     onClick={() => handleToggleAlignment(player.id, true)}
                     className={cn(
                       'flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors border',
@@ -209,6 +212,7 @@ export function PerceptionConfigStep({
               {context === 'team' && (
                 <div className='flex flex-wrap gap-2'>
                   <button
+                    type='button'
                     onClick={() => handleToggleTeam(player.id, null)}
                     className={cn(
                       'flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors border min-w-0',
@@ -221,6 +225,7 @@ export function PerceptionConfigStep({
                   </button>
                   {canRegTeams.map((team) => (
                     <button
+                      type='button'
                       key={team}
                       onClick={() => handleToggleTeam(player.id, team)}
                       className={cn(
@@ -241,6 +246,7 @@ export function PerceptionConfigStep({
                 <div className='mt-3'>
                   <div className='mb-3 flex gap-2'>
                     <button
+                      type='button'
                       onClick={() => handleToggleRole(player.id, null)}
                       className={cn(
                         'flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors border',
@@ -252,7 +258,7 @@ export function PerceptionConfigStep({
                       {t.game.keepOriginalRole.replace('{role}', getRoleName(player.roleId))}
                     </button>
                   </div>
-                  {overriddenRole !== null && (
+                  {overriddenRole !== undefined && (
                     <p className='mb-2 text-center text-xs font-semibold tracking-wider text-parchment-400 uppercase'>
                       {t.game.chooseFalseRole}
                     </p>

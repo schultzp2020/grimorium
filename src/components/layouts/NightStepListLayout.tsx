@@ -126,6 +126,7 @@ export function NightStepListLayout({ icon, roleName, playerName, isEvil, steps,
 
             return (
               <button
+                type='button'
                 key={step.id}
                 onClick={isNext ? () => onSelectStep(step.id) : undefined}
                 disabled={!isNext}

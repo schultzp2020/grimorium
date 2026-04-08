@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, assert, beforeEach, describe, expect, it } from 'vitest'
 
 import definition from '.'
 import {
@@ -14,7 +14,7 @@ import { perceive } from '../../../../pipeline/perception'
 import { getAliveNeighbors } from '../../../../types'
 
 // Track registered test effects so we can restore originals after each test
-const originalEffects: Map<EffectId, EffectDefinition | undefined> = new Map()
+const originalEffects = new Map<EffectId, EffectDefinition | undefined>()
 
 function registerTestEffect(def: EffectDefinition) {
   if (!originalEffects.has(def.id)) {
@@ -71,8 +71,10 @@ describe('Empath', () => {
         makeState({ round: 3, players: [player] }),
       )
 
-      expect(definition.shouldWake!(round1, player)).toBeTruthy()
-      expect(definition.shouldWake!(round3, player)).toBeTruthy()
+      assert(definition.shouldWake)
+      expect(definition.shouldWake(round1, player)).toBeTruthy()
+      assert(definition.shouldWake)
+      expect(definition.shouldWake(round3, player)).toBeTruthy()
     })
 
     it('does not wake when dead', () => {
@@ -87,7 +89,8 @@ describe('Empath', () => {
         ],
         makeState({ round: 2, players: [player] }),
       )
-      expect(definition.shouldWake!(game, player)).toBeFalsy()
+      assert(definition.shouldWake)
+      expect(definition.shouldWake(game, player)).toBeFalsy()
     })
   })
 
@@ -162,8 +165,9 @@ describe('Empath', () => {
       })
 
       const [, right] = getAliveNeighbors(state, 'p2')
-      expect(right?.id).toBe('p3')
-      const perception = perceive(right!, empath, 'alignment', state)
+      assert(right)
+      expect(right.id).toBe('p3')
+      const perception = perceive(right, empath, 'alignment', state)
       expect(perception.alignment).toBe('good') // deceived
     })
 
@@ -186,8 +190,9 @@ describe('Empath', () => {
       })
 
       const [, right] = getAliveNeighbors(state, 'p2')
-      expect(right?.id).toBe('p3')
-      const perception = perceive(right!, empath, 'alignment', state)
+      assert(right)
+      expect(right.id).toBe('p3')
+      const perception = perceive(right, empath, 'alignment', state)
       expect(perception.alignment).toBe('evil') // false positive
     })
   })

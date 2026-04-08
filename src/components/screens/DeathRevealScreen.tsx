@@ -45,6 +45,7 @@ export function DeathRevealScreen({ deaths, onContinue }: Props) {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- array bounds check
   if (!currentDeath) {
     return null
   }

@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
+import type { Game } from '../../types'
 import {
   clearCurrentGame,
   deleteGame,
@@ -14,7 +15,6 @@ import {
 } from '../index'
 import { createLocalStorageBackend } from '../localStorageBackend'
 import type { StorageBackend } from '../types'
-import type { Game } from '../../types'
 
 function makeTestGame(overrides: Partial<Game> = {}): Game {
   return {

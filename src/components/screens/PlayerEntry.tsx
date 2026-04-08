@@ -28,7 +28,7 @@ export function PlayerEntry({ onNext, onBack }: Props) {
   const [players, setPlayers] = useState<PlayerItem[]>(() =>
     Array(MIN_PLAYERS)
       .fill('')
-      .map(() => makePlayerItem(''))
+      .map(() => makePlayerItem('')),
   )
   const [loadedFromLast, setLoadedFromLast] = useState(false)
 

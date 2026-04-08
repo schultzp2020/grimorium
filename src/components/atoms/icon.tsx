@@ -80,9 +80,9 @@ import {
   VoteIcon,
   XIcon,
   ZapOffIcon,
-} from 'lucide-react'
-import { cn } from '../../lib/utils'
-import { candleHolderLit, flowerLotus, hatTop, starNorth } from '@lucide/lab'
+} from "lucide-react";
+import { cn } from "../../lib/utils";
+import { candleHolderLit, flowerLotus, hatTop, starNorth } from "@lucide/lab";
 
 const Icons = {
   alertTriangle: AlertTriangleIcon,
@@ -165,43 +165,38 @@ const Icons = {
   vote: VoteIcon,
   x: XIcon,
   zapOff: ZapOffIcon,
-}
+};
 
 const LabIcons = {
   candleHolderLit,
   flowerLotus,
   starNorth,
   hatTop,
-}
+};
 
-export type IconName = keyof typeof Icons | keyof typeof LabIcons
+export type IconName = keyof typeof Icons | keyof typeof LabIcons;
 
 export type IconProps = {
-  name: IconName
-  size?: Size
-  className?: string
-  strokeWidth?: number
-}
+  name: IconName;
+  size?: Size;
+  className?: string;
+  strokeWidth?: number;
+};
 
-type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl'
+type Size = "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
 
 const sizeClasses: Record<Size, string> = {
-  xs: 'w-3 h-3',
-  sm: 'w-4 h-4',
-  md: 'w-5 h-5',
-  lg: 'w-6 h-6',
-  xl: 'w-8 h-8',
-  '2xl': 'w-12 h-12',
-  '3xl': 'w-16 h-16',
-  '4xl': 'w-20 h-20',
-}
+  xs: "w-3 h-3",
+  sm: "w-4 h-4",
+  md: "w-5 h-5",
+  lg: "w-6 h-6",
+  xl: "w-8 h-8",
+  "2xl": "w-12 h-12",
+  "3xl": "w-16 h-16",
+  "4xl": "w-20 h-20",
+};
 
-export function Icon({
-  name,
-  size = 'md',
-  strokeWidth = 2,
-  className,
-}: IconProps) {
+export function Icon({ name, size = "md", strokeWidth = 2, className }: IconProps) {
   if (name in LabIcons) {
     return (
       <IconRootComponent
@@ -209,14 +204,9 @@ export function Icon({
         className={cn(sizeClasses[size], className)}
         strokeWidth={strokeWidth}
       />
-    )
+    );
   }
 
-  const IconComponent = Icons[name as keyof typeof Icons]
-  return (
-    <IconComponent
-      className={cn(sizeClasses[size], className)}
-      strokeWidth={strokeWidth}
-    />
-  )
+  const IconComponent = Icons[name as keyof typeof Icons];
+  return <IconComponent className={cn(sizeClasses[size], className)} strokeWidth={strokeWidth} />;
 }

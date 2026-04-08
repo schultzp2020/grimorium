@@ -1,18 +1,14 @@
-import type { EffectDefinition } from '../../types'
-import {
-  type IntentHandler,
-  type KillIntent,
-  type ExecuteIntent,
-} from '../../../pipeline/types'
-import { getRole } from '../../../roles'
-import { hasEffect, getAlivePlayers } from '../../../types'
-import { registerEffectTranslations } from '../../../i18n'
+import type { EffectDefinition } from "../../types";
+import { type IntentHandler, type KillIntent, type ExecuteIntent } from "../../../pipeline/types";
+import { getRole } from "../../../roles";
+import { hasEffect, getAlivePlayers } from "../../../types";
+import { registerEffectTranslations } from "../../../i18n";
 
-import en from './i18n/en'
-import es from './i18n/es'
+import en from "./i18n/en";
+import es from "./i18n/es";
 
-registerEffectTranslations('demon_successor', 'en', en)
-registerEffectTranslations('demon_successor', 'es', es)
+registerEffectTranslations("demon_successor", "en", en);
+registerEffectTranslations("demon_successor", "es", es);
 
 /**
  * Demon Successor effect handler.
@@ -27,64 +23,60 @@ registerEffectTranslations('demon_successor', 'es', es)
  * is allowed, the successor transforms.
  */
 const demonSuccessorHandler: IntentHandler = {
-  intentType: ['kill', 'execute'],
+  intentType: ["kill", "execute"],
   priority: 15,
   appliesTo: (intent, effectPlayer, state) => {
     // Skip for voluntary Imp self-kill starpass — the narrator manually
     // chooses who becomes the new Imp via the starpass handler.
-    if (
-      intent.type === 'kill' &&
-      (intent as KillIntent).cause === 'imp_self_kill'
-    )
-      return false
+    if (intent.type === "kill" && (intent as KillIntent).cause === "imp_self_kill") return false;
 
     // Get the target of the intent
-    let targetId: string
-    if (intent.type === 'kill') {
-      targetId = (intent as KillIntent).targetId
-    } else if (intent.type === 'execute') {
-      targetId = (intent as ExecuteIntent).playerId
+    let targetId: string;
+    if (intent.type === "kill") {
+      targetId = (intent as KillIntent).targetId;
+    } else if (intent.type === "execute") {
+      targetId = (intent as ExecuteIntent).playerId;
     } else {
-      return false
+      return false;
     }
 
     // The target must be a Demon
-    const target = state.players.find((p) => p.id === targetId)
-    if (!target) return false
-    const targetRole = getRole(target.roleId)
-    if (targetRole?.team !== 'demon') return false
+    const target = state.players.find((p) => p.id === targetId);
+    if (!target) return false;
+    const targetRole = getRole(target.roleId);
+    if (targetRole?.team !== "demon") return false;
 
     // The successor (effect holder) must be alive
-    if (hasEffect(effectPlayer, 'dead')) return false
+    if (hasEffect(effectPlayer, "dead")) return false;
 
     // The successor must not be the target themselves
-    if (effectPlayer.id === targetId) return false
+    if (effectPlayer.id === targetId) return false;
 
     // 5+ alive players (Travellers don't count — none exist yet)
-    const aliveCount = getAlivePlayers(state).length
-    return aliveCount >= 5
+    const aliveCount = getAlivePlayers(state).length;
+    return aliveCount >= 5;
   },
   handle: (intent, effectPlayer, state) => {
     // Determine the demon's role so the successor inherits it
-    let targetId: string
-    if (intent.type === 'kill') {
-      targetId = (intent as KillIntent).targetId
+    let targetId: string;
+    if (intent.type === "kill") {
+      targetId = (intent as KillIntent).targetId;
     } else {
-      targetId = (intent as ExecuteIntent).playerId
+      targetId = (intent as ExecuteIntent).playerId;
     }
 
-    const target = state.players.find((p) => p.id === targetId)!
+    const target = state.players.find((p) => p.id === targetId)!;
 
     return {
-      action: 'allow',
+      action: "allow",
       stateChanges: {
         entries: [
           {
-            type: 'role_changed',
+            type: "role_changed",
             message: [
               {
-                type: 'i18n',
-                key: 'roles.scarlet_woman.history.becameDemon',
+                type: "i18n",
+                key: "roles.scarlet_woman.history.becameDemon",
                 params: {
                   player: effectPlayer.id,
                   role: target.roleId,
@@ -102,23 +94,21 @@ const demonSuccessorHandler: IntentHandler = {
           [effectPlayer.id]: target.roleId,
         },
         addEffects: {
-          [effectPlayer.id]: [
-            { type: 'pending_role_reveal', expiresAt: 'never' },
-          ],
+          [effectPlayer.id]: [{ type: "pending_role_reveal", expiresAt: "never" }],
         },
         removeEffects: {
-          [effectPlayer.id]: ['demon_successor'],
+          [effectPlayer.id]: ["demon_successor"],
         },
       },
-    }
+    };
   },
-}
+};
 
 const definition: EffectDefinition = {
-  id: 'demon_successor',
-  icon: 'crown',
-  defaultType: 'passive',
+  id: "demon_successor",
+  icon: "crown",
+  defaultType: "passive",
   handlers: [demonSuccessorHandler],
-}
+};
 
-export default definition
+export default definition;

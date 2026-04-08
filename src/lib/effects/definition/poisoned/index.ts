@@ -1,11 +1,11 @@
-import type { EffectDefinition } from '../../types'
-import { registerEffectTranslations } from '../../../i18n'
+import type { EffectDefinition } from "../../types";
+import { registerEffectTranslations } from "../../../i18n";
 
-import en from './i18n/en'
-import es from './i18n/es'
+import en from "./i18n/en";
+import es from "./i18n/es";
 
-registerEffectTranslations('poisoned', 'en', en)
-registerEffectTranslations('poisoned', 'es', es)
+registerEffectTranslations("poisoned", "en", en);
+registerEffectTranslations("poisoned", "es", es);
 
 /**
  * Poisoned effect — causes the player's ability to malfunction.
@@ -19,10 +19,10 @@ registerEffectTranslations('poisoned', 'es', es)
  * detected by `isMalfunctioning()`.
  */
 const definition: EffectDefinition = {
-  id: 'poisoned',
-  icon: 'flask',
-  defaultType: 'nerf',
+  id: "poisoned",
+  icon: "flask",
+  defaultType: "nerf",
   poisonsAbility: true,
-}
+};
 
-export default definition
+export default definition;

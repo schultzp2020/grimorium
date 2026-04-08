@@ -1,12 +1,12 @@
-import { createContext, useContext } from 'react'
+import { createContext, useContext } from "react";
 
 export type PlayerFacingContextType = {
-  setPlayerFacing: (value: boolean) => void
-}
+  setPlayerFacing: (value: boolean) => void;
+};
 
 export const PlayerFacingContext = createContext<PlayerFacingContextType>({
   setPlayerFacing: () => {},
-})
+});
 
 /**
  * Context provided by PlayerFacingScreen to its children.
@@ -16,13 +16,13 @@ export const PlayerFacingContext = createContext<PlayerFacingContextType>({
  * Default behavior (when no PlayerFacingScreen wraps): call callback immediately.
  */
 export type HandbackContextType = {
-  requestHandback: (callback: () => void) => void
-}
+  requestHandback: (callback: () => void) => void;
+};
 
 export const HandbackContext = createContext<HandbackContextType>({
   requestHandback: (cb) => cb(),
-})
+});
 
 export function useHandback() {
-  return useContext(HandbackContext)
+  return useContext(HandbackContext);
 }

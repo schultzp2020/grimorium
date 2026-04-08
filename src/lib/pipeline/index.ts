@@ -6,31 +6,28 @@ import {
   type AvailableDayAction,
   type AvailableNightFollowUp,
   type WinConditionTrigger,
-} from './types'
+} from "./types";
 import {
   type GameState,
   type PlayerState,
   type Game,
   type HistoryEntry,
   generateId,
-} from '../types'
-import { getEffect, isMalfunctioning } from '../effects'
-import { getDefaultResolver } from './resolvers'
-import type { EffectToAdd } from '../roles/types'
+} from "../types";
+import { getEffect, isMalfunctioning } from "../effects";
+import { getDefaultResolver } from "./resolvers";
+import type { EffectToAdd } from "../roles/types";
 
 // ============================================================================
 // STATE CHANGES UTILITIES
 // ============================================================================
 
 export function emptyStateChanges(): StateChanges {
-  return { entries: [] }
+  return { entries: [] };
 }
 
-export function mergeStateChanges(
-  target: StateChanges,
-  source?: StateChanges,
-): StateChanges {
-  if (!source) return target
+export function mergeStateChanges(target: StateChanges, source?: StateChanges): StateChanges {
+  if (!source) return target;
 
   return {
     entries: [...target.entries, ...source.entries],
@@ -38,43 +35,40 @@ export function mergeStateChanges(
       ? { ...target.stateUpdates, ...source.stateUpdates }
       : target.stateUpdates,
     addEffects: mergeEffectRecords(target.addEffects, source.addEffects),
-    removeEffects: mergeRemoveRecords(
-      target.removeEffects,
-      source.removeEffects,
-    ),
+    removeEffects: mergeRemoveRecords(target.removeEffects, source.removeEffects),
     changeRoles:
       target.changeRoles || source.changeRoles
         ? { ...target.changeRoles, ...source.changeRoles }
         : undefined,
-  }
+  };
 }
 
 function mergeEffectRecords(
   a?: Record<string, EffectToAdd[]>,
   b?: Record<string, EffectToAdd[]>,
 ): Record<string, EffectToAdd[]> | undefined {
-  if (!a && !b) return undefined
-  const result: Record<string, EffectToAdd[]> = { ...a }
+  if (!a && !b) return undefined;
+  const result: Record<string, EffectToAdd[]> = { ...a };
   if (b) {
     for (const [key, val] of Object.entries(b)) {
-      result[key] = [...(result[key] ?? []), ...val]
+      result[key] = [...(result[key] ?? []), ...val];
     }
   }
-  return result
+  return result;
 }
 
 function mergeRemoveRecords(
   a?: Record<string, string[]>,
   b?: Record<string, string[]>,
 ): Record<string, string[]> | undefined {
-  if (!a && !b) return undefined
-  const result: Record<string, string[]> = { ...a }
+  if (!a && !b) return undefined;
+  const result: Record<string, string[]> = { ...a };
   if (b) {
     for (const [key, val] of Object.entries(b)) {
-      result[key] = [...(result[key] ?? []), ...val]
+      result[key] = [...(result[key] ?? []), ...val];
     }
   }
-  return result
+  return result;
 }
 
 // ============================================================================
@@ -85,30 +79,28 @@ function collectActiveHandlers(
   state: GameState,
   intentType: string,
 ): Array<{ handler: IntentHandler; player: PlayerState }> {
-  const result: Array<{ handler: IntentHandler; player: PlayerState }> = []
+  const result: Array<{ handler: IntentHandler; player: PlayerState }> = [];
 
   for (const player of state.players) {
     // Skip handlers from malfunctioning players — their passive abilities
     // don't work (e.g., Poisoned Soldier's Safe doesn't protect,
     // Drunk Virgin's Pure doesn't trigger)
-    if (isMalfunctioning(player)) continue
+    if (isMalfunctioning(player)) continue;
 
     for (const effectInstance of player.effects) {
-      const effectDef = getEffect(effectInstance.type)
-      if (!effectDef?.handlers) continue
+      const effectDef = getEffect(effectInstance.type);
+      if (!effectDef?.handlers) continue;
 
       for (const handler of effectDef.handlers) {
-        const types = Array.isArray(handler.intentType)
-          ? handler.intentType
-          : [handler.intentType]
-        if (types.includes(intentType as Intent['type'])) {
-          result.push({ handler, player })
+        const types = Array.isArray(handler.intentType) ? handler.intentType : [handler.intentType];
+        if (types.includes(intentType as Intent["type"])) {
+          result.push({ handler, player });
         }
       }
     }
   }
 
-  return result
+  return result;
 }
 
 // ============================================================================
@@ -124,123 +116,81 @@ function runPipeline(
   startIndex: number,
 ): PipelineResult {
   for (let i = startIndex; i < handlers.length; i++) {
-    const { handler, player } = handlers[i]
-    if (!handler.appliesTo(intent, player, state)) continue
+    const { handler, player } = handlers[i];
+    if (!handler.appliesTo(intent, player, state)) continue;
 
-    const result = handler.handle(intent, player, state, game)
+    const result = handler.handle(intent, player, state, game);
 
     switch (result.action) {
-      case 'allow':
+      case "allow":
         if (result.stateChanges) {
-          accumulated = mergeStateChanges(accumulated, result.stateChanges)
+          accumulated = mergeStateChanges(accumulated, result.stateChanges);
         }
-        continue
+        continue;
 
-      case 'prevent':
+      case "prevent":
         if (result.stateChanges) {
-          accumulated = mergeStateChanges(accumulated, result.stateChanges)
+          accumulated = mergeStateChanges(accumulated, result.stateChanges);
         }
-        return { type: 'prevented', stateChanges: accumulated }
+        return { type: "prevented", stateChanges: accumulated };
 
-      case 'redirect': {
+      case "redirect": {
         if (result.stateChanges) {
-          accumulated = mergeStateChanges(accumulated, result.stateChanges)
+          accumulated = mergeStateChanges(accumulated, result.stateChanges);
         }
         // Re-collect handlers for the new intent type and restart pipeline
-        const newHandlers = collectActiveHandlers(state, result.newIntent.type)
-        newHandlers.sort((a, b) => a.handler.priority - b.handler.priority)
-        return runPipeline(
-          result.newIntent,
-          newHandlers,
-          state,
-          game,
-          accumulated,
-          0,
-        )
+        const newHandlers = collectActiveHandlers(state, result.newIntent.type);
+        newHandlers.sort((a, b) => a.handler.priority - b.handler.priority);
+        return runPipeline(result.newIntent, newHandlers, state, game, accumulated, 0);
       }
 
-      case 'request_ui':
+      case "request_ui":
         return {
-          type: 'needs_input',
+          type: "needs_input",
           UIComponent: result.UIComponent,
           intent,
           resume: (uiResult: unknown) => {
-            const afterUI = result.resume(uiResult)
+            const afterUI = result.resume(uiResult);
 
             switch (afterUI.action) {
-              case 'allow':
+              case "allow":
                 if (afterUI.stateChanges) {
-                  accumulated = mergeStateChanges(
-                    accumulated,
-                    afterUI.stateChanges,
-                  )
+                  accumulated = mergeStateChanges(accumulated, afterUI.stateChanges);
                 }
-                return runPipeline(
-                  intent,
-                  handlers,
-                  state,
-                  game,
-                  accumulated,
-                  i + 1,
-                )
-              case 'prevent':
+                return runPipeline(intent, handlers, state, game, accumulated, i + 1);
+              case "prevent":
                 if (afterUI.stateChanges) {
-                  accumulated = mergeStateChanges(
-                    accumulated,
-                    afterUI.stateChanges,
-                  )
+                  accumulated = mergeStateChanges(accumulated, afterUI.stateChanges);
                 }
                 return {
-                  type: 'prevented' as const,
+                  type: "prevented" as const,
                   stateChanges: accumulated,
-                }
-              case 'redirect': {
+                };
+              case "redirect": {
                 if (afterUI.stateChanges) {
-                  accumulated = mergeStateChanges(
-                    accumulated,
-                    afterUI.stateChanges,
-                  )
+                  accumulated = mergeStateChanges(accumulated, afterUI.stateChanges);
                 }
-                const newHandlers = collectActiveHandlers(
-                  state,
-                  afterUI.newIntent.type,
-                )
-                newHandlers.sort(
-                  (a, b) => a.handler.priority - b.handler.priority,
-                )
-                return runPipeline(
-                  afterUI.newIntent,
-                  newHandlers,
-                  state,
-                  game,
-                  accumulated,
-                  0,
-                )
+                const newHandlers = collectActiveHandlers(state, afterUI.newIntent.type);
+                newHandlers.sort((a, b) => a.handler.priority - b.handler.priority);
+                return runPipeline(afterUI.newIntent, newHandlers, state, game, accumulated, 0);
               }
               default:
                 // request_ui after request_ui — continue pipeline
-                return runPipeline(
-                  intent,
-                  handlers,
-                  state,
-                  game,
-                  accumulated,
-                  i + 1,
-                )
+                return runPipeline(intent, handlers, state, game, accumulated, i + 1);
             }
           },
-        }
+        };
     }
   }
 
   // No handler prevented — apply default resolution
-  const resolver = getDefaultResolver(intent.type)
+  const resolver = getDefaultResolver(intent.type);
   if (resolver) {
-    const defaultChanges = resolver(intent, state)
-    accumulated = mergeStateChanges(accumulated, defaultChanges)
+    const defaultChanges = resolver(intent, state);
+    accumulated = mergeStateChanges(accumulated, defaultChanges);
   }
 
-  return { type: 'resolved', stateChanges: accumulated }
+  return { type: "resolved", stateChanges: accumulated };
 }
 
 /**
@@ -249,14 +199,10 @@ function runPipeline(
  * Collects all handlers from active effects on all players,
  * runs them in priority order, and returns the result.
  */
-export function resolveIntent(
-  intent: Intent,
-  state: GameState,
-  game: Game,
-): PipelineResult {
-  const handlers = collectActiveHandlers(state, intent.type)
-  handlers.sort((a, b) => a.handler.priority - b.handler.priority)
-  return runPipeline(intent, handlers, state, game, emptyStateChanges(), 0)
+export function resolveIntent(intent: Intent, state: GameState, game: Game): PipelineResult {
+  const handlers = collectActiveHandlers(state, intent.type);
+  handlers.sort((a, b) => a.handler.priority - b.handler.priority);
+  return runPipeline(intent, handlers, state, game, emptyStateChanges(), 0);
 }
 
 // ============================================================================
@@ -274,43 +220,40 @@ export function applyPipelineChanges(game: Game, changes: StateChanges): Game {
     !changes.addEffects &&
     !changes.removeEffects
   ) {
-    return game
+    return game;
   }
 
   const currentState = game.history.at(-1)?.stateAfter ?? {
-    phase: 'setup' as const,
+    phase: "setup" as const,
     round: 0,
     players: [],
     winner: null,
-  }
+  };
 
   if (changes.entries.length > 0) {
     // Apply state updates and effects with the first entry
-    let updatedGame = game
+    let updatedGame = game;
     for (let i = 0; i < changes.entries.length; i++) {
-      const isFirst = i === 0
-      const entry = changes.entries[i]
+      const isFirst = i === 0;
+      const entry = changes.entries[i];
 
       let newState = isFirst
         ? { ...currentState, ...changes.stateUpdates }
-        : (updatedGame.history.at(-1)?.stateAfter ?? currentState)
+        : (updatedGame.history.at(-1)?.stateAfter ?? currentState);
 
       // Apply effect and role changes on first entry
-      if (
-        isFirst &&
-        (changes.addEffects || changes.removeEffects || changes.changeRoles)
-      ) {
+      if (isFirst && (changes.addEffects || changes.removeEffects || changes.changeRoles)) {
         newState = applyPlayerChanges(
           newState,
           changes.addEffects,
           changes.removeEffects,
           changes.changeRoles,
-        )
+        );
       }
 
       // Create non-first entry state from latest
       if (!isFirst) {
-        newState = updatedGame.history.at(-1)?.stateAfter ?? newState
+        newState = updatedGame.history.at(-1)?.stateAfter ?? newState;
       }
 
       const historyEntry: HistoryEntry = {
@@ -320,40 +263,37 @@ export function applyPipelineChanges(game: Game, changes: StateChanges): Game {
         message: entry.message,
         data: entry.data,
         stateAfter: newState,
-      }
+      };
 
       updatedGame = {
         ...updatedGame,
         history: [...updatedGame.history, historyEntry],
-      }
+      };
     }
-    return updatedGame
+    return updatedGame;
   }
 
   // No entries but there are state/effect changes — apply silently
   // by updating the last history entry's stateAfter
-  let newState = { ...currentState, ...changes.stateUpdates }
+  let newState = { ...currentState, ...changes.stateUpdates };
   if (changes.addEffects || changes.removeEffects || changes.changeRoles) {
     newState = applyPlayerChanges(
       newState,
       changes.addEffects,
       changes.removeEffects,
       changes.changeRoles,
-    )
+    );
   }
 
-  const lastEntry = game.history[game.history.length - 1]
+  const lastEntry = game.history[game.history.length - 1];
   if (lastEntry) {
     return {
       ...game,
-      history: [
-        ...game.history.slice(0, -1),
-        { ...lastEntry, stateAfter: newState },
-      ],
-    }
+      history: [...game.history.slice(0, -1), { ...lastEntry, stateAfter: newState }],
+    };
   }
 
-  return game
+  return game;
 }
 
 function applyPlayerChanges(
@@ -365,13 +305,11 @@ function applyPlayerChanges(
   return {
     ...state,
     players: state.players.map((player) => {
-      let effects = [...player.effects]
-      let roleId = player.roleId
+      let effects = [...player.effects];
+      let roleId = player.roleId;
 
       if (removeEffects?.[player.id]) {
-        effects = effects.filter(
-          (e) => !removeEffects[player.id].includes(e.type),
-        )
+        effects = effects.filter((e) => !removeEffects[player.id].includes(e.type));
       }
 
       if (addEffects?.[player.id]) {
@@ -381,17 +319,17 @@ function applyPlayerChanges(
           data: e.data,
           sourcePlayerId: e.sourcePlayerId,
           expiresAt: e.expiresAt,
-        }))
-        effects = [...effects, ...newEffects]
+        }));
+        effects = [...effects, ...newEffects];
       }
 
       if (changeRoles?.[player.id]) {
-        roleId = changeRoles[player.id]
+        roleId = changeRoles[player.id];
       }
 
-      return { ...player, effects, roleId }
+      return { ...player, effects, roleId };
     }),
-  }
+  };
 }
 
 // ============================================================================
@@ -405,12 +343,12 @@ export function getAvailableDayActions(
   state: GameState,
   t: Record<string, any>,
 ): AvailableDayAction[] {
-  const actions: AvailableDayAction[] = []
+  const actions: AvailableDayAction[] = [];
 
   for (const player of state.players) {
     for (const effectInstance of player.effects) {
-      const effectDef = getEffect(effectInstance.type)
-      if (!effectDef?.dayActions) continue
+      const effectDef = getEffect(effectInstance.type);
+      if (!effectDef?.dayActions) continue;
 
       for (const dayAction of effectDef.dayActions) {
         if (dayAction.condition(player, state)) {
@@ -421,13 +359,13 @@ export function getAvailableDayActions(
             label: dayAction.getLabel(t),
             description: dayAction.getDescription(t),
             ActionComponent: dayAction.ActionComponent,
-          })
+          });
         }
       }
     }
   }
 
-  return actions
+  return actions;
 }
 
 // ============================================================================
@@ -446,12 +384,12 @@ export function getAvailableNightFollowUps(
   game: Game,
   t: Record<string, any>,
 ): AvailableNightFollowUp[] {
-  const followUps: AvailableNightFollowUp[] = []
+  const followUps: AvailableNightFollowUp[] = [];
 
   for (const player of state.players) {
     for (const effectInstance of player.effects) {
-      const effectDef = getEffect(effectInstance.type)
-      if (!effectDef?.nightFollowUps) continue
+      const effectDef = getEffect(effectInstance.type);
+      if (!effectDef?.nightFollowUps) continue;
 
       for (const followUp of effectDef.nightFollowUps) {
         if (followUp.condition(player, state, game)) {
@@ -462,13 +400,13 @@ export function getAvailableNightFollowUps(
             icon: followUp.icon,
             label: followUp.getLabel(t),
             ActionComponent: followUp.ActionComponent,
-          })
+          });
         }
       }
     }
   }
 
-  return followUps
+  return followUps;
 }
 
 // ============================================================================
@@ -484,22 +422,22 @@ export function checkDynamicWinConditions(
   triggers: WinConditionTrigger[],
   getRole: (
     roleId: string,
-  ) => { winConditions?: import('./types').WinConditionCheck[] } | undefined,
-): 'townsfolk' | 'demon' | null {
+  ) => { winConditions?: import("./types").WinConditionCheck[] } | undefined,
+): "townsfolk" | "demon" | null {
   // Check effect-based win conditions
   // Skip win conditions from malfunctioning players (e.g., poisoned Saint's
   // martyrdom doesn't trigger evil winning)
   for (const player of state.players) {
-    if (isMalfunctioning(player)) continue
+    if (isMalfunctioning(player)) continue;
 
     for (const effectInstance of player.effects) {
-      const effectDef = getEffect(effectInstance.type)
-      if (!effectDef?.winConditions) continue
+      const effectDef = getEffect(effectInstance.type);
+      if (!effectDef?.winConditions) continue;
 
       for (const wc of effectDef.winConditions) {
         if (triggers.includes(wc.trigger)) {
-          const result = wc.check(state, game)
-          if (result) return result
+          const result = wc.check(state, game);
+          if (result) return result;
         }
       }
     }
@@ -509,20 +447,20 @@ export function checkDynamicWinConditions(
   // Skip win conditions from malfunctioning players (e.g., poisoned Mayor's
   // peaceful victory doesn't trigger)
   for (const player of state.players) {
-    if (isMalfunctioning(player)) continue
+    if (isMalfunctioning(player)) continue;
 
-    const role = getRole(player.roleId)
-    if (!role?.winConditions) continue
+    const role = getRole(player.roleId);
+    if (!role?.winConditions) continue;
 
     for (const wc of role.winConditions) {
       if (triggers.includes(wc.trigger)) {
-        const result = wc.check(state, game)
-        if (result) return result
+        const result = wc.check(state, game);
+        if (result) return result;
       }
     }
   }
 
-  return null
+  return null;
 }
 
 export {
@@ -531,5 +469,5 @@ export {
   canRegisterAsAlignment,
   getAmbiguousPlayers,
   applyPerceptionOverrides,
-} from './perception'
-export * from './types'
+} from "./perception";
+export * from "./types";

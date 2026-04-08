@@ -1,6 +1,6 @@
 const en = {
-  name: 'Role Changed',
+  name: "Role Changed",
   description: "This player's role has changed and needs to be revealed.",
-} as const
+} as const;
 
-export default en
+export default en;

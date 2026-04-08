@@ -1,15 +1,15 @@
-import type { EffectDefinition } from '../../types'
-import type { IntentHandler, KillIntent } from '../../../pipeline/types'
-import { StarpassSelectUI } from '../../../../components/items/StarpassSelectUI'
-import { isAlive } from '../../../types'
-import { getRole } from '../../../roles'
-import { registerEffectTranslations } from '../../../i18n'
+import type { EffectDefinition } from "../../types";
+import type { IntentHandler, KillIntent } from "../../../pipeline/types";
+import { StarpassSelectUI } from "../../../../components/items/StarpassSelectUI";
+import { isAlive } from "../../../types";
+import { getRole } from "../../../roles";
+import { registerEffectTranslations } from "../../../i18n";
 
-import en from './i18n/en'
-import es from './i18n/es'
+import en from "./i18n/en";
+import es from "./i18n/es";
 
-registerEffectTranslations('imp_starpass_pending', 'en', en)
-registerEffectTranslations('imp_starpass_pending', 'es', es)
+registerEffectTranslations("imp_starpass_pending", "en", en);
+registerEffectTranslations("imp_starpass_pending", "es", es);
 
 /**
  * Imp Starpass Pending effect handler.
@@ -26,55 +26,53 @@ registerEffectTranslations('imp_starpass_pending', 'es', es)
  * prevents the kill, the pipeline stops and this handler never executes.
  */
 const starpassHandler: IntentHandler = {
-  intentType: 'kill',
+  intentType: "kill",
   priority: 20,
   appliesTo: (intent, effectPlayer) => {
-    if (intent.type !== 'kill') return false
-    const kill = intent as KillIntent
-    return kill.cause === 'imp_self_kill' && kill.targetId === effectPlayer.id
+    if (intent.type !== "kill") return false;
+    const kill = intent as KillIntent;
+    return kill.cause === "imp_self_kill" && kill.targetId === effectPlayer.id;
   },
   handle: (_intent, effectPlayer, state) => {
     // Find alive minions
     const aliveMinions = state.players.filter((p) => {
-      if (!isAlive(p)) return false
-      const role = getRole(p.roleId)
-      return role?.team === 'minion'
-    })
+      if (!isAlive(p)) return false;
+      const role = getRole(p.roleId);
+      return role?.team === "minion";
+    });
 
     // No alive minions — just allow the kill (Imp dies, no starpass)
     if (aliveMinions.length === 0) {
-      return { action: 'allow' }
+      return { action: "allow" };
     }
 
     return {
-      action: 'request_ui',
+      action: "request_ui",
       UIComponent: StarpassSelectUI,
       resume: (selectedNewImpId: unknown) => {
-        const newImpId = selectedNewImpId as string
-        const newImpPlayer = state.players.find((p) => p.id === newImpId)
+        const newImpId = selectedNewImpId as string;
+        const newImpPlayer = state.players.find((p) => p.id === newImpId);
 
         // Clean up effects sourced by the converting Minion (role-agnostic).
         // E.g., if the Poisoner becomes the Imp, poison they applied is removed.
-        const sourcedEffectRemovals: Record<string, string[]> = {}
+        const sourcedEffectRemovals: Record<string, string[]> = {};
         for (const p of state.players) {
-          const sourced = p.effects.filter(
-            (e) => e.sourcePlayerId === newImpId,
-          )
+          const sourced = p.effects.filter((e) => e.sourcePlayerId === newImpId);
           if (sourced.length > 0) {
-            sourcedEffectRemovals[p.id] = sourced.map((e) => e.type)
+            sourcedEffectRemovals[p.id] = sourced.map((e) => e.type);
           }
         }
 
         return {
-          action: 'allow',
+          action: "allow",
           stateChanges: {
             entries: [
               {
-                type: 'role_changed',
+                type: "role_changed",
                 message: [
                   {
-                    type: 'i18n',
-                    key: 'roles.imp.history.minionBecameImp',
+                    type: "i18n",
+                    key: "roles.imp.history.minionBecameImp",
                     params: {
                       player: newImpId,
                     },
@@ -82,35 +80,33 @@ const starpassHandler: IntentHandler = {
                 ],
                 data: {
                   playerId: newImpId,
-                  fromRole: newImpPlayer?.roleId ?? 'unknown',
-                  toRole: 'imp',
+                  fromRole: newImpPlayer?.roleId ?? "unknown",
+                  toRole: "imp",
                 },
               },
             ],
             changeRoles: {
-              [newImpId]: 'imp',
+              [newImpId]: "imp",
             },
             addEffects: {
-              [newImpId]: [
-                { type: 'pending_role_reveal', expiresAt: 'never' },
-              ],
+              [newImpId]: [{ type: "pending_role_reveal", expiresAt: "never" }],
             },
             removeEffects: {
-              [effectPlayer.id]: ['imp_starpass_pending'],
+              [effectPlayer.id]: ["imp_starpass_pending"],
               ...sourcedEffectRemovals,
             },
           },
-        }
+        };
       },
-    }
+    };
   },
-}
+};
 
 const definition: EffectDefinition = {
-  id: 'imp_starpass_pending',
-  icon: 'sparkles',
-  defaultType: 'pending',
+  id: "imp_starpass_pending",
+  icon: "sparkles",
+  defaultType: "pending",
   handlers: [starpassHandler],
-}
+};
 
-export default definition
+export default definition;

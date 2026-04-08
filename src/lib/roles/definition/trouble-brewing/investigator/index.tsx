@@ -1,25 +1,25 @@
-import type { RoleDefinition } from '../../../types'
-import { isAlive } from '../../../../types'
-import { registerRoleTranslations } from '../../../../i18n'
-import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
+import type { RoleDefinition } from "../../../types";
+import { isAlive } from "../../../../types";
+import { registerRoleTranslations } from "../../../../i18n";
+import { DefaultRoleReveal } from "../../../../../components/items/DefaultRoleReveal";
 import {
   InfoRoleNightAction,
   type InfoRoleConfig,
-} from '../../../../../components/night_steps/InfoRoleNightAction'
+} from "../../../../../components/night_steps/InfoRoleNightAction";
 
-import en from './i18n/en'
-import es from './i18n/es'
+import en from "./i18n/en";
+import es from "./i18n/es";
 
-registerRoleTranslations('investigator', 'en', en)
-registerRoleTranslations('investigator', 'es', es)
+registerRoleTranslations("investigator", "en", en);
+registerRoleTranslations("investigator", "es", es);
 
 const investigatorConfig: InfoRoleConfig = {
-  roleId: 'investigator',
-  icon: 'search',
-  targetTeam: 'minion',
+  roleId: "investigator",
+  icon: "search",
+  targetTeam: "minion",
   historyKeys: {
-    discovered: 'roles.investigator.history.discoveredMinion',
-    noTarget: 'roles.investigator.history.noMinions',
+    discovered: "roles.investigator.history.discoveredMinion",
+    noTarget: "roles.investigator.history.noMinions",
   },
   getLabels: (roleT) => ({
     infoTitle: roleT.investigatorInfo,
@@ -29,22 +29,19 @@ const investigatorConfig: InfoRoleConfig = {
     showNoTargetLink: roleT.showNoMinions,
     mustIncludeTarget: roleT.mustIncludeMinion,
   }),
-}
+};
 
 const definition: RoleDefinition = {
-  id: 'investigator',
-  team: 'townsfolk',
-  icon: 'search',
+  id: "investigator",
+  team: "townsfolk",
+  icon: "search",
   nightOrder: 12,
   chaos: 15,
-  shouldWake: (game, player) =>
-    isAlive(player) && game.history.at(-1)?.stateAfter.round === 1,
+  shouldWake: (game, player) => isAlive(player) && game.history.at(-1)?.stateAfter.round === 1,
 
   RoleReveal: DefaultRoleReveal,
 
-  NightAction: (props) => (
-    <InfoRoleNightAction config={investigatorConfig} {...props} />
-  ),
-}
+  NightAction: (props) => <InfoRoleNightAction config={investigatorConfig} {...props} />,
+};
 
-export default definition
+export default definition;

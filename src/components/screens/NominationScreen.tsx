@@ -1,18 +1,18 @@
-import { useState, useMemo } from 'react'
-import { type GameState, getAlivePlayers } from '../../lib/types'
-import { useI18n } from '../../lib/i18n'
-import { Button, Icon, BackButton } from '../atoms'
-import { ScreenFooter } from '../layouts/ScreenFooter'
-import { MysticDivider } from '../items'
-import { PlayerPickerList } from '../inputs'
+import { useState, useMemo } from "react";
+import { type GameState, getAlivePlayers } from "../../lib/types";
+import { useI18n } from "../../lib/i18n";
+import { Button, Icon, BackButton } from "../atoms";
+import { ScreenFooter } from "../layouts/ScreenFooter";
+import { MysticDivider } from "../items";
+import { PlayerPickerList } from "../inputs";
 
 type Props = {
-  state: GameState
-  nominatorsToday?: Set<string>
-  nomineesToday?: Set<string>
-  onNominate: (nominatorId: string, nomineeId: string) => void
-  onBack: () => void
-}
+  state: GameState;
+  nominatorsToday?: Set<string>;
+  nomineesToday?: Set<string>;
+  onNominate: (nominatorId: string, nomineeId: string) => void;
+  onBack: () => void;
+};
 
 export function NominationScreen({
   state,
@@ -21,69 +21,69 @@ export function NominationScreen({
   onNominate,
   onBack,
 }: Props) {
-  const { t } = useI18n()
-  const [nominator, setNominator] = useState<string | null>(null)
-  const [nominee, setNominee] = useState<string | null>(null)
+  const { t } = useI18n();
+  const [nominator, setNominator] = useState<string | null>(null);
+  const [nominee, setNominee] = useState<string | null>(null);
 
-  const alivePlayers = getAlivePlayers(state)
+  const alivePlayers = getAlivePlayers(state);
 
-  const nomineeCandidates = alivePlayers
+  const nomineeCandidates = alivePlayers;
 
   const handleSelectNominator = (playerId: string) => {
-    setNominator(playerId)
-  }
+    setNominator(playerId);
+  };
 
   const handleNominate = () => {
     if (nominator && nominee) {
-      onNominate(nominator, nominee)
+      onNominate(nominator, nominee);
     }
-  }
+  };
 
-  const canNominate = nominator && nominee
+  const canNominate = nominator && nominee;
 
   // Build annotations for players who already nominated today
   const nominatorAnnotations = useMemo(() => {
-    if (!nominatorsToday || nominatorsToday.size === 0) return undefined
-    const annotations: Record<string, string> = {}
+    if (!nominatorsToday || nominatorsToday.size === 0) return undefined;
+    const annotations: Record<string, string> = {};
     for (const player of alivePlayers) {
       if (nominatorsToday.has(player.id)) {
-        annotations[player.id] = t.game.alreadyNominated
+        annotations[player.id] = t.game.alreadyNominated;
       }
     }
-    return Object.keys(annotations).length > 0 ? annotations : undefined
-  }, [nominatorsToday, alivePlayers, t])
+    return Object.keys(annotations).length > 0 ? annotations : undefined;
+  }, [nominatorsToday, alivePlayers, t]);
 
   // Build disabled set + annotations for players who have already been nominated
   const nomineeAnnotations = useMemo(() => {
-    if (!nomineesToday || nomineesToday.size === 0) return undefined
-    const annotations: Record<string, string> = {}
+    if (!nomineesToday || nomineesToday.size === 0) return undefined;
+    const annotations: Record<string, string> = {};
     for (const player of alivePlayers) {
       if (nomineesToday.has(player.id)) {
-        annotations[player.id] = t.game.alreadyBeenNominated
+        annotations[player.id] = t.game.alreadyBeenNominated;
       }
     }
-    return Object.keys(annotations).length > 0 ? annotations : undefined
-  }, [nomineesToday, alivePlayers, t])
+    return Object.keys(annotations).length > 0 ? annotations : undefined;
+  }, [nomineesToday, alivePlayers, t]);
 
   // Build disabled sets for enforcement
   const disabledNominators = useMemo(() => {
-    if (!nominatorsToday || nominatorsToday.size === 0) return undefined
-    return nominatorsToday
-  }, [nominatorsToday])
+    if (!nominatorsToday || nominatorsToday.size === 0) return undefined;
+    return nominatorsToday;
+  }, [nominatorsToday]);
 
   const disabledNominees = useMemo(() => {
-    if (!nomineesToday || nomineesToday.size === 0) return undefined
-    return nomineesToday
-  }, [nomineesToday])
+    if (!nomineesToday || nomineesToday.size === 0) return undefined;
+    return nomineesToday;
+  }, [nomineesToday]);
 
   return (
-    <div className='min-h-app bg-gradient-to-b from-red-950 via-grimoire-blood to-grimoire-darker flex flex-col'>
+    <div className="min-h-app bg-gradient-to-b from-red-950 via-grimoire-blood to-grimoire-darker flex flex-col">
       {/* Header */}
-      <div className='sticky top-0 z-10 bg-grimoire-dark/95 backdrop-blur-xs border-b border-red-500/30 px-4 py-3'>
-        <div className='flex items-center gap-3 max-w-lg mx-auto'>
+      <div className="sticky top-0 z-10 bg-grimoire-dark/95 backdrop-blur-xs border-b border-red-500/30 px-4 py-3">
+        <div className="flex items-center gap-3 max-w-lg mx-auto">
           <BackButton onClick={onBack} />
           <div>
-            <h1 className='font-tarot text-lg text-parchment-100 tracking-wider uppercase'>
+            <h1 className="font-tarot text-lg text-parchment-100 tracking-wider uppercase">
               {t.game.newNomination}
             </h1>
           </div>
@@ -91,11 +91,11 @@ export function NominationScreen({
       </div>
 
       {/* Content */}
-      <div className='flex-1 px-4 py-6 max-w-lg mx-auto w-full'>
+      <div className="flex-1 px-4 py-6 max-w-lg mx-auto w-full">
         {/* Nominator Selection */}
-        <div className='mb-6'>
-          <label className='flex items-center gap-2 text-parchment-400 text-xs tracking-wider uppercase mb-3'>
-            <Icon name='userRound' size='sm' />
+        <div className="mb-6">
+          <label className="flex items-center gap-2 text-parchment-400 text-xs tracking-wider uppercase mb-3">
+            <Icon name="userRound" size="sm" />
             {t.game.whoIsNominating}
           </label>
           <PlayerPickerList
@@ -103,23 +103,19 @@ export function NominationScreen({
             selected={nominator ? [nominator] : []}
             onSelect={handleSelectNominator}
             selectionCount={1}
-            variant='red'
+            variant="red"
             annotations={nominatorAnnotations}
             disabled={disabledNominators}
           />
         </div>
 
         {/* Divider */}
-        <MysticDivider
-          icon='swords'
-          iconClassName='text-red-500/50'
-          className='mb-6'
-        />
+        <MysticDivider icon="swords" iconClassName="text-red-500/50" className="mb-6" />
 
         {/* Nominee Selection */}
-        <div className='mb-6'>
-          <label className='flex items-center gap-2 text-parchment-400 text-xs tracking-wider uppercase mb-3'>
-            <Icon name='userX' size='sm' />
+        <div className="mb-6">
+          <label className="flex items-center gap-2 text-parchment-400 text-xs tracking-wider uppercase mb-3">
+            <Icon name="userX" size="sm" />
             {t.game.whoAreTheyNominating}
           </label>
           <PlayerPickerList
@@ -127,7 +123,7 @@ export function NominationScreen({
             selected={nominee ? [nominee] : []}
             onSelect={setNominee}
             selectionCount={1}
-            variant='red'
+            variant="red"
             annotations={nomineeAnnotations}
             disabled={disabledNominees}
           />
@@ -135,18 +131,15 @@ export function NominationScreen({
 
         {/* Summary */}
         {nominator && nominee && (
-          <div className='bg-red-900/20 border border-red-500/30 rounded-lg p-4 mb-6 text-center'>
-            <p className='text-parchment-200 text-sm'>
-              <span className='font-medium text-parchment-100'>
+          <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4 mb-6 text-center">
+            <p className="text-parchment-200 text-sm">
+              <span className="font-medium text-parchment-100">
                 {alivePlayers.find((p) => p.id === nominator)?.name}
-              </span>
-              {' '}
-              {t.game.nominatesVerb}
-              {' '}
-              <span className='font-medium text-red-300'>
+              </span>{" "}
+              {t.game.nominatesVerb}{" "}
+              <span className="font-medium text-red-300">
                 {alivePlayers.find((p) => p.id === nominee)?.name}
-              </span>
-              {' '}
+              </span>{" "}
               {t.game.forExecution}
             </p>
           </div>
@@ -154,18 +147,12 @@ export function NominationScreen({
       </div>
 
       {/* Footer */}
-      <ScreenFooter borderColor='border-red-500/30'>
-        <Button
-          onClick={handleNominate}
-          disabled={!canNominate}
-          fullWidth
-          size='lg'
-          variant='evil'
-        >
-          <Icon name='swords' size='md' className='mr-2' />
+      <ScreenFooter borderColor="border-red-500/30">
+        <Button onClick={handleNominate} disabled={!canNominate} fullWidth size="lg" variant="evil">
+          <Icon name="swords" size="md" className="mr-2" />
           {t.game.startNomination}
         </Button>
       </ScreenFooter>
     </div>
-  )
+  );
 }

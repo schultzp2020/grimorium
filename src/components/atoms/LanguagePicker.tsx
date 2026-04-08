@@ -1,23 +1,20 @@
-import * as Popover from '@radix-ui/react-popover'
-import { useI18n, LANGUAGES } from '../../lib/i18n'
-import { Icon } from './icon'
+import * as Popover from "@radix-ui/react-popover";
+import { useI18n, LANGUAGES } from "../../lib/i18n";
+import { Icon } from "./icon";
 
 type Props = {
-  variant?: 'button' | 'floating'
-  className?: string
-}
+  variant?: "button" | "floating";
+  className?: string;
+};
 
-export function LanguagePicker({
-  variant = 'button',
-  className = '',
-}: Props) {
-  const { language, setLanguage } = useI18n()
-  const current = LANGUAGES.find((l) => l.code === language)
+export function LanguagePicker({ variant = "button", className = "" }: Props) {
+  const { language, setLanguage } = useI18n();
+  const current = LANGUAGES.find((l) => l.code === language);
 
   return (
     <Popover.Root>
       <Popover.Trigger asChild>
-        {variant === 'floating' ? (
+        {variant === "floating" ? (
           <button
             className={`w-12 h-12 rounded-full bg-grimoire-dark/90 border border-mystic-gold/30 text-mystic-gold flex items-center justify-center shadow-lg hover:bg-grimoire-dark hover:border-mystic-gold/50 active:scale-95 transition-all text-sm font-medium ${className}`}
             title={current?.nativeName}
@@ -44,34 +41,28 @@ export function LanguagePicker({
         >
           <div className="py-1">
             {LANGUAGES.map((lang) => {
-              const isActive = lang.code === language
+              const isActive = lang.code === language;
               return (
                 <Popover.Close key={lang.code} asChild>
                   <button
                     onClick={() => setLanguage(lang.code)}
                     className={`w-full flex items-center gap-3 px-4 py-3.5 min-h-[48px] text-left transition-colors ${
                       isActive
-                        ? 'bg-mystic-gold/15 text-mystic-gold'
-                        : 'text-parchment-300 active:bg-white/10'
+                        ? "bg-mystic-gold/15 text-mystic-gold"
+                        : "text-parchment-300 active:bg-white/10"
                     }`}
                   >
-                    <span className="flex-1 text-[15px] font-medium">
-                      {lang.nativeName}
-                    </span>
+                    <span className="flex-1 text-[15px] font-medium">{lang.nativeName}</span>
                     {isActive && (
-                      <Icon
-                        name="check"
-                        size="sm"
-                        className="text-mystic-gold shrink-0"
-                      />
+                      <Icon name="check" size="sm" className="text-mystic-gold shrink-0" />
                     )}
                   </button>
                 </Popover.Close>
-              )
+              );
             })}
           </div>
         </Popover.Content>
       </Popover.Portal>
     </Popover.Root>
-  )
+  );
 }

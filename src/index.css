@@ -1,36 +1,42 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap");
 
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @theme {
-  --font-tarot: 'Cinzel', serif;
-  --font-body: 'Inter', sans-serif;
+  --font-tarot: "Cinzel", serif;
+  --font-body: "Inter", sans-serif;
 
   --tracking-widest-xl: 0.2em;
 
-  --color-parchment-50: #FFFEF8;
-  --color-parchment-100: #FDF8E7;
-  --color-parchment-200: #F5EDD6;
-  --color-parchment-300: #E8DCC0;
-  --color-parchment-400: #D4C5A2;
-  --color-parchment-500: #B8A77D;
+  --color-parchment-50: #fffef8;
+  --color-parchment-100: #fdf8e7;
+  --color-parchment-200: #f5edd6;
+  --color-parchment-300: #e8dcc0;
+  --color-parchment-400: #d4c5a2;
+  --color-parchment-500: #b8a77d;
 
-  --color-mystic-gold: #D4AF37;
-  --color-mystic-bronze: #CD7F32;
-  --color-mystic-silver: #C0C0C0;
-  --color-mystic-crimson: #8B0000;
+  --color-mystic-gold: #d4af37;
+  --color-mystic-bronze: #cd7f32;
+  --color-mystic-silver: #c0c0c0;
+  --color-mystic-crimson: #8b0000;
   --color-mystic-midnight: #191970;
 
-  --color-grimoire-dark: #0D0D0D;
+  --color-grimoire-dark: #0d0d0d;
   --color-grimoire-darker: #080808;
-  --color-grimoire-purple: #1A0A2E;
-  --color-grimoire-blood: #2D0A0A;
+  --color-grimoire-purple: #1a0a2e;
+  --color-grimoire-blood: #2d0a0a;
 
   --shadow-tarot: 0 0 0 1px rgba(212, 175, 55, 0.3), 0 4px 20px rgba(0, 0, 0, 0.3);
   --shadow-tarot-glow: 0 0 20px rgba(212, 175, 55, 0.2);
 
-  --background-image-tarot-pattern: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.03) 0%, transparent 50%);
-  --background-image-parchment-texture: radial-gradient(ellipse at 20% 20%, rgba(255,250,240,0.03) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(255,250,240,0.02) 0%, transparent 50%);
+  --background-image-tarot-pattern: radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 255, 255, 0.03) 0%,
+    transparent 50%
+  );
+  --background-image-parchment-texture:
+    radial-gradient(ellipse at 20% 20%, rgba(255, 250, 240, 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(255, 250, 240, 0.02) 0%, transparent 50%);
 
   --animate-sheet-in: sheet-in 0.3s cubic-bezier(0.32, 0.72, 0, 1);
   --animate-sheet-out: sheet-out 0.2s cubic-bezier(0.32, 0.72, 0, 1);
@@ -43,36 +49,76 @@
 }
 
 @keyframes sheet-in {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 @keyframes sheet-out {
-  from { transform: translateY(0); }
-  to { transform: translateY(100%); }
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
 }
 @keyframes overlay-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 @keyframes overlay-out {
-  from { opacity: 1; }
-  to { opacity: 0; }
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 @keyframes toast-in {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes toast-out {
-  from { opacity: 1; transform: translateY(0); }
-  to { opacity: 0; transform: translateY(-8px); }
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
 }
 @keyframes popover-in {
-  from { opacity: 0; transform: scale(0.95) translateY(-4px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 @keyframes popover-out {
-  from { opacity: 1; transform: scale(1) translateY(0); }
-  to { opacity: 0; transform: scale(0.95) translateY(-4px); }
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
 }
 
 @utility text-glow-gold {
@@ -108,7 +154,6 @@
 }
 
 @layer base {
-
   /* Use dynamic viewport height for proper mobile support */
   :root {
     --app-height: 100vh;
@@ -184,7 +229,6 @@
 
 /* Card 3D float — continuous gentle bob on the card itself */
 @keyframes cardFloat {
-
   0%,
   100% {
     transform: perspective(800px) rotateY(-3deg) rotateX(3deg);
@@ -202,7 +246,6 @@
 
 /* Holographic foil shimmer — sweeps across card synced with float */
 @keyframes cardShimmer {
-
   0%,
   100% {
     background-position: -200% center;
@@ -223,16 +266,18 @@
   z-index: 20;
   mix-blend-mode: overlay;
   background-size: 200% 100%;
-  background-image: linear-gradient(105deg,
-      transparent 35%,
-      var(--shimmer-color, rgba(255, 255, 255, 0.1)) 43%,
-      var(--shimmer-color, rgba(255, 255, 255, 0.1)) 45%,
-      rgba(255, 255, 255, 0.18) 48%,
-      rgba(255, 255, 255, 0.22) 50%,
-      rgba(255, 255, 255, 0.18) 52%,
-      var(--shimmer-color, rgba(255, 255, 255, 0.1)) 55%,
-      var(--shimmer-color, rgba(255, 255, 255, 0.1)) 57%,
-      transparent 65%);
+  background-image: linear-gradient(
+    105deg,
+    transparent 35%,
+    var(--shimmer-color, rgba(255, 255, 255, 0.1)) 43%,
+    var(--shimmer-color, rgba(255, 255, 255, 0.1)) 45%,
+    rgba(255, 255, 255, 0.18) 48%,
+    rgba(255, 255, 255, 0.22) 50%,
+    rgba(255, 255, 255, 0.18) 52%,
+    var(--shimmer-color, rgba(255, 255, 255, 0.1)) 55%,
+    var(--shimmer-color, rgba(255, 255, 255, 0.1)) 57%,
+    transparent 65%
+  );
   animation: cardShimmer 6s ease-in-out infinite;
 }
 
@@ -243,7 +288,7 @@
 }
 
 .card-border-glow::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: -1px;
   border-radius: inherit;
@@ -257,7 +302,6 @@
 }
 
 @keyframes glowPulse {
-
   0%,
   100% {
     opacity: 0.4;
@@ -335,26 +379,30 @@
 /* Townsfolk: elegant double-line gold frame with corner flourishes */
 .card-frame-townsfolk {
   border: 1px solid rgba(212, 175, 55, 0.2);
-  box-shadow: inset 0 0 0 3px transparent, inset 0 0 0 4px rgba(212, 175, 55, 0.08);
+  box-shadow:
+    inset 0 0 0 3px transparent,
+    inset 0 0 0 4px rgba(212, 175, 55, 0.08);
 }
 
 /* Outsider: dashed fractured silver frame */
 .card-frame-outsider {
   border: 1px dashed rgba(192, 192, 192, 0.2);
-  box-shadow: inset 0 0 0 3px transparent, inset 0 0 0 4px rgba(192, 192, 192, 0.06);
+  box-shadow:
+    inset 0 0 0 3px transparent,
+    inset 0 0 0 4px rgba(192, 192, 192, 0.06);
 }
 
 /* Minion: ember-dotted orange frame */
 .card-frame-minion {
   border: 1px solid rgba(234, 140, 30, 0.2);
-  background-image: radial-gradient(circle at 10% 50%, rgba(234, 140, 30, 0.06) 0%, transparent 30%),
+  background-image:
+    radial-gradient(circle at 10% 50%, rgba(234, 140, 30, 0.06) 0%, transparent 30%),
     radial-gradient(circle at 90% 30%, rgba(234, 140, 30, 0.04) 0%, transparent 25%),
     radial-gradient(circle at 50% 90%, rgba(234, 140, 30, 0.05) 0%, transparent 20%);
 }
 
 /* Demon: pulsing crimson frame with "breathing" hot corners */
 @keyframes demonFramePulse {
-
   0%,
   100% {
     border-color: rgba(200, 0, 0, 0.2);
@@ -393,11 +441,13 @@
   pointer-events: none;
   z-index: 15;
   opacity: 0.04;
-  background: repeating-linear-gradient(0deg,
-      transparent,
-      transparent 1px,
-      rgba(200, 0, 0, 0.5) 1px,
-      rgba(200, 0, 0, 0.5) 2px);
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 1px,
+    rgba(200, 0, 0, 0.5) 1px,
+    rgba(200, 0, 0, 0.5) 2px
+  );
   animation: scanlines 0.3s linear infinite;
 }
 
@@ -436,7 +486,6 @@
 
 /* Star twinkle for Townsfolk cards */
 @keyframes starTwinkle {
-
   0%,
   100% {
     opacity: 0;
@@ -541,7 +590,6 @@
 
 /* Subtle breathing for prompt text */
 @keyframes breathe {
-
   0%,
   100% {
     opacity: 0.3;

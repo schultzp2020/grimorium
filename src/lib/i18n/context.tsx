@@ -1,96 +1,81 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-  type ReactNode,
-  useMemo,
-} from 'react'
-import type { Language, Translations } from './types'
-import en from './translations/en'
-import es from './translations/es'
+import { createContext, useContext, useState, useCallback, type ReactNode, useMemo } from "react";
+import type { Language, Translations } from "./types";
+import en from "./translations/en";
+import es from "./translations/es";
 
-const TRANSLATIONS: Record<Language, Translations> = { en, es }
+const TRANSLATIONS: Record<Language, Translations> = { en, es };
 
 export type LanguageOption = {
-  code: Language
-  nativeName: string
-}
+  code: Language;
+  nativeName: string;
+};
 
 export const LANGUAGES: LanguageOption[] = [
-  { code: 'en', nativeName: 'English' },
-  { code: 'es', nativeName: 'Español' },
-]
+  { code: "en", nativeName: "English" },
+  { code: "es", nativeName: "Español" },
+];
 
-const VALID_CODES = new Set<string>(LANGUAGES.map((l) => l.code))
+const VALID_CODES = new Set<string>(LANGUAGES.map((l) => l.code));
 
-const STORAGE_KEY = 'grimoire_language'
+const STORAGE_KEY = "grimoire_language";
 
 function isValidLanguage(value: string): value is Language {
-  return VALID_CODES.has(value)
+  return VALID_CODES.has(value);
 }
 
 function getInitialLanguage(): Language {
   // Check localStorage first
-  const stored = localStorage.getItem(STORAGE_KEY)
+  const stored = localStorage.getItem(STORAGE_KEY);
   if (stored && isValidLanguage(stored)) {
-    return stored
+    return stored;
   }
 
   // Check browser language
-  const browserLang = navigator.language.slice(0, 2)
+  const browserLang = navigator.language.slice(0, 2);
   if (isValidLanguage(browserLang)) {
-    return browserLang
+    return browserLang;
   }
 
-  return 'en'
+  return "en";
 }
 
 type I18nContextType = {
-  language: Language
-  setLanguage: (lang: Language) => void
-  t: Translations
-}
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  t: Translations;
+};
 
-const I18nContext = createContext<I18nContextType | null>(null)
+const I18nContext = createContext<I18nContextType | null>(null);
 
 type Props = {
-  children: ReactNode
-}
+  children: ReactNode;
+};
 
 export function I18nProvider({ children }: Props) {
-  const [language, setLanguageState] = useState<Language>(getInitialLanguage)
+  const [language, setLanguageState] = useState<Language>(getInitialLanguage);
 
   const setLanguage = useCallback((lang: Language) => {
-    setLanguageState(lang)
-    localStorage.setItem(STORAGE_KEY, lang)
-  }, [])
+    setLanguageState(lang);
+    localStorage.setItem(STORAGE_KEY, lang);
+  }, []);
 
-  const t = useMemo(() => TRANSLATIONS[language], [language])
+  const t = useMemo(() => TRANSLATIONS[language], [language]);
 
-  const value = useMemo(
-    () => ({ language, setLanguage, t }),
-    [language, setLanguage, t],
-  )
+  const value = useMemo(() => ({ language, setLanguage, t }), [language, setLanguage, t]);
 
-  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>
+  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
 
 export function useI18n(): I18nContextType {
-  const context = useContext(I18nContext)
+  const context = useContext(I18nContext);
   if (!context) {
-    throw new Error('useI18n must be used within an I18nProvider')
+    throw new Error("useI18n must be used within an I18nProvider");
   }
-  return context
+  return context;
 }
 
 // Helper function to interpolate variables in strings
 // Usage: interpolate("Hello {name}!", { name: "World" }) => "Hello World!"
-export function interpolate(
-  template: string,
-  vars: Record<string, string | number>,
-): string {
-  return template.replace(/\{(\w+)\}/g, (_, key) =>
-    String(vars[key] ?? `{${key}}`),
-  )
+export function interpolate(template: string, vars: Record<string, string | number>): string {
+  return template.replace(/\{(\w+)\}/g, (_, key) => String(vars[key] ?? `{${key}}`));
 }

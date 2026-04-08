@@ -1,11 +1,11 @@
-import type { EffectDefinition } from '../../types'
-import { registerEffectTranslations } from '../../../i18n'
+import type { EffectDefinition } from "../../types";
+import { registerEffectTranslations } from "../../../i18n";
 
-import en from './i18n/en'
-import es from './i18n/es'
+import en from "./i18n/en";
+import es from "./i18n/es";
 
-registerEffectTranslations('drunk', 'en', en)
-registerEffectTranslations('drunk', 'es', es)
+registerEffectTranslations("drunk", "en", en);
+registerEffectTranslations("drunk", "es", es);
 
 /**
  * Drunk effect — permanently causes the player's ability to malfunction.
@@ -26,20 +26,20 @@ registerEffectTranslations('drunk', 'es', es)
  * Instance data: `{ actualRole: "drunk" }` — preserves the ground truth.
  */
 const definition: EffectDefinition = {
-  id: 'drunk',
-  icon: 'beer',
-  defaultType: 'nerf',
+  id: "drunk",
+  icon: "beer",
+  defaultType: "nerf",
   poisonsAbility: true,
   perceptionModifiers: [
     {
-      context: ['role', 'team'],
+      context: ["role", "team"],
       modify: (perception) => ({
         ...perception,
-        roleId: 'drunk',
-        team: 'outsider',
+        roleId: "drunk",
+        team: "outsider",
       }),
     },
   ],
-}
+};
 
-export default definition
+export default definition;

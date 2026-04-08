@@ -1,28 +1,28 @@
-import type { RoleId } from '../roles/types'
-import type { IconName } from '../../components/atoms/icon'
+import type { RoleId } from "../roles/types";
+import type { IconName } from "../../components/atoms/icon";
 
-export type ScriptId = 'trouble-brewing' | 'custom'
+export type ScriptId = "trouble-brewing" | "custom";
 
 export type ScriptDefinition = {
-  id: ScriptId
-  icon: IconName
+  id: ScriptId;
+  icon: IconName;
   /** Available roles for this script ('custom' includes all roles) */
-  roles: RoleId[]
+  roles: RoleId[];
   /** Whether to enforce the standard team distribution rules */
-  enforceDistribution: boolean
-}
+  enforceDistribution: boolean;
+};
 
 export type RoleDistribution = {
-  townsfolk: number
-  outsider: number
-  minion: number
-  demon: number
-}
+  townsfolk: number;
+  outsider: number;
+  minion: number;
+  demon: number;
+};
 
-export type GeneratorPreset = 'simple' | 'interesting' | 'chaotic'
+export type GeneratorPreset = "simple" | "interesting" | "chaotic";
 
 export type GeneratedPool = {
-  roles: RoleId[]
-  totalChaos: number
-  distribution: RoleDistribution
-}
+  roles: RoleId[];
+  totalChaos: number;
+  distribution: RoleDistribution;
+};

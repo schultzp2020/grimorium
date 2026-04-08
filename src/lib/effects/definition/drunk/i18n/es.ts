@@ -1,7 +1,7 @@
 const es = {
-  name: 'Borracho',
+  name: "Borracho",
   description:
-    'Este jugador cree ser un Aldeano, pero en realidad es el Borracho. Su habilidad falla permanentemente.',
-} as const
+    "Este jugador cree ser un Aldeano, pero en realidad es el Borracho. Su habilidad falla permanentemente.",
+} as const;
 
-export default es
+export default es;

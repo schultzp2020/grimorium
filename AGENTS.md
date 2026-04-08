@@ -79,41 +79,41 @@ This document explains every system in the codebase, how they interconnect, and 
 
 ```typescript
 type Game = {
-    id: string;
-    name: string;
-    createdAt: number;
-    history: HistoryEntry[];    // The entire game state is here
+  id: string;
+  name: string;
+  createdAt: number;
+  history: HistoryEntry[]; // The entire game state is here
 };
 
 type HistoryEntry = {
-    id: string;
-    timestamp: number;
-    type: EventType;
-    message: RichMessage;           // i18n-ready display messages
-    data: Record<string, unknown>;  // Structured event data
-    stateAfter: GameState;          // Full state snapshot after this event
+  id: string;
+  timestamp: number;
+  type: EventType;
+  message: RichMessage; // i18n-ready display messages
+  data: Record<string, unknown>; // Structured event data
+  stateAfter: GameState; // Full state snapshot after this event
 };
 
 type GameState = {
-    phase: Phase;                   // "setup" | "night" | "day" | "voting" | "ended"
-    round: number;                  // 0 = setup, 1+ = game rounds
-    players: PlayerState[];
-    winner: Team | null;
+  phase: Phase; // "setup" | "night" | "day" | "voting" | "ended"
+  round: number; // 0 = setup, 1+ = game rounds
+  players: PlayerState[];
+  winner: Team | null;
 };
 
 type PlayerState = {
-    id: string;
-    name: string;
-    roleId: string;
-    effects: EffectInstance[];      // All active effects on this player
+  id: string;
+  name: string;
+  roleId: string;
+  effects: EffectInstance[]; // All active effects on this player
 };
 
 type EffectInstance = {
-    id: string;
-    type: string;                   // References an EffectId
-    data?: Record<string, unknown>; // Instance-specific data
-    sourcePlayerId?: string;
-    expiresAt?: "end_of_night" | "end_of_day" | "never";
+  id: string;
+  type: string; // References an EffectId
+  data?: Record<string, unknown>; // Instance-specific data
+  sourcePlayerId?: string;
+  expiresAt?: "end_of_night" | "end_of_day" | "never";
 };
 ```
 
@@ -151,21 +151,21 @@ The game controller provides pure functions that take a `Game` and return a new 
 
 ### Key Functions
 
-| Function | Purpose |
-|----------|---------|
-| `createGame(name, players)` | Creates a game, applies `initialEffects` from roles |
-| `getNextStep(game)` | Returns the next `GameStep` (role reveal, night action, day, etc.) |
-| `startNight(game)` | Transitions to night phase, increments round |
-| `startDay(game)` | Resolves night, announces deaths, expires effects, transitions to day |
-| `applyNightAction(game, result)` | Applies direct history entries and effects from a role's night action |
-| `nominate(game, nominatorId, nomineeId)` | Sends nomination through the Intent Pipeline |
-| `resolveVote(game, nomineeId, votesFor, votesAgainst)` | Processes vote, executes if majority |
-| `checkWinCondition(state, game)` | Checks core + dynamic win conditions |
-| `checkEndOfDayWinConditions(state, game)` | Checks "end_of_day" trigger win conditions |
-| `endGame(game, winner)` | Ends game with a winner |
-| `applySetupAction(game, playerId, result)` | Applies a pre-revelation setup action (e.g., Drunk's role change) |
-| `addEffectToPlayer(game, playerId, effectType)` | Narrator manually adds an effect |
-| `removeEffectFromPlayer(game, playerId, effectType)` | Narrator manually removes an effect |
+| Function                                               | Purpose                                                               |
+| ------------------------------------------------------ | --------------------------------------------------------------------- |
+| `createGame(name, players)`                            | Creates a game, applies `initialEffects` from roles                   |
+| `getNextStep(game)`                                    | Returns the next `GameStep` (role reveal, night action, day, etc.)    |
+| `startNight(game)`                                     | Transitions to night phase, increments round                          |
+| `startDay(game)`                                       | Resolves night, announces deaths, expires effects, transitions to day |
+| `applyNightAction(game, result)`                       | Applies direct history entries and effects from a role's night action |
+| `nominate(game, nominatorId, nomineeId)`               | Sends nomination through the Intent Pipeline                          |
+| `resolveVote(game, nomineeId, votesFor, votesAgainst)` | Processes vote, executes if majority                                  |
+| `checkWinCondition(state, game)`                       | Checks core + dynamic win conditions                                  |
+| `checkEndOfDayWinConditions(state, game)`              | Checks "end_of_day" trigger win conditions                            |
+| `endGame(game, winner)`                                | Ends game with a winner                                               |
+| `applySetupAction(game, playerId, result)`             | Applies a pre-revelation setup action (e.g., Drunk's role change)     |
+| `addEffectToPlayer(game, playerId, effectType)`        | Narrator manually adds an effect                                      |
+| `removeEffectFromPlayer(game, playerId, effectType)`   | Narrator manually removes an effect                                   |
 
 ### Night Action Flow
 
@@ -182,10 +182,10 @@ This separation exists because the pipeline may return `needs_input` (requiring 
 
 ```typescript
 type NightRoleStatus = {
-    roleId: string;
-    playerId: string;
-    playerName: string;
-    status: "pending" | "done";
+  roleId: string;
+  playerId: string;
+  playerName: string;
+  status: "pending" | "done";
 };
 ```
 
@@ -209,17 +209,17 @@ Only roles whose `shouldWake()` returns `true` (or is undefined) and who have a 
 
 ```typescript
 type RoleDefinition = {
-    id: RoleId;
-    team: TeamId;                           // "townsfolk" | "outsider" | "minion" | "demon"
-    icon: IconName;
-    nightOrder: number | null;              // Lower = wakes earlier. null = doesn't wake
-    shouldWake?: (game, player) => boolean; // Conditional waking
-    initialEffects?: EffectToAdd[];         // Effects added at game creation
-    winConditions?: WinConditionCheck[];    // Dynamic win conditions
-    nightSteps?: NightStepDefinition[];     // Declarative night action step list (see §4a)
-    RoleReveal: FC<RoleRevealProps>;        // Component shown when player learns their role
-    NightAction: FC<NightActionProps> | null; // Night action component (null = no action)
-    SetupAction?: FC<SetupActionProps>;     // Pre-revelation narrator setup (see §4b)
+  id: RoleId;
+  team: TeamId; // "townsfolk" | "outsider" | "minion" | "demon"
+  icon: IconName;
+  nightOrder: number | null; // Lower = wakes earlier. null = doesn't wake
+  shouldWake?: (game, player) => boolean; // Conditional waking
+  initialEffects?: EffectToAdd[]; // Effects added at game creation
+  winConditions?: WinConditionCheck[]; // Dynamic win conditions
+  nightSteps?: NightStepDefinition[]; // Declarative night action step list (see §4a)
+  RoleReveal: FC<RoleRevealProps>; // Component shown when player learns their role
+  NightAction: FC<NightActionProps> | null; // Night action component (null = no action)
+  SetupAction?: FC<SetupActionProps>; // Pre-revelation narrator setup (see §4b)
 };
 ```
 
@@ -229,11 +229,11 @@ When a role's `NightAction` component calls `onComplete()`, it provides:
 
 ```typescript
 type NightActionResult = {
-    entries: Omit<HistoryEntry, "id" | "timestamp" | "stateAfter">[];  // History log
-    stateUpdates?: Partial<GameState>;
-    addEffects?: Record<string, EffectToAdd[]>;     // playerId -> effects to add
-    removeEffects?: Record<string, string[]>;       // playerId -> effect types to remove
-    intent?: Intent;                                // Optional intent for the pipeline
+  entries: Omit<HistoryEntry, "id" | "timestamp" | "stateAfter">[]; // History log
+  stateUpdates?: Partial<GameState>;
+  addEffects?: Record<string, EffectToAdd[]>; // playerId -> effects to add
+  removeEffects?: Record<string, string[]>; // playerId -> effect types to remove
+  intent?: Intent; // Optional intent for the pipeline
 };
 ```
 
@@ -241,13 +241,13 @@ type NightActionResult = {
 
 ### Role Categories
 
-| Category | Example Roles | Pattern |
-|----------|---------------|---------|
-| **Action Roles** | Imp, Monk, Poisoner | Emit an intent or apply direct effects at night |
-| **Info Roles (auto-calc)** | Chef, Empath | Calculate information using `perceive()`, display result |
-| **Info Roles (narrator-setup)** | Washerwoman, Librarian, Investigator | Narrator selects players/roles to show, uses `perceive()` for highlighting and role display |
-| **Info Roles (death-triggered)** | Ravenkeeper, Undertaker | Wake conditionally, show role using `perceive()` |
-| **Passive Roles** | Virgin, Slayer, Mayor, Soldier, Saint | `NightAction: null`, behavior via `initialEffects` |
+| Category                         | Example Roles                         | Pattern                                                                                     |
+| -------------------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------- |
+| **Action Roles**                 | Imp, Monk, Poisoner                   | Emit an intent or apply direct effects at night                                             |
+| **Info Roles (auto-calc)**       | Chef, Empath                          | Calculate information using `perceive()`, display result                                    |
+| **Info Roles (narrator-setup)**  | Washerwoman, Librarian, Investigator  | Narrator selects players/roles to show, uses `perceive()` for highlighting and role display |
+| **Info Roles (death-triggered)** | Ravenkeeper, Undertaker               | Wake conditionally, show role using `perceive()`                                            |
+| **Passive Roles**                | Virgin, Slayer, Mayor, Soldier, Saint | `NightAction: null`, behavior via `initialEffects`                                          |
 
 ### Night Action Steps (NightStepListLayout)
 
@@ -278,10 +278,10 @@ Roles declare their steps via the optional `nightSteps` field on `RoleDefinition
 
 ```typescript
 type NightStepDefinition = {
-    id: string;
-    icon: IconName;
-    getLabel: (t: Translations) => string;
-    condition?: (game: Game, player: PlayerState, state: GameState) => boolean;
+  id: string;
+  icon: IconName;
+  getLabel: (t: Translations) => string;
+  condition?: (game: Game, player: PlayerState, state: GameState) => boolean;
 };
 ```
 
@@ -291,6 +291,7 @@ type NightStepDefinition = {
 #### NightStepListLayout Component
 
 The shared layout component renders the step list with:
+
 - Role header (icon, name, player name)
 - Numbered step rows with status badges (pending / done / next)
 - Only the next pending step is tappable (consistent with Night Dashboard pattern)
@@ -298,20 +299,20 @@ The shared layout component renders the step list with:
 
 ```typescript
 type NightStep = {
-    id: string;
-    icon: IconName;
-    label: string;
-    status: "pending" | "done" | "active";
+  id: string;
+  icon: IconName;
+  label: string;
+  status: "pending" | "done" | "active";
 };
 
 // Props
 type Props = {
-    icon: IconName;
-    roleName: string;
-    playerName: string;
-    isEvil?: boolean;
-    steps: NightStep[];
-    onSelectStep: (stepId: string) => void;
+  icon: IconName;
+  roleName: string;
+  playerName: string;
+  isEvil?: boolean;
+  steps: NightStep[];
+  onSelectStep: (stepId: string) => void;
 };
 ```
 
@@ -321,45 +322,45 @@ The `NightAction` component reads its role's `nightSteps` (or hardcodes a step a
 
 ```typescript
 const steps: NightStep[] = useMemo(() => {
-    const result: NightStep[] = [];
+  const result: NightStep[] = [];
 
-    // Conditional step — only appears when ambiguous players exist
-    if (needsPerceptionConfig) {
-        result.push({
-            id: "configure_perceptions",
-            icon: "eye",
-            label: t.game.stepConfigurePerceptions,
-            status: perceptionConfigDone ? "done" : "pending",
-        });
-    }
-
-    // Always-present step
+  // Conditional step — only appears when ambiguous players exist
+  if (needsPerceptionConfig) {
     result.push({
-        id: "show_result",
-        icon: "chefHat",
-        label: t.game.stepShowResult,
-        status: "pending",
+      id: "configure_perceptions",
+      icon: "eye",
+      label: t.game.stepConfigurePerceptions,
+      status: perceptionConfigDone ? "done" : "pending",
     });
+  }
 
-    return result;
+  // Always-present step
+  result.push({
+    id: "show_result",
+    icon: "chefHat",
+    label: t.game.stepShowResult,
+    status: "pending",
+  });
+
+  return result;
 }, [needsPerceptionConfig, perceptionConfigDone, t]);
 ```
 
 #### Current Role Step Configurations
 
-| Role | Steps | Notes |
-|------|-------|-------|
-| **Chef** | (1) Configure Perceptions (cond.), (2) Show Result | Perception config when ambiguous alignment players exist |
-| **Empath** | (1) Configure Perceptions (cond.), (2) Show Result | Scoped to alive neighbors only |
-| **Undertaker** | (1) Configure Perceptions (cond.), (2) Show Role | Scoped to the executed player |
-| **Fortune Teller** | (1) Assign Red Herring (cond.), (2) Select players, (3) Configure Malfunction (cond.), (4) Show Result | Red Herring step only on night 1 |
-| **Ravenkeeper** | (1) Select Player, (2) Configure Perceptions (cond.), (3) Show Role | Perception step appears dynamically after player selection |
-| **Washerwoman** | (1) Narrator Setup | Single step (misregistration handled inline) |
-| **Librarian** | (1) Narrator Setup | Single step |
-| **Investigator** | (1) Narrator Setup | Single step |
-| **Imp** | (1) Choose Victim | Single step, evil theming |
-| **Monk** | (1) Choose Player | Single step |
-| **Poisoner** | (1) Choose Target | Single step, evil theming. Applies `poisoned` effect to target |
+| Role               | Steps                                                                                                  | Notes                                                          |
+| ------------------ | ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------- |
+| **Chef**           | (1) Configure Perceptions (cond.), (2) Show Result                                                     | Perception config when ambiguous alignment players exist       |
+| **Empath**         | (1) Configure Perceptions (cond.), (2) Show Result                                                     | Scoped to alive neighbors only                                 |
+| **Undertaker**     | (1) Configure Perceptions (cond.), (2) Show Role                                                       | Scoped to the executed player                                  |
+| **Fortune Teller** | (1) Assign Red Herring (cond.), (2) Select players, (3) Configure Malfunction (cond.), (4) Show Result | Red Herring step only on night 1                               |
+| **Ravenkeeper**    | (1) Select Player, (2) Configure Perceptions (cond.), (3) Show Role                                    | Perception step appears dynamically after player selection     |
+| **Washerwoman**    | (1) Narrator Setup                                                                                     | Single step (misregistration handled inline)                   |
+| **Librarian**      | (1) Narrator Setup                                                                                     | Single step                                                    |
+| **Investigator**   | (1) Narrator Setup                                                                                     | Single step                                                    |
+| **Imp**            | (1) Choose Victim                                                                                      | Single step, evil theming                                      |
+| **Monk**           | (1) Choose Player                                                                                      | Single step                                                    |
+| **Poisoner**       | (1) Choose Target                                                                                      | Single step, evil theming. Applies `poisoned` effect to target |
 
 When a role is malfunctioning (has `poisoned` or `drunk` effect), an additional **Configure Malfunction** step is conditionally inserted before the result step. The narrator uses `MalfunctionConfigStep` to provide false results. See [§5a: The Malfunction System](#the-malfunction-system).
 
@@ -373,15 +374,15 @@ Some roles require narrator configuration **before** role revelation begins. The
 
 ```typescript
 type SetupActionProps = {
-    player: PlayerState;
-    state: GameState;
-    onComplete: (result: SetupActionResult) => void;
+  player: PlayerState;
+  state: GameState;
+  onComplete: (result: SetupActionResult) => void;
 };
 
 type SetupActionResult = {
-    changeRole?: string;             // Change the player's roleId
-    addEffects?: Record<string, EffectToAdd[]>;
-    removeEffects?: Record<string, string[]>;
+  changeRole?: string; // Change the player's roleId
+  addEffects?: Record<string, EffectToAdd[]>;
+  removeEffects?: Record<string, string[]>;
 };
 ```
 
@@ -401,8 +402,8 @@ The `SetupActionsScreen` displays a list of pending setup actions. The narrator 
 
 #### Current Setup Actions
 
-| Role | Purpose |
-|------|---------|
+| Role      | Purpose                                                                                                                                |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | **Drunk** | Narrator chooses which Townsfolk role the Drunk believes they are. Changes `roleId` to that role and applies permanent `drunk` effect. |
 
 ### Registering a New Role
@@ -419,6 +420,7 @@ The `SetupActionsScreen` displays a list of pending setup actions. The narrator 
 **Files:** `src/lib/effects/types.ts`, `src/lib/effects/index.ts`, `src/lib/effects/definition/*`
 
 Effects are the primary mechanism for modular game behavior. They attach to players and can:
+
 - Modify player state (dead, can't vote, can't nominate)
 - Intercept game intents (prevent kills, redirect kills, prevent nominations)
 - Register day actions (Slayer shot)
@@ -430,57 +432,57 @@ Effects are the primary mechanism for modular game behavior. They attach to play
 
 ```typescript
 type EffectDefinition = {
-    id: EffectId;
-    icon: IconName;
+  id: EffectId;
+  icon: IconName;
 
-    // Behavior modifiers (simple boolean flags)
-    preventsNightWake?: boolean;
-    preventsVoting?: boolean;
-    preventsNomination?: boolean;
+  // Behavior modifiers (simple boolean flags)
+  preventsNightWake?: boolean;
+  preventsVoting?: boolean;
+  preventsNomination?: boolean;
 
-    // Malfunction flag — when true, the player's ability malfunctions
-    // (info roles give wrong info, action roles' effects don't apply,
-    // passive handlers are skipped, win conditions are disabled)
-    poisonsAbility?: boolean;
+  // Malfunction flag — when true, the player's ability malfunctions
+  // (info roles give wrong info, action roles' effects don't apply,
+  // passive handlers are skipped, win conditions are disabled)
+  poisonsAbility?: boolean;
 
-    // Conditional behavior
-    canVote?: (player, state) => boolean;
-    canNominate?: (player, state) => boolean;
+  // Conditional behavior
+  canVote?: (player, state) => boolean;
+  canNominate?: (player, state) => boolean;
 
-    // Pipeline integration
-    handlers?: IntentHandler[];             // Intercept/modify intents
-    dayActions?: DayActionDefinition[];     // Register day-phase abilities
-    nightFollowUps?: NightFollowUpDefinition[];  // Register reactive night-phase actions
-    winConditions?: WinConditionCheck[];    // Register custom win conditions
-    perceptionModifiers?: PerceptionModifier[];  // Alter perceived identity
+  // Pipeline integration
+  handlers?: IntentHandler[]; // Intercept/modify intents
+  dayActions?: DayActionDefinition[]; // Register day-phase abilities
+  nightFollowUps?: NightFollowUpDefinition[]; // Register reactive night-phase actions
+  winConditions?: WinConditionCheck[]; // Register custom win conditions
+  perceptionModifiers?: PerceptionModifier[]; // Alter perceived identity
 
-    // Misregistration declaration — used by perception query utilities
-    // (getAmbiguousPlayers, canRegisterAsTeam, canRegisterAsAlignment)
-    // to detect players needing narrator perception configuration
-    canRegisterAs?: {
-        teams?: TeamId[];
-        alignments?: ("good" | "evil")[];
-    };
+  // Misregistration declaration — used by perception query utilities
+  // (getAmbiguousPlayers, canRegisterAsTeam, canRegisterAsAlignment)
+  // to detect players needing narrator perception configuration
+  canRegisterAs?: {
+    teams?: TeamId[];
+    alignments?: ("good" | "evil")[];
+  };
 };
 ```
 
 ### Current Effects
 
-| Effect | Applied By | Purpose | Pipeline Features |
-|--------|-----------|---------|-------------------|
-| `dead` | Pipeline/game | Player is dead | `preventsNightWake`, conditional voting |
-| `used_dead_vote` | game.ts | Dead player used their one vote | `preventsVoting` |
-| `safe` | Soldier (permanent), Monk (nightly) | Protection from death | `handlers`: prevents kill intents |
-| `red_herring` | Fortune Teller | False positive for FT checks | No handlers (checked directly by FT) |
-| `pure` | Virgin | Townsfolk nominators get executed | `handlers`: intercepts nominations |
-| `slayer_bullet` | Slayer | One-shot day kill | `dayActions`: SlayerActionScreen |
-| `bounce` | Mayor | Redirects kills to another player | `handlers`: requests UI, redirects kill |
-| `martyrdom` | Saint | Evil wins if executed | `winConditions`: after_execution |
-| `scarlet_woman` | Scarlet Woman | Becomes Demon when Demon dies | `handlers`: piggybacks role change + `pending_role_reveal` |
-| `recluse_misregister` | Recluse | Outsider that may register as evil | `perceptionModifiers`, `canRegisterAs: { teams: [minion, demon], alignments: [evil] }` |
-| `pending_role_reveal` | Scarlet Woman handler (or any role-changing effect) | Signals a role change needs to be revealed | `nightFollowUps`: shows RoleCard to narrator |
-| `poisoned` | Poisoner (nightly) | Ability malfunction, expires at end of day (lasts night + day) | `poisonsAbility: true` — flag only, detected by `isMalfunctioning()` |
-| `drunk` | Drunk (permanent, via SetupAction) | Permanent malfunction + unconditional Drunk/Outsider perception | `poisonsAbility: true`, `perceptionModifiers`: always shows as Drunk/Outsider |
+| Effect                | Applied By                                          | Purpose                                                         | Pipeline Features                                                                      |
+| --------------------- | --------------------------------------------------- | --------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `dead`                | Pipeline/game                                       | Player is dead                                                  | `preventsNightWake`, conditional voting                                                |
+| `used_dead_vote`      | game.ts                                             | Dead player used their one vote                                 | `preventsVoting`                                                                       |
+| `safe`                | Soldier (permanent), Monk (nightly)                 | Protection from death                                           | `handlers`: prevents kill intents                                                      |
+| `red_herring`         | Fortune Teller                                      | False positive for FT checks                                    | No handlers (checked directly by FT)                                                   |
+| `pure`                | Virgin                                              | Townsfolk nominators get executed                               | `handlers`: intercepts nominations                                                     |
+| `slayer_bullet`       | Slayer                                              | One-shot day kill                                               | `dayActions`: SlayerActionScreen                                                       |
+| `bounce`              | Mayor                                               | Redirects kills to another player                               | `handlers`: requests UI, redirects kill                                                |
+| `martyrdom`           | Saint                                               | Evil wins if executed                                           | `winConditions`: after_execution                                                       |
+| `scarlet_woman`       | Scarlet Woman                                       | Becomes Demon when Demon dies                                   | `handlers`: piggybacks role change + `pending_role_reveal`                             |
+| `recluse_misregister` | Recluse                                             | Outsider that may register as evil                              | `perceptionModifiers`, `canRegisterAs: { teams: [minion, demon], alignments: [evil] }` |
+| `pending_role_reveal` | Scarlet Woman handler (or any role-changing effect) | Signals a role change needs to be revealed                      | `nightFollowUps`: shows RoleCard to narrator                                           |
+| `poisoned`            | Poisoner (nightly)                                  | Ability malfunction, expires at end of day (lasts night + day)  | `poisonsAbility: true` — flag only, detected by `isMalfunctioning()`                   |
+| `drunk`               | Drunk (permanent, via SetupAction)                  | Permanent malfunction + unconditional Drunk/Outsider perception | `poisonsAbility: true`, `perceptionModifiers`: always shows as Drunk/Outsider          |
 
 ### Effect Lifecycle
 
@@ -514,17 +516,17 @@ const malfunctioning = isMalfunctioning(player);
 
 #### How Malfunction Affects Each Role Category
 
-| Category | Malfunction Behavior | Implementation |
-|----------|---------------------|----------------|
-| **Info roles (auto-calc)** (Chef, Empath) | Narrator picks false result via `MalfunctionConfigStep` | Conditional "Configure Malfunction" step before "Show Result" |
-| **Info roles (narrator-setup)** (Washerwoman, Librarian, Investigator) | Narrator freely picks any players/roles | `malfunctioned: true` flag in history data; perception config skipped |
-| **Info roles (death-triggered)** (Undertaker, Ravenkeeper) | Narrator picks false role via `MalfunctionConfigStep` | Conditional "Configure Malfunction" step; perception config skipped |
-| **Info roles (boolean)** (Fortune Teller) | Narrator picks true/false via `MalfunctionConfigStep` | Conditional "Configure Malfunction" step with boolean picker |
-| **Action roles** (Monk) | Effect is not applied | `addEffects` conditionally omitted when malfunctioning |
-| **Demon** (Imp) | Kill intent is not emitted | `intent` conditionally omitted when malfunctioning |
-| **Passive handlers** (Safe, Pure, Bounce, ScarletWoman) | Handler is completely skipped | `collectActiveHandlers()` in pipeline skips malfunctioning players |
-| **Win conditions** (Martyrdom, Mayor) | Win condition is skipped | `checkDynamicWinConditions()` skips malfunctioning players |
-| **Day actions** (Slayer) | Shot always misses | `isDemon` check overridden to `false` when malfunctioning |
+| Category                                                               | Malfunction Behavior                                    | Implementation                                                        |
+| ---------------------------------------------------------------------- | ------------------------------------------------------- | --------------------------------------------------------------------- |
+| **Info roles (auto-calc)** (Chef, Empath)                              | Narrator picks false result via `MalfunctionConfigStep` | Conditional "Configure Malfunction" step before "Show Result"         |
+| **Info roles (narrator-setup)** (Washerwoman, Librarian, Investigator) | Narrator freely picks any players/roles                 | `malfunctioned: true` flag in history data; perception config skipped |
+| **Info roles (death-triggered)** (Undertaker, Ravenkeeper)             | Narrator picks false role via `MalfunctionConfigStep`   | Conditional "Configure Malfunction" step; perception config skipped   |
+| **Info roles (boolean)** (Fortune Teller)                              | Narrator picks true/false via `MalfunctionConfigStep`   | Conditional "Configure Malfunction" step with boolean picker          |
+| **Action roles** (Monk)                                                | Effect is not applied                                   | `addEffects` conditionally omitted when malfunctioning                |
+| **Demon** (Imp)                                                        | Kill intent is not emitted                              | `intent` conditionally omitted when malfunctioning                    |
+| **Passive handlers** (Safe, Pure, Bounce, ScarletWoman)                | Handler is completely skipped                           | `collectActiveHandlers()` in pipeline skips malfunctioning players    |
+| **Win conditions** (Martyrdom, Mayor)                                  | Win condition is skipped                                | `checkDynamicWinConditions()` skips malfunctioning players            |
+| **Day actions** (Slayer)                                               | Shot always misses                                      | `isDemon` check overridden to `false` when malfunctioning             |
 
 #### Pipeline-Level Malfunction
 
@@ -543,16 +545,16 @@ A narrator-only screen for configuring false results when a role is malfunctioni
 
 ```typescript
 type Props = {
-    type: "number" | "boolean" | "role";
-    roleIcon: string;
-    roleName: string;
-    playerName: string;
-    // For "number" type:
-    numberRange?: [number, number];
-    onComplete: (value: number | boolean | string) => void;
-    // For "boolean" type:
-    trueLabel?: string;
-    falseLabel?: string;
+  type: "number" | "boolean" | "role";
+  roleIcon: string;
+  roleName: string;
+  playerName: string;
+  // For "number" type:
+  numberRange?: [number, number];
+  onComplete: (value: number | boolean | string) => void;
+  // For "boolean" type:
+  trueLabel?: string;
+  falseLabel?: string;
 };
 ```
 
@@ -563,6 +565,7 @@ type Props = {
 #### History Data Convention
 
 When a role's action is malfunctioned, the history entry's `data` includes:
+
 - `malfunctioned: true` — flags that this result was narrator-controlled
 - `actualXxx` — the real value (e.g., `actualEvilPairs`, `actualResult`, `actualRoleId`)
 
@@ -620,10 +623,10 @@ type Intent = KillIntent | NominateIntent | ExecuteIntent;
 
 ```typescript
 type IntentHandler = {
-    intentType: Intent["type"] | Intent["type"][];   // Which intents to handle
-    priority: number;                                 // Lower = runs first
-    appliesTo: (intent, effectPlayer, state) => boolean;  // Guard condition
-    handle: (intent, effectPlayer, state, game) => HandlerResult;  // Logic
+  intentType: Intent["type"] | Intent["type"][]; // Which intents to handle
+  priority: number; // Lower = runs first
+  appliesTo: (intent, effectPlayer, state) => boolean; // Guard condition
+  handle: (intent, effectPlayer, state, game) => HandlerResult; // Logic
 };
 ```
 
@@ -631,10 +634,14 @@ type IntentHandler = {
 
 ```typescript
 type HandlerResult =
-    | { action: "allow"; stateChanges?: StateChanges }
-    | { action: "prevent"; reason: string; stateChanges?: StateChanges }
-    | { action: "redirect"; newIntent: Intent; stateChanges?: StateChanges }
-    | { action: "request_ui"; UIComponent: FC<PipelineInputProps>; resume: (result: unknown) => HandlerResult };
+  | { action: "allow"; stateChanges?: StateChanges }
+  | { action: "prevent"; reason: string; stateChanges?: StateChanges }
+  | { action: "redirect"; newIntent: Intent; stateChanges?: StateChanges }
+  | {
+      action: "request_ui";
+      UIComponent: FC<PipelineInputProps>;
+      resume: (result: unknown) => HandlerResult;
+    };
 ```
 
 ### StateChanges
@@ -643,10 +650,10 @@ The unified structure for describing changes across the pipeline:
 
 ```typescript
 type StateChanges = {
-    entries: Omit<HistoryEntry, "id" | "timestamp" | "stateAfter">[];
-    stateUpdates?: Partial<GameState>;
-    addEffects?: Record<string, EffectToAdd[]>;
-    removeEffects?: Record<string, string[]>;
+  entries: Omit<HistoryEntry, "id" | "timestamp" | "stateAfter">[];
+  stateUpdates?: Partial<GameState>;
+  addEffects?: Record<string, EffectToAdd[]>;
+  removeEffects?: Record<string, string[]>;
 };
 ```
 
@@ -658,20 +665,20 @@ Multiple `StateChanges` from different handlers are merged via `mergeStateChange
 
 If no handler prevents an intent, a **default resolver** runs:
 
-| Intent | Default Resolver |
-|--------|-----------------|
-| `kill` | Adds `dead` effect to target |
+| Intent     | Default Resolver                                      |
+| ---------- | ----------------------------------------------------- |
+| `kill`     | Adds `dead` effect to target                          |
 | `nominate` | Creates nomination entry, transitions to voting phase |
-| `execute` | Creates execution entry, adds `dead` effect |
+| `execute`  | Creates execution entry, adds `dead` effect           |
 
 ### Priority Conventions
 
-| Priority | Use Case |
-|----------|----------|
-| 1-5 | Redirect handlers (Bounce) — run before protection so redirect happens first |
-| 6-10 | Protection handlers (Safe) — can prevent after redirect |
-| 11-20 | Modification handlers — alter intent details |
-| 21+ | Observation handlers — react without changing |
+| Priority | Use Case                                                                     |
+| -------- | ---------------------------------------------------------------------------- |
+| 1-5      | Redirect handlers (Bounce) — run before protection so redirect happens first |
+| 6-10     | Protection handlers (Safe) — can prevent after redirect                      |
+| 11-20    | Modification handlers — alter intent details                                 |
+| 21+      | Observation handlers — react without changing                                |
 
 ### Example: Kill Intent Flow (Imp → Bounce → Safe)
 
@@ -714,41 +721,43 @@ This starts with the target's actual identity, then applies **perception modifie
 type PerceptionContext = "alignment" | "team" | "role";
 
 type Perception = {
-    roleId: string;          // What role they appear to be
-    team: TeamId;            // What team they appear on
-    alignment: "good" | "evil"; // What alignment they appear to have
+  roleId: string; // What role they appear to be
+  team: TeamId; // What team they appear on
+  alignment: "good" | "evil"; // What alignment they appear to have
 };
 
 type PerceptionModifier = {
-    context: PerceptionContext | PerceptionContext[];  // When to apply
-    observerRoles?: string[];  // Optional: only for specific observer roles
-    modify: (
-        perception: Perception,
-        targetPlayer: PlayerState,
-        observerPlayer: PlayerState,
-        state: GameState,
-        effectData?: Record<string, unknown>  // Data from the EffectInstance
-    ) => Perception;
+  context: PerceptionContext | PerceptionContext[]; // When to apply
+  observerRoles?: string[]; // Optional: only for specific observer roles
+  modify: (
+    perception: Perception,
+    targetPlayer: PlayerState,
+    observerPlayer: PlayerState,
+    state: GameState,
+    effectData?: Record<string, unknown>, // Data from the EffectInstance
+  ) => Perception;
 };
 ```
 
 ### PerceptionContext
 
-| Context | Used By | What It Queries |
-|---------|---------|-----------------|
-| `"alignment"` | Chef, Empath | Is this player good or evil? |
-| `"team"` | Washerwoman, Librarian, Investigator | What team is this player on? |
-| `"role"` | Fortune Teller, Undertaker, Ravenkeeper | What specific role is this player? |
+| Context       | Used By                                 | What It Queries                    |
+| ------------- | --------------------------------------- | ---------------------------------- |
+| `"alignment"` | Chef, Empath                            | Is this player good or evil?       |
+| `"team"`      | Washerwoman, Librarian, Investigator    | What team is this player on?       |
+| `"role"`      | Fortune Teller, Undertaker, Ravenkeeper | What specific role is this player? |
 
 ### How Roles Use Perception
 
 **Auto-calculating roles** (Chef, Empath):
+
 ```typescript
 const perception = perceive(targetPlayer, chefPlayer, "alignment", state);
 const isEvil = perception.alignment === "evil";
 ```
 
 **Narrator-setup roles** (Washerwoman, Librarian, Investigator):
+
 ```typescript
 // For team highlighting in player lists:
 const perception = perceive(p, observerPlayer, "team", state);
@@ -760,6 +769,7 @@ const perceivedRole = getRole(pPerception.roleId);
 ```
 
 **Role-reveal roles** (Undertaker, Ravenkeeper):
+
 ```typescript
 const perception = perceive(executedPlayer, undertakerPlayer, "role", state);
 const executedRole = getRole(perception.roleId);
@@ -790,6 +800,7 @@ const ambiguous = getAmbiguousPlayers(state.players.filter(isAlive), "alignment"
 ```
 
 Context matching rules:
+
 - `"alignment"` → checks `canRegisterAs.alignments`
 - `"team"` → checks `canRegisterAs.teams`
 - `"role"` → checks both (misregistration at any level affects role perception)
@@ -814,17 +825,18 @@ A narrator-only screen where the narrator configures how ambiguous players regis
 
 ```typescript
 type Props = {
-    ambiguousPlayers: PlayerState[];     // From getAmbiguousPlayers()
-    context: PerceptionContext;          // What aspect is being configured
-    state: GameState;
-    roleIcon: string;
-    roleName: string;
-    playerName: string;
-    onComplete: (overrides: Record<string, Partial<Perception>>) => void;
+  ambiguousPlayers: PlayerState[]; // From getAmbiguousPlayers()
+  context: PerceptionContext; // What aspect is being configured
+  state: GameState;
+  roleIcon: string;
+  roleName: string;
+  playerName: string;
+  onComplete: (overrides: Record<string, Partial<Perception>>) => void;
 };
 ```
 
 For each ambiguous player, it shows:
+
 - The player's name, actual role, and the effect granting misregistration
 - Toggle buttons for how they should register (e.g., "Good" vs "Evil" for alignment context)
 
@@ -848,14 +860,16 @@ This keeps perception configuration **fully modular** — roles detect ambiguity
 On an `EffectDefinition`, add `perceptionModifiers`. Example for a hypothetical "misregister" effect:
 
 ```typescript
-perceptionModifiers: [{
+perceptionModifiers: [
+  {
     context: ["alignment", "team", "role"],
     modify: (perception, _target, _observer, _state, effectData) => {
-        const overrides = effectData?.perceiveAs as Partial<Perception> | undefined;
-        if (!overrides) return perception;
-        return { ...perception, ...overrides };
+      const overrides = effectData?.perceiveAs as Partial<Perception> | undefined;
+      if (!overrides) return perception;
+      return { ...perception, ...overrides };
     },
-}]
+  },
+];
 ```
 
 The narrator would configure the effect's instance data when assigning it (e.g., `{ perceiveAs: { team: "minion", alignment: "evil", roleId: "poisoner" } }`).
@@ -865,6 +879,7 @@ The narrator would configure the effect's instance data when assigning it (e.g.,
 If a new effect should cause narrator configuration for information roles:
 
 1. Add `canRegisterAs` to the effect definition declaring what it can misregister as:
+
    ```typescript
    canRegisterAs: {
        teams?: TeamId[];           // e.g., ["minion", "demon"]
@@ -886,25 +901,25 @@ Day actions are abilities that can be used during the day phase. They are regist
 
 ```typescript
 type DayActionDefinition = {
-    id: string;
-    icon: IconName;
-    getLabel: (t) => string;         // i18n label
-    getDescription: (t) => string;   // i18n description
-    condition: (player, state) => boolean;  // When is this action available?
-    ActionComponent: FC<DayActionProps>;    // The UI for this action
+  id: string;
+  icon: IconName;
+  getLabel: (t) => string; // i18n label
+  getDescription: (t) => string; // i18n description
+  condition: (player, state) => boolean; // When is this action available?
+  ActionComponent: FC<DayActionProps>; // The UI for this action
 };
 
 type DayActionProps = {
-    state: GameState;
-    playerId: string;
-    onComplete: (result: DayActionResult) => void;
-    onBack: () => void;
+  state: GameState;
+  playerId: string;
+  onComplete: (result: DayActionResult) => void;
+  onBack: () => void;
 };
 
 type DayActionResult = {
-    entries: Omit<HistoryEntry, "id" | "timestamp" | "stateAfter">[];
-    addEffects?: Record<string, EffectToAdd[]>;
-    removeEffects?: Record<string, string[]>;
+  entries: Omit<HistoryEntry, "id" | "timestamp" | "stateAfter">[];
+  addEffects?: Record<string, EffectToAdd[]>;
+  removeEffects?: Record<string, string[]>;
 };
 ```
 
@@ -928,24 +943,24 @@ Night follow-ups are reactive actions that appear in the Night Dashboard during 
 
 ```typescript
 type NightFollowUpDefinition = {
-    id: string;
-    icon: IconName;
-    getLabel: (t) => string;                               // i18n label
-    condition: (player, state, game) => boolean;            // When is this follow-up needed?
-    ActionComponent: FC<NightFollowUpProps>;                // The UI for this follow-up
+  id: string;
+  icon: IconName;
+  getLabel: (t) => string; // i18n label
+  condition: (player, state, game) => boolean; // When is this follow-up needed?
+  ActionComponent: FC<NightFollowUpProps>; // The UI for this follow-up
 };
 
 type NightFollowUpProps = {
-    state: GameState;
-    game: Game;
-    playerId: string;
-    onComplete: (result: NightFollowUpResult) => void;
+  state: GameState;
+  game: Game;
+  playerId: string;
+  onComplete: (result: NightFollowUpResult) => void;
 };
 
 type NightFollowUpResult = {
-    entries: Omit<HistoryEntry, "id" | "timestamp" | "stateAfter">[];
-    addEffects?: Record<string, EffectToAdd[]>;
-    removeEffects?: Record<string, string[]>;
+  entries: Omit<HistoryEntry, "id" | "timestamp" | "stateAfter">[];
+  addEffects?: Record<string, EffectToAdd[]>;
+  removeEffects?: Record<string, string[]>;
 };
 ```
 
@@ -968,8 +983,8 @@ Follow-ups are condition-based. When a follow-up's `ActionComponent` calls `onCo
 
 ### Current Night Follow-Ups
 
-| Follow-Up | Effect | Trigger | Purpose |
-|-----------|--------|---------|---------|
+| Follow-Up          | Effect                | Trigger                                        | Purpose                                                                    |
+| ------------------ | --------------------- | ---------------------------------------------- | -------------------------------------------------------------------------- |
 | Role Change Reveal | `pending_role_reveal` | Added by Scarlet Woman handler when Demon dies | Shows the player's new RoleCard so the narrator can reveal the role change |
 
 ### The `pending_role_reveal` pattern
@@ -1007,8 +1022,8 @@ Effects and roles can declare `winConditions`:
 type WinConditionTrigger = "after_execution" | "end_of_day" | "after_state_change";
 
 type WinConditionCheck = {
-    trigger: WinConditionTrigger;
-    check: (state: GameState, game: Game) => "townsfolk" | "demon" | null;
+  trigger: WinConditionTrigger;
+  check: (state: GameState, game: Game) => "townsfolk" | "demon" | null;
 };
 ```
 
@@ -1016,10 +1031,10 @@ type WinConditionCheck = {
 
 ### Current Dynamic Win Conditions
 
-| Source | Trigger | Condition |
-|--------|---------|-----------|
-| `martyrdom` effect (Saint) | `after_execution` | Evil wins if player with martyrdom is executed |
-| `mayor` role | `end_of_day` | Good wins if 3 alive, no execution today, Mayor alive |
+| Source                     | Trigger           | Condition                                             |
+| -------------------------- | ----------------- | ----------------------------------------------------- |
+| `martyrdom` effect (Saint) | `after_execution` | Evil wins if player with martyrdom is executed        |
+| `mayor` role               | `end_of_day`      | Good wins if 3 alive, no execution today, Mayor alive |
 
 ---
 
@@ -1047,6 +1062,7 @@ grimoire_role_card (from grimoire modal, returns to previous screen)
 ### Night Dashboard Flow
 
 The Night Dashboard (`NightDashboard.tsx`) is the central hub for the night phase. It displays a unified list of:
+
 1. **Regular night actions** — from `getNightRolesStatus(game)` (roles with `nightOrder`)
 2. **Night follow-ups** — from `getAvailableNightFollowUps(state, game, t)` (reactive actions from effects)
 
@@ -1084,6 +1100,7 @@ The list is ordered: regular actions first (by `nightOrder`), follow-ups appende
 ### Pipeline Input Screen
 
 When the pipeline returns `needs_input`:
+
 1. `pipelineUI` state is set with the `UIComponent`, `intent`, and `resume` callback
 2. The screen type becomes `pipeline_input`
 3. The component renders, narrator makes a choice
@@ -1211,20 +1228,20 @@ When adding a new role or effect, add translations in **both** `src/lib/i18n/tra
 
 ### When to use each capability
 
-| I want to... | Use... |
-|--------------|--------|
-| Prevent a player from being killed | `handlers` with `intentType: "kill"`, return `{ action: "prevent" }` |
-| Redirect a kill to someone else | `handlers` with `intentType: "kill"`, return `{ action: "redirect" }` |
-| Need narrator input during pipeline | `handlers` returning `{ action: "request_ui" }` |
-| Give a player a day-phase ability | `dayActions` with condition + ActionComponent |
-| React to a night event with a follow-up action | `nightFollowUps` with condition + ActionComponent |
-| Show a role change reveal after transformation | Add `pending_role_reveal` effect (it has a built-in `nightFollowUp`) |
-| Create a custom win condition | `winConditions` with trigger + check |
-| Make a player register differently to info roles | `perceptionModifiers` + `canRegisterAs` (see §7) |
-| Enable narrator perception config for info roles | `canRegisterAs: { teams?, alignments? }` on the effect |
-| Prevent a player from waking at night | `preventsNightWake: true` |
-| Prevent voting | `preventsVoting: true` or `canVote` function |
-| Make a player's ability malfunction | `poisonsAbility: true` on the effect (detected by `isMalfunctioning()`) |
+| I want to...                                     | Use...                                                                  |
+| ------------------------------------------------ | ----------------------------------------------------------------------- |
+| Prevent a player from being killed               | `handlers` with `intentType: "kill"`, return `{ action: "prevent" }`    |
+| Redirect a kill to someone else                  | `handlers` with `intentType: "kill"`, return `{ action: "redirect" }`   |
+| Need narrator input during pipeline              | `handlers` returning `{ action: "request_ui" }`                         |
+| Give a player a day-phase ability                | `dayActions` with condition + ActionComponent                           |
+| React to a night event with a follow-up action   | `nightFollowUps` with condition + ActionComponent                       |
+| Show a role change reveal after transformation   | Add `pending_role_reveal` effect (it has a built-in `nightFollowUp`)    |
+| Create a custom win condition                    | `winConditions` with trigger + check                                    |
+| Make a player register differently to info roles | `perceptionModifiers` + `canRegisterAs` (see §7)                        |
+| Enable narrator perception config for info roles | `canRegisterAs: { teams?, alignments? }` on the effect                  |
+| Prevent a player from waking at night            | `preventsNightWake: true`                                               |
+| Prevent voting                                   | `preventsVoting: true` or `canVote` function                            |
+| Make a player's ability malfunction              | `poisonsAbility: true` on the effect (detected by `isMalfunctioning()`) |
 
 ---
 
@@ -1233,12 +1250,15 @@ When adding a new role or effect, add translations in **both** `src/lib/i18n/tra
 If you need a new category of game action that should be interceptable:
 
 1. **Define the intent type** in `src/lib/pipeline/types.ts`:
+
    ```typescript
-   type MyNewIntent = { type: "my_new"; /* fields */ };
+   type MyNewIntent = { type: "my_new" /* fields */ };
    ```
+
    Add it to the `Intent` union.
 
 2. **Add a default resolver** in `src/lib/pipeline/resolvers.ts`:
+
    ```typescript
    function resolveMyNew(intent: Intent, state: GameState): StateChanges { ... }
    // Add to the resolvers record
@@ -1300,19 +1320,19 @@ src/lib/
 
 Tests must validate **features and behavior**, not definition metadata. Do not test `id`, `team`, `icon`, `nightOrder`, or other static properties.
 
-| Category | What to test |
-|----------|-------------|
+| Category                                                | What to test                                                                                                                           |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | **Information roles** (Chef, Empath, Washerwoman, etc.) | `shouldWake` conditions, perception integration including **deception** (false positives and false negatives via perception modifiers) |
-| **Action roles** (Imp, Monk) | `shouldWake` conditions |
-| **Passive roles** (Soldier, Virgin, Slayer, Saint) | Nothing — just an empty test delegating to the corresponding effect test file |
-| **Role win conditions** (Mayor) | The `check` function with various game states (trigger conditions, edge cases) |
-| **Effect handlers** (Safe, Pure, Bounce, ScarletWoman) | `appliesTo` guard, `handle` logic (action type, stateChanges, history entries) |
-| **Effect day actions** (SlayerBullet) | `condition` function (alive checks, effect presence) |
-| **Effect night follow-ups** (PendingRoleReveal) | `condition` function, metadata (id, icon), `ActionComponent` presence, integration with `getAvailableNightFollowUps()` |
-| **Effect win conditions** (Martyrdom) | `check` function with matching and non-matching history entries |
-| **Effect behavior flags** (Dead, UsedDeadVote) | `canVote`, `canNominate`, `preventsNightWake`, etc. |
-| **Malfunction effects** (Poisoned, Drunk) | `poisonsAbility: true` flag, `isMalfunctioning()` helper |
-| **Pipeline malfunction integration** | Handlers skipped for malfunctioning players, win conditions skipped |
+| **Action roles** (Imp, Monk)                            | `shouldWake` conditions                                                                                                                |
+| **Passive roles** (Soldier, Virgin, Slayer, Saint)      | Nothing — just an empty test delegating to the corresponding effect test file                                                          |
+| **Role win conditions** (Mayor)                         | The `check` function with various game states (trigger conditions, edge cases)                                                         |
+| **Effect handlers** (Safe, Pure, Bounce, ScarletWoman)  | `appliesTo` guard, `handle` logic (action type, stateChanges, history entries)                                                         |
+| **Effect day actions** (SlayerBullet)                   | `condition` function (alive checks, effect presence)                                                                                   |
+| **Effect night follow-ups** (PendingRoleReveal)         | `condition` function, metadata (id, icon), `ActionComponent` presence, integration with `getAvailableNightFollowUps()`                 |
+| **Effect win conditions** (Martyrdom)                   | `check` function with matching and non-matching history entries                                                                        |
+| **Effect behavior flags** (Dead, UsedDeadVote)          | `canVote`, `canNominate`, `preventsNightWake`, etc.                                                                                    |
+| **Malfunction effects** (Poisoned, Drunk)               | `poisonsAbility: true` flag, `isMalfunctioning()` helper                                                                               |
+| **Pipeline malfunction integration**                    | Handlers skipped for malfunctioning players, win conditions skipped                                                                    |
 
 ### Testing Perception Deception
 
@@ -1323,32 +1343,35 @@ import { vi } from "vitest";
 import { EffectDefinition, EffectId } from "../../../effects/types";
 
 vi.mock("../../../effects", async (importOriginal) => {
-    const actual = (await importOriginal()) as Record<string, unknown>;
-    return {
-        ...actual,
-        getEffect: (effectId: string) => {
-            if (testEffects[effectId]) return testEffects[effectId];
-            return (actual.getEffect as (id: string) => EffectDefinition | undefined)(effectId);
-        },
-    };
+  const actual = (await importOriginal()) as Record<string, unknown>;
+  return {
+    ...actual,
+    getEffect: (effectId: string) => {
+      if (testEffects[effectId]) return testEffects[effectId];
+      return (actual.getEffect as (id: string) => EffectDefinition | undefined)(effectId);
+    },
+  };
 });
 
 const testEffects: Record<string, EffectDefinition> = {};
 
 // In tests:
 testEffects["appears_evil"] = {
-    id: "appears_evil" as EffectId,
-    icon: "user",
-    perceptionModifiers: [{
-        context: "alignment",
-        modify: (p) => ({ ...p, alignment: "evil" }),
-    }],
+  id: "appears_evil" as EffectId,
+  icon: "user",
+  perceptionModifiers: [
+    {
+      context: "alignment",
+      modify: (p) => ({ ...p, alignment: "evil" }),
+    },
+  ],
 };
 const player = addEffectTo(makePlayer({ roleId: "villager" }), "appears_evil");
 // Now `perceive(player, observer, "alignment", state).alignment` === "evil"
 ```
 
 Always test both directions:
+
 - **False positive**: a good player appearing evil/wrong team
 - **False negative**: an evil player appearing good/different team
 
@@ -1356,15 +1379,15 @@ Always test both directions:
 
 `src/lib/__tests__/helpers.ts` provides:
 
-| Helper | Purpose |
-|--------|---------|
-| `makePlayer({ id, roleId, ... })` | Creates a `PlayerState` |
-| `addEffectTo(player, effectType, data?, expiresAt?)` | Returns a new player with the effect added |
-| `makeState({ phase, round, players })` | Creates a `GameState` |
-| `makeGame(state?)` | Creates a `Game` with a single history entry |
-| `makeGameWithHistory(entries, baseState?)` | Creates a `Game` with specific history entries |
-| `makeStandardPlayers()` | Creates a standard 5-player set |
-| `resetPlayerCounter()` | Resets the auto-incrementing player counter (call in `beforeEach`) |
+| Helper                                               | Purpose                                                            |
+| ---------------------------------------------------- | ------------------------------------------------------------------ |
+| `makePlayer({ id, roleId, ... })`                    | Creates a `PlayerState`                                            |
+| `addEffectTo(player, effectType, data?, expiresAt?)` | Returns a new player with the effect added                         |
+| `makeState({ phase, round, players })`               | Creates a `GameState`                                              |
+| `makeGame(state?)`                                   | Creates a `Game` with a single history entry                       |
+| `makeGameWithHistory(entries, baseState?)`           | Creates a `Game` with specific history entries                     |
+| `makeStandardPlayers()`                              | Creates a standard 5-player set                                    |
+| `resetPlayerCounter()`                               | Resets the auto-incrementing player counter (call in `beforeEach`) |
 
 ### Empty Tests
 
@@ -1374,7 +1397,7 @@ If a role or effect has no testable behavior of its own (e.g., Villager, or role
 import { it, expect } from "vitest";
 
 it("Villager has no testable features", () => {
-    expect(true);
+  expect(true);
 });
 ```
 

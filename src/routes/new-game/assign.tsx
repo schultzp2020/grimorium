@@ -20,15 +20,15 @@ function AssignPage() {
   const { players, scriptId, selectedRoles } = Route.useRouteContext()
   const navigate = useNavigate()
 
-  const handleStart = (assignments: { name: string; roleId: string }[]) => {
+  const handleStart = async (assignments: { name: string; roleId: string }[]) => {
     const playerSetups: PlayerSetup[] = assignments.map((a) => ({
       name: a.name,
       roleId: a.roleId,
     }))
     const gameName = `Game ${new Date().toLocaleDateString()}`
     const game = createGame(gameName, scriptId, playerSetups)
-    saveGame(game)
-    setCurrentGameId(game.id)
+    await saveGame(game)
+    await setCurrentGameId(game.id)
     clearWizardState()
     void navigate({ to: '/game/$gameId', params: { gameId: game.id }, replace: true })
   }
@@ -37,7 +37,7 @@ function AssignPage() {
     <RoleAssignment
       players={players}
       selectedRoles={selectedRoles}
-      onStart={handleStart}
+      onStart={(assignments) => void handleStart(assignments)}
       onBack={() => void navigate({ to: '/new-game/roles' })}
     />
   )

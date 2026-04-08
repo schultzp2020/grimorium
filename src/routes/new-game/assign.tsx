@@ -11,12 +11,13 @@ export const Route = createFileRoute('/new-game/assign')({
     if (!players || players.length < 5 || !scriptId || !selectedRoles || selectedRoles.length === 0) {
       throw redirect({ to: '/new-game/players' })
     }
+    return { players, scriptId, selectedRoles }
   },
   component: AssignPage,
 })
 
 function AssignPage() {
-  const { players, scriptId, selectedRoles } = getWizardState()
+  const { players, scriptId, selectedRoles } = Route.useRouteContext()
   const navigate = useNavigate()
 
   const handleStart = (assignments: { name: string; roleId: string }[]) => {
@@ -25,17 +26,17 @@ function AssignPage() {
       roleId: a.roleId,
     }))
     const gameName = `Game ${new Date().toLocaleDateString()}`
-    const game = createGame(gameName, scriptId!, playerSetups)
+    const game = createGame(gameName, scriptId, playerSetups)
     saveGame(game)
     setCurrentGameId(game.id)
     clearWizardState()
-    void navigate({ to: '/game/$gameId', params: { gameId: game.id } })
+    void navigate({ to: '/game/$gameId', params: { gameId: game.id }, replace: true })
   }
 
   return (
     <RoleAssignment
-      players={players!}
-      selectedRoles={selectedRoles!}
+      players={players}
+      selectedRoles={selectedRoles}
       onStart={handleStart}
       onBack={() => void navigate({ to: '/new-game/roles' })}
     />

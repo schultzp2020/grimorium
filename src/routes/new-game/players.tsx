@@ -15,7 +15,7 @@ function PlayersPage() {
       onNext={(players) => {
         clearWizardState()
         setWizardState({ players })
-        void navigate({ to: '/new-game/script' })
+        void navigate({ to: '/new-game/script', replace: true })
       }}
       onBack={() => void navigate({ to: '/' })}
     />

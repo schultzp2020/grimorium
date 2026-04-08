@@ -9,20 +9,21 @@ export const Route = createFileRoute('/new-game/script')({
     if (!players || players.length < 5) {
       throw redirect({ to: '/new-game/players' })
     }
+    return { players }
   },
   component: ScriptPage,
 })
 
 function ScriptPage() {
-  const { players } = getWizardState()
+  const { players } = Route.useRouteContext()
   const navigate = useNavigate()
 
   return (
     <ScriptSelection
-      players={players!}
+      players={players}
       onSelect={(scriptId) => {
         setWizardState({ scriptId })
-        void navigate({ to: '/new-game/roles' })
+        void navigate({ to: '/new-game/roles', replace: true })
       }}
       onBack={() => void navigate({ to: '/new-game/players' })}
     />

@@ -10,14 +10,14 @@ export const Route = createFileRoute('/game/$gameId')({
     if (!game) {
       throw redirect({ to: '/' })
     }
-    return { hideLanguagePicker: true }
+    return { hideLanguagePicker: true, game }
   },
   component: GamePage,
 })
 
 function GamePage() {
   const { gameId } = Route.useParams()
-  const game = getGame(gameId)!
+  const { game } = Route.useRouteContext()
   const navigate = useNavigate()
 
   useEffect(() => {

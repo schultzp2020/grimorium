@@ -1,5 +1,5 @@
 import { useNavigate } from '@tanstack/react-router'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useShaderBackground } from '../../hooks/useShaderBackground'
 import { useI18n } from '../../lib/i18n'
@@ -166,8 +166,18 @@ const BURST_PARTICLES = Array.from({ length: 8 }, (_, i) => {
 export function MainMenu() {
   const { language, t } = useI18n()
   const navigate = useNavigate()
-  const games = getGameSummaries()
-  const currentGameId = getCurrentGameId()
+  const [games, setGames] = useState<GameSummary[]>([])
+  const [currentGameId, setCurrentGameIdState] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function load() {
+      const [summaries, id] = await Promise.all([getGameSummaries(), getCurrentGameId()])
+      setGames(summaries)
+      setCurrentGameIdState(id)
+    }
+    void load()
+  }, [])
+
   const currentGame = games.find((g) => g.id === currentGameId)
   const hasActiveGame = !!(currentGame && currentGame.phase !== 'ended')
 

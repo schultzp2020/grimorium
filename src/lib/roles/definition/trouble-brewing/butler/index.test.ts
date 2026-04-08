@@ -12,10 +12,6 @@ import {
 beforeEach(() => resetPlayerCounter())
 
 describe('Butler', () => {
-  // ================================================================
-  // BASIC PROPERTIES
-  // ================================================================
-
   describe('basic properties', () => {
     it('is an outsider', () => {
       expect(definition.team).toBe('outsider')
@@ -30,14 +26,35 @@ describe('Butler', () => {
     })
   })
 
-  // ================================================================
-  // SHOULD WAKE
-  // ================================================================
-
   describe('shouldWake', () => {
-    it('wakes on the first night (no shouldWake restriction)', () => {
-      // Butler has no shouldWake function — it always wakes
-      expect(definition.shouldWake).toBeUndefined()
+    it('wakes every night when alive', () => {
+      assert(definition.shouldWake)
+      const butler = makePlayer({ id: 'butler', roleId: 'butler' })
+      const game = makeGameWithHistory(
+        [{ type: 'night_started', data: { round: 1 }, stateOverrides: { round: 1 } }],
+        makeState({ round: 1, players: [butler] }),
+      )
+      expect(definition.shouldWake(game, butler)).toBeTruthy()
+    })
+
+    it('wakes on subsequent nights when alive', () => {
+      assert(definition.shouldWake)
+      const butler = makePlayer({ id: 'butler', roleId: 'butler' })
+      const game = makeGameWithHistory(
+        [{ type: 'night_started', data: { round: 2 }, stateOverrides: { round: 2 } }],
+        makeState({ round: 2, players: [butler] }),
+      )
+      expect(definition.shouldWake(game, butler)).toBeTruthy()
+    })
+
+    it('does not wake when dead', () => {
+      assert(definition.shouldWake)
+      const butler = addEffectTo(makePlayer({ id: 'butler', roleId: 'butler' }), 'dead')
+      const game = makeGameWithHistory(
+        [{ type: 'night_started', data: { round: 2 }, stateOverrides: { round: 2 } }],
+        makeState({ round: 2, players: [butler] }),
+      )
+      expect(definition.shouldWake(game, butler)).toBeFalsy()
     })
 
     it('has a nightOrder so it appears in the night dashboard', () => {
@@ -45,10 +62,6 @@ describe('Butler', () => {
       expect(typeof definition.nightOrder).toBe('number')
     })
   })
-
-  // ================================================================
-  // BUTLER MASTER EFFECT
-  // ================================================================
 
   describe('butler_master effect integration', () => {
     it("butler_master effect stores the master's player ID in data", () => {
@@ -68,39 +81,19 @@ describe('Butler', () => {
     })
   })
 
-  // ================================================================
-  // MALFUNCTION BEHAVIOR
-  // ================================================================
-
   describe('malfunction', () => {
     it('when malfunctioning, the effect should NOT be applied (Butler votes freely)', () => {
-      // The NightAction component conditionally omits addEffects when
-      // isMalfunctioning returns true, following the Monk pattern.
-      // This is a UI-level concern tested via component behavior.
-      // Here we verify the role has a NightAction that handles malfunction.
       expect(definition.NightAction).toBeDefined()
     })
 
-    it('poisoned Butler still wakes (shouldWake is undefined)', () => {
-      // Butler has no shouldWake, so poisoned/drunk Butler still wakes
-      // to maintain the charade — just the effect isn't applied.
+    it('poisoned Butler still wakes when alive', () => {
+      assert(definition.shouldWake)
       const butler = addEffectTo(makePlayer({ id: 'butler', roleId: 'butler' }), 'poisoned')
       const game = makeGameWithHistory(
-        [
-          {
-            type: 'night_started',
-            data: { round: 2 },
-            stateOverrides: { round: 2 },
-          },
-        ],
+        [{ type: 'night_started', data: { round: 2 }, stateOverrides: { round: 2 } }],
         makeState({ round: 2, players: [butler] }),
       )
-
-      // No shouldWake means always wakes (dead effect would prevent via preventsNightWake)
-      expect(definition.shouldWake).toBeUndefined()
-      // The player is alive and has no dead effect, so they'll wake
-      expect(butler.effects.some((e) => e.type === 'dead')).toBeFalsy()
-      expect(game).toBeDefined() // Game is valid
+      expect(definition.shouldWake(game, butler)).toBeTruthy()
     })
   })
 })

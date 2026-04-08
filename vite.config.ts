@@ -1,5 +1,6 @@
 import babel from '@rolldown/plugin-babel'
 import tailwindcss from '@tailwindcss/vite'
+import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 import react, { reactCompilerPreset } from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import { defineConfig } from 'vitest/config'
@@ -10,10 +11,20 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
-    exclude: ['**/node_modules/**', '**/dist/**', '**/e2e/**', '**/.{idea,git,cache,output,temp}/**', '**/.worktrees/**'],
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/e2e/**',
+      '**/.{idea,git,cache,output,temp}/**',
+      '**/.worktrees/**',
+    ],
   },
   base: '/',
   plugins: [
+    TanStackRouterVite({
+      target: 'react',
+      autoCodeSplitting: true,
+    }),
     react(),
     babel({ presets: [reactCompilerPreset()] }),
     tailwindcss(),

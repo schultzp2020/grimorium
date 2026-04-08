@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { EffectDefinition, EffectConfigEditorProps } from '../../types'
+import type { EffectDefinition, EffectConfigEditorProps } from '../../types'
 import {
   registerEffectTranslations,
   getEffectTranslations,

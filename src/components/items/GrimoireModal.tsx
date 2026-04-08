@@ -1,20 +1,20 @@
 import { useState, useCallback, useEffect } from 'react'
 import {
-  GameState,
-  PlayerState,
+  type GameState,
+  type PlayerState,
   hasEffect,
-  EffectInstance,
+  type EffectInstance,
   getPlayer,
 } from '../../lib/types'
 import { getRole } from '../../lib/roles'
-import { getTeam, TeamId } from '../../lib/teams'
+import { getTeam, type TeamId } from '../../lib/teams'
 import {
   getEffect,
   getAllEffects,
   getEffectType,
   EFFECT_TYPE_BADGE_VARIANT,
 } from '../../lib/effects'
-import { EffectDefinition } from '../../lib/effects/types'
+import type { EffectDefinition } from '../../lib/effects/types'
 import {
   useI18n,
   getRoleName as getRegistryRoleName,

@@ -1,22 +1,22 @@
 import {
-  Intent,
-  IntentHandler,
-  PipelineResult,
-  StateChanges,
-  AvailableDayAction,
-  AvailableNightFollowUp,
-  WinConditionTrigger,
+  type Intent,
+  type IntentHandler,
+  type PipelineResult,
+  type StateChanges,
+  type AvailableDayAction,
+  type AvailableNightFollowUp,
+  type WinConditionTrigger,
 } from './types'
 import {
-  GameState,
-  PlayerState,
-  Game,
-  HistoryEntry,
+  type GameState,
+  type PlayerState,
+  type Game,
+  type HistoryEntry,
   generateId,
 } from '../types'
 import { getEffect, isMalfunctioning } from '../effects'
 import { getDefaultResolver } from './resolvers'
-import { EffectToAdd } from '../roles/types'
+import type { EffectToAdd } from '../roles/types'
 
 // ============================================================================
 // STATE CHANGES UTILITIES

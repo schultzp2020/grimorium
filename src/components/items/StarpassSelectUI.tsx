@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { PipelineInputProps } from '../../lib/pipeline/types'
+import type { PipelineInputProps } from '../../lib/pipeline/types'
 import { isAlive } from '../../lib/types'
 import { useI18n, getRoleTranslations } from '../../lib/i18n'
 import { getRole } from '../../lib/roles'

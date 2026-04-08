@@ -1,4 +1,4 @@
-import { RoleDefinition, RoleId } from './types'
+import type { RoleDefinition, RoleId } from './types'
 import Imp from './definition/imp'
 import Villager from './definition/villager'
 // Trouble Brewing

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { PipelineInputProps, KillIntent } from '../../lib/pipeline/types'
+import type { PipelineInputProps, KillIntent } from '../../lib/pipeline/types'
 import { isAlive, hasEffect } from '../../lib/types'
 import { useI18n, getRoleTranslations, interpolate } from '../../lib/i18n'
 import { PlayerPickerList } from '../inputs'

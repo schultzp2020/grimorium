@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
-import { Game, GameState, PlayerState } from '../../lib/types'
+import type { Game, GameState, PlayerState } from '../../lib/types'
 import { getRole } from '../../lib/roles'
 import { useI18n, getRoleName } from '../../lib/i18n'
-import { Button, Icon, IconName } from '../atoms'
+import { Button, Icon, type IconName } from '../atoms'
 import { ScreenFooter } from '../layouts/ScreenFooter'
 import { cn } from '../../lib/utils'
 

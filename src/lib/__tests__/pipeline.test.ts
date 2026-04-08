@@ -6,10 +6,10 @@ import {
   mergeStateChanges,
 } from '../pipeline'
 import {
-  KillIntent,
-  NominateIntent,
-  ExecuteIntent,
-  StateChanges,
+  type KillIntent,
+  type NominateIntent,
+  type ExecuteIntent,
+  type StateChanges,
 } from '../pipeline/types'
 import { getCurrentState, hasEffect } from '../types'
 import {

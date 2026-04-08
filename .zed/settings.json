@@ -1,0 +1,14 @@
+{
+  "languages": {
+    "TypeScript": {
+      "language_servers": ["typescript-language-server"]
+    }
+  },
+  "lsp": {
+    "typescript-language-server": {
+      "binary": {
+        "path": "node_modules/@typescript/native-preview/bin/tsgo"
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react'
-import { Game, getCurrentState, getPlayer, PlayerState } from '../../lib/types'
+import { type Game, getCurrentState, getPlayer, type PlayerState } from '../../lib/types'
 import { getRole } from '../../lib/roles'
 import { getTeam } from '../../lib/teams'
 import { RoleCard } from '../items/RoleCard'
@@ -34,12 +34,12 @@ import {
   getAvailableDayActions,
 } from '../../lib/pipeline'
 import {
-  PipelineResult,
-  PipelineInputProps,
-  AvailableDayAction,
-  AvailableNightFollowUp,
-  NightFollowUpResult,
-  DayActionResult,
+  type PipelineResult,
+  type PipelineInputProps,
+  type AvailableDayAction,
+  type AvailableNightFollowUp,
+  type NightFollowUpResult,
+  type DayActionResult,
 } from '../../lib/pipeline/types'
 import { saveGame } from '../../lib/storage'
 import { useI18n } from '../../lib/i18n'
@@ -52,11 +52,11 @@ import { GameOver } from './GameOver'
 import { HistoryView } from './HistoryView'
 import { GrimoireModal, type GrimoireIntent } from '../items/GrimoireModal'
 import { Icon, LanguagePicker } from '../atoms'
-import { NightActionResult, SetupActionResult } from '../../lib/roles/types'
+import type { NightActionResult, SetupActionResult } from '../../lib/roles/types'
 import type { FC } from 'react'
 import { SetupActionsScreen } from './SetupActionsScreen'
 import { DawnScreen } from './DawnScreen'
-import { DeathRevealScreen, DeathRevealEntry } from './DeathRevealScreen'
+import { DeathRevealScreen, type DeathRevealEntry } from './DeathRevealScreen'
 import { PlayerFacingContext } from '../context/PlayerFacingContext'
 import { PlayerFacingScreen } from '../layouts/PlayerFacingScreen'
 

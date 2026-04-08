@@ -1,4 +1,4 @@
-import { IconName } from '../../components/atoms/icon'
+import type { IconName } from '../../components/atoms/icon'
 
 export type TeamId = 'townsfolk' | 'outsider' | 'minion' | 'demon'
 

@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react'
-import { GameState, PlayerState, hasEffect } from '../../lib/types'
+import { type GameState, type PlayerState, hasEffect } from '../../lib/types'
 import { getEffect } from '../../lib/effects'
 import { useI18n, interpolate, getRoleTranslations } from '../../lib/i18n'
 import { Button, Icon, BackButton } from '../atoms'
 import { ScreenFooter } from '../layouts/ScreenFooter'
 import { cn } from '../../lib/utils'
-import { BlockStatus, getVoteThreshold } from '../../lib/game'
+import { type BlockStatus, getVoteThreshold } from '../../lib/game'
 
 type Props = {
   state: GameState

@@ -1,10 +1,10 @@
-import { RoleDefinition } from '../../../types'
+import type { RoleDefinition } from '../../../types'
 import { isAlive } from '../../../../types'
 import { registerRoleTranslations } from '../../../../i18n'
 import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
 import {
   InfoRoleNightAction,
-  InfoRoleConfig,
+  type InfoRoleConfig,
 } from '../../../../../components/night_steps/InfoRoleNightAction'
 
 import en from './i18n/en'

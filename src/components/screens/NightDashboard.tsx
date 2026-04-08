@@ -1,14 +1,14 @@
 import { useMemo, useState } from 'react'
-import { Game, GameState, PlayerState, RichMessage } from '../../lib/types'
+import type { Game, GameState, PlayerState, RichMessage } from '../../lib/types'
 import { getRole } from '../../lib/roles'
 import { getTeam } from '../../lib/teams'
 import {
   getNightRolesStatus,
   getNightActionSummary,
-  NightRoleStatus,
+  type NightRoleStatus,
 } from '../../lib/game'
 import { getAvailableNightFollowUps } from '../../lib/pipeline'
-import { AvailableNightFollowUp } from '../../lib/pipeline/types'
+import type { AvailableNightFollowUp } from '../../lib/pipeline/types'
 import { useI18n, getRoleName } from '../../lib/i18n'
 import { Button, Icon } from '../atoms'
 import {

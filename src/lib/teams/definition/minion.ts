@@ -1,4 +1,4 @@
-import { TeamDefinition } from '../types'
+import type { TeamDefinition } from '../types'
 
 const definition: TeamDefinition = {
   id: 'minion',

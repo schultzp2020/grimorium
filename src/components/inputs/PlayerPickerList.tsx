@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
-import { PlayerState, hasEffect } from '../../lib/types'
+import { type PlayerState, hasEffect } from '../../lib/types'
 import { getRole } from '../../lib/roles'
 import { getTeam } from '../../lib/teams'
 import { getEffect } from '../../lib/effects'
 import { useI18n, getRoleName as getRegistryRoleName } from '../../lib/i18n'
 import { Icon } from '../atoms'
-import { IconName } from '../atoms/icon'
+import type { IconName } from '../atoms/icon'
 import { PlayerRoleIcon, filterVisibleEffects } from '../items/PlayerRoleIcon'
 import { cn } from '../../lib/utils'
 

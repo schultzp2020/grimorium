@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { countEvilPairs } from '.'
 import definition from '.'
-import { EffectDefinition, EffectId } from '../../../../effects/types'
+import type { EffectDefinition, EffectId } from '../../../../effects/types'
 import {
   makePlayer,
   makeState,

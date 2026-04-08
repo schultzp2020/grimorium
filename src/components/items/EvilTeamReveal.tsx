@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { GameState, PlayerState } from '../../lib/types'
+import type { GameState, PlayerState } from '../../lib/types'
 import { getRole } from '../../lib/roles'
 import { useI18n, getRoleName } from '../../lib/i18n'
 import { Icon } from '../atoms'

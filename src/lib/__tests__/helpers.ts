@@ -1,8 +1,8 @@
 import {
-  PlayerState,
-  GameState,
-  Game,
-  HistoryEntry,
+  type PlayerState,
+  type GameState,
+  type Game,
+  type HistoryEntry,
   generateId,
 } from '../types'
 

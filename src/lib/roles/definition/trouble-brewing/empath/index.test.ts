@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import definition from '.'
 import { perceive } from '../../../../pipeline/perception'
 import { getAliveNeighbors } from '../../../../types'
-import { EffectDefinition, EffectId } from '../../../../effects/types'
+import type { EffectDefinition, EffectId } from '../../../../effects/types'
 import {
   makePlayer,
   makeState,

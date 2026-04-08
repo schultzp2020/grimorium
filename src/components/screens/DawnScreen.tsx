@@ -1,4 +1,4 @@
-import { GameState } from '../../lib/types'
+import type { GameState } from '../../lib/types'
 import { useI18n, interpolate } from '../../lib/i18n'
 import { Button, Icon } from '../atoms'
 import { ScreenFooter } from '../layouts/ScreenFooter'

@@ -1,11 +1,11 @@
-import { RoleId } from '../roles/types'
-import { TeamId } from '../teams/types'
+import type { RoleId } from '../roles/types'
+import type { TeamId } from '../teams/types'
 import { getRole } from '../roles'
 import {
-  ScriptDefinition,
-  RoleDistribution,
-  GeneratedPool,
-  GeneratorPreset,
+  type ScriptDefinition,
+  type RoleDistribution,
+  type GeneratedPool,
+  type GeneratorPreset,
 } from './types'
 import { getRecommendedDistribution, applyDistributionModifiers } from './index'
 

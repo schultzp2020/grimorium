@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import definition from '.'
 import { perceive, canRegisterAsTeam } from '../../../../pipeline/perception'
-import { EffectDefinition, EffectId } from '../../../../effects/types'
+import type { EffectDefinition, EffectId } from '../../../../effects/types'
 import {
   makePlayer,
   makeState,

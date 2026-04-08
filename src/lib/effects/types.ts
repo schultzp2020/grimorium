@@ -1,13 +1,13 @@
-import { FC } from 'react'
-import { IconName } from '../../components/atoms/icon'
-import { EffectInstance, GameState, PlayerState } from '../types'
-import { TeamId } from '../teams'
+import type { FC } from 'react'
+import type { IconName } from '../../components/atoms/icon'
+import type { EffectInstance, GameState, PlayerState } from '../types'
+import type { TeamId } from '../teams'
 import {
-  IntentHandler,
-  DayActionDefinition,
-  NightFollowUpDefinition,
-  WinConditionCheck,
-  PerceptionModifier,
+  type IntentHandler,
+  type DayActionDefinition,
+  type NightFollowUpDefinition,
+  type WinConditionCheck,
+  type PerceptionModifier,
 } from '../pipeline/types'
 
 export type EffectId =

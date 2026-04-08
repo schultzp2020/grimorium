@@ -1,4 +1,4 @@
-import { RoleDefinition } from '../../../types'
+import type { RoleDefinition } from '../../../types'
 import { registerRoleTranslations } from '../../../../i18n'
 import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
 

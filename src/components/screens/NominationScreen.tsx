@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { GameState, getAlivePlayers } from '../../lib/types'
+import { type GameState, getAlivePlayers } from '../../lib/types'
 import { useI18n } from '../../lib/i18n'
 import { Button, Icon, BackButton } from '../atoms'
 import { ScreenFooter } from '../layouts/ScreenFooter'

@@ -1,4 +1,4 @@
-import { EffectDefinition } from '../../types'
+import type { EffectDefinition } from '../../types'
 import { hasEffect } from '../../../types'
 import { registerEffectTranslations } from '../../../i18n'
 

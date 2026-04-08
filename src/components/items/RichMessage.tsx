@@ -1,13 +1,13 @@
 import {
-  RichMessage as RichMessageType,
-  GameState,
+  type RichMessage as RichMessageType,
+  type GameState,
   getPlayer,
 } from '../../lib/types'
 import { getRole } from '../../lib/roles'
 import { getEffect, getEffectType, EFFECT_TYPE_BADGE_VARIANT } from '../../lib/effects'
 import {
   useI18n,
-  Translations,
+  type Translations,
   getRoleName as getRegistryRoleName,
   getEffectName as getRegistryEffectName,
   getRoleTranslations,
@@ -15,7 +15,7 @@ import {
 } from '../../lib/i18n'
 import type { Language } from '../../lib/i18n'
 import { Badge, Icon } from '../atoms'
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 type Props = {
   message: RichMessageType

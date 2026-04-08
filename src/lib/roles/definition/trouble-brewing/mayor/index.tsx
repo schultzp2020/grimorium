@@ -1,4 +1,4 @@
-import { RoleDefinition } from '../../../types'
+import type { RoleDefinition } from '../../../types'
 import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
 import { getAlivePlayers } from '../../../../types'
 import { isMalfunctioning } from '../../../../effects'

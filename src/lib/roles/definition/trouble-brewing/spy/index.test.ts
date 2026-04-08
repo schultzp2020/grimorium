@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import definition from '.'
-import { EffectDefinition } from '../../../../effects/types'
+import type { EffectDefinition } from '../../../../effects/types'
 import {
   makePlayer,
   makeState,

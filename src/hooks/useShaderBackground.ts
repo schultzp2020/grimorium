@@ -1,4 +1,4 @@
-import { useEffect, RefObject } from 'react'
+import { useEffect, type RefObject } from 'react'
 
 const VERTEX_SHADER = `
 attribute vec2 a_position;

@@ -1,8 +1,8 @@
-import React, { ReactNode } from 'react'
-import { getTeam, TeamId } from '../../../lib/teams'
+import React, { type ReactNode } from 'react'
+import { getTeam, type TeamId } from '../../../lib/teams'
 import { cn } from '../../../lib/utils'
 import { Icon } from '../../atoms'
-import { IconName } from '../../atoms/icon'
+import type { IconName } from '../../atoms/icon'
 import { TownsfolkParticles, MinionParticles } from './CardParticles'
 
 // ─── Corner icon decorations ─────────────────────────────────────────────────

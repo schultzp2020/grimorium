@@ -1,5 +1,5 @@
 import { useI18n } from '../../lib/i18n'
-import { SCRIPTS, ScriptId } from '../../lib/scripts'
+import { SCRIPTS, type ScriptId } from '../../lib/scripts'
 import { Icon, BackButton } from '../atoms'
 import { cn } from '../../lib/utils'
 

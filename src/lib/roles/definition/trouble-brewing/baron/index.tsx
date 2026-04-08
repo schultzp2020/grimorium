@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { RoleDefinition } from '../../../types'
+import type { RoleDefinition } from '../../../types'
 import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
 import { EvilTeamReveal } from '../../../../../components/items/EvilTeamReveal'
 import {

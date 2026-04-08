@@ -1,4 +1,4 @@
-import { TeamDefinition, TeamId } from './types'
+import type { TeamDefinition, TeamId } from './types'
 import townsfolk from './definition/townsfolk'
 import outsider from './definition/outsider'
 import minion from './definition/minion'

@@ -12,8 +12,8 @@ import {
   addEffectTo,
   resetPlayerCounter,
 } from './helpers'
-import { PerceptionModifier, Perception } from '../pipeline/types'
-import { EffectDefinition, EffectId } from '../effects/types'
+import type { PerceptionModifier, Perception } from '../pipeline/types'
+import type { EffectDefinition, EffectId } from '../effects/types'
 
 // We need to mock getEffect to inject test perception modifiers
 // since we can't register arbitrary effects in the real registry.

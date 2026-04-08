@@ -1,8 +1,8 @@
-import { PlayerState, EffectInstance, hasEffect } from '../../lib/types'
+import { type PlayerState, type EffectInstance, hasEffect } from '../../lib/types'
 import { getRole } from '../../lib/roles'
 import { getTeam } from '../../lib/teams'
 import { Icon } from '../atoms'
-import { IconName } from '../atoms/icon'
+import type { IconName } from '../atoms/icon'
 import { cn } from '../../lib/utils'
 
 // =============================================================================

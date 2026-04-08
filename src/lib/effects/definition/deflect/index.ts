@@ -1,5 +1,5 @@
-import { EffectDefinition } from '../../types'
-import { IntentHandler, KillIntent } from '../../../pipeline/types'
+import type { EffectDefinition } from '../../types'
+import type { IntentHandler, KillIntent } from '../../../pipeline/types'
 import { DeflectRedirectUI } from '../../../../components/items/DeflectRedirectUI'
 import { registerEffectTranslations } from '../../../i18n'
 

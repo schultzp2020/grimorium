@@ -1,4 +1,4 @@
-import { RoleDefinition } from '../../../lib/roles'
+import type { RoleDefinition } from '../../../lib/roles'
 import { CardIcon } from './CardIcon'
 
 /**

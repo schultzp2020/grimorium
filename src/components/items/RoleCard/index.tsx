@@ -1,5 +1,5 @@
 import { getRole } from '../../../lib/roles'
-import { getTeam, TeamId } from '../../../lib/teams'
+import { getTeam, type TeamId } from '../../../lib/teams'
 import {
   useI18n,
   interpolate,

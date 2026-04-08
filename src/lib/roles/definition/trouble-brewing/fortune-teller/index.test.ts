@@ -5,7 +5,7 @@ import {
   getAmbiguousPlayers,
   applyPerceptionOverrides,
 } from '../../../../pipeline/perception'
-import { EffectDefinition, EffectId } from '../../../../effects/types'
+import type { EffectDefinition, EffectId } from '../../../../effects/types'
 import {
   makePlayer,
   makeState,

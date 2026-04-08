@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { createGame, PlayerSetup } from './lib/game'
+import { createGame, type PlayerSetup } from './lib/game'
 import {
   saveGame,
   setCurrentGameId,
@@ -18,9 +18,9 @@ import {
 } from './components/screens'
 import { LanguagePicker } from './components/atoms'
 import { useRouter } from './hooks/useRouter'
-import { RoleId } from './lib/roles/types'
+import type { RoleId } from './lib/roles/types'
 import { getRole } from './lib/roles'
-import { ScriptId } from './lib/scripts'
+import type { ScriptId } from './lib/scripts'
 
 // Internal screens for the new-game wizard (not routed — stays on "/")
 type NewGameScreen =

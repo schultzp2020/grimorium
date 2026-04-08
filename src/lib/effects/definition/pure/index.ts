@@ -1,6 +1,6 @@
-import { EffectDefinition } from '../../types'
-import { IntentHandler, NominateIntent } from '../../../pipeline/types'
-import { PlayerState } from '../../../types'
+import type { EffectDefinition } from '../../types'
+import type { IntentHandler, NominateIntent } from '../../../pipeline/types'
+import type { PlayerState } from '../../../types'
 import { getRole } from '../../../roles'
 import { registerEffectTranslations } from '../../../i18n'
 

@@ -1,4 +1,4 @@
-import { Game } from './types'
+import type { Game } from './types'
 
 const STORAGE_KEY = 'grimoire_games'
 const CURRENT_GAME_KEY = 'grimoire_current_game'

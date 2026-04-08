@@ -1,5 +1,5 @@
 import { Icon } from '../atoms'
-import { IconName } from '../atoms/icon'
+import type { IconName } from '../atoms/icon'
 
 type RoleRevealBadgeProps = {
   icon: IconName

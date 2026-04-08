@@ -1,7 +1,7 @@
-import { EffectDefinition } from '../../types'
+import type { EffectDefinition } from '../../types'
 import {
-  NightFollowUpDefinition,
-  NightFollowUpProps,
+  type NightFollowUpDefinition,
+  type NightFollowUpProps,
 } from '../../../pipeline/types'
 import { getRole } from '../../../roles'
 import { getTeam } from '../../../teams'

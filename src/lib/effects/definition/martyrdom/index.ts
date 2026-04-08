@@ -1,5 +1,5 @@
-import { EffectDefinition } from '../../types'
-import { WinConditionCheck } from '../../../pipeline/types'
+import type { EffectDefinition } from '../../types'
+import type { WinConditionCheck } from '../../../pipeline/types'
 import { hasEffect } from '../../../types'
 import { registerEffectTranslations } from '../../../i18n'
 

@@ -1,4 +1,4 @@
-import { PlayerState } from '../../lib/types'
+import type { PlayerState } from '../../lib/types'
 import { getRole } from '../../lib/roles'
 import { getTeam } from '../../lib/teams'
 import { useI18n, getRoleName, interpolate } from '../../lib/i18n'

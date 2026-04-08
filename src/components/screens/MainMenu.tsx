@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from 'react'
 import {
   getGameSummaries,
   getCurrentGameId,
-  GameSummary,
+  type GameSummary,
 } from '../../lib/storage'
 import { useI18n } from '../../lib/i18n'
 import { Icon } from '../atoms'

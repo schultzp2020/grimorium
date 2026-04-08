@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { RoleDefinition } from '../../../types'
+import type { RoleDefinition } from '../../../types'
 import {
   useI18n,
   registerRoleTranslations,
@@ -20,14 +20,14 @@ import {
   NumberReveal,
   TeamBackground,
 } from '../../../../../components/items'
-import { GameState, PlayerState, isAlive } from '../../../../types'
+import { type GameState, type PlayerState, isAlive } from '../../../../types'
 import {
   perceive,
   getAmbiguousPlayers,
   applyPerceptionOverrides,
 } from '../../../../pipeline'
 import { isMalfunctioning } from '../../../../effects'
-import { Perception } from '../../../../pipeline/types'
+import type { Perception } from '../../../../pipeline/types'
 
 import en from './i18n/en'
 import es from './i18n/es'

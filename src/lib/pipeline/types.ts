@@ -1,8 +1,8 @@
 import type { FC } from 'react'
-import { GameState, PlayerState, HistoryEntry, Game } from '../types'
-import { EffectToAdd } from '../roles/types'
-import { IconName } from '../../components/atoms/icon'
-import { TeamId } from '../teams/types'
+import type { GameState, PlayerState, HistoryEntry, Game } from '../types'
+import type { EffectToAdd } from '../roles/types'
+import type { IconName } from '../../components/atoms/icon'
+import type { TeamId } from '../teams/types'
 
 // ============================================================================
 // INTENTS

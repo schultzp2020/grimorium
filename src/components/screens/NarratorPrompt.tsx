@@ -1,4 +1,4 @@
-import { PlayerState } from '../../lib/types'
+import type { PlayerState } from '../../lib/types'
 import { getRole } from '../../lib/roles'
 import { useI18n, interpolate, getRoleName } from '../../lib/i18n'
 import { Button, Icon, BackButton } from '../atoms'

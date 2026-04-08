@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
-import { RoleDefinition } from '../../lib/roles/types'
-import { getTeam, TeamId } from '../../lib/teams'
-import { GameState, PlayerState, hasEffect } from '../../lib/types'
+import type { RoleDefinition } from '../../lib/roles/types'
+import { getTeam, type TeamId } from '../../lib/teams'
+import { type GameState, type PlayerState, hasEffect } from '../../lib/types'
 import { getEffect } from '../../lib/effects'
 import {
   useI18n,
@@ -9,7 +9,7 @@ import {
   getRoleDescription as getRegistryRoleDescription,
 } from '../../lib/i18n'
 import { Icon } from '../atoms'
-import { IconName } from '../atoms/icon'
+import type { IconName } from '../atoms/icon'
 import { filterVisibleEffects } from '../items/PlayerRoleIcon'
 import { cn } from '../../lib/utils'
 

@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react'
-import { GameState, PlayerState } from '../../lib/types'
-import { RoleDefinition, NightActionResult } from '../../lib/roles/types'
+import type { GameState, PlayerState } from '../../lib/types'
+import type { RoleDefinition, NightActionResult } from '../../lib/roles/types'
 import { getRole, getAllRoles } from '../../lib/roles/index'
-import { getTeam, TeamId } from '../../lib/teams'
+import { getTeam, type TeamId } from '../../lib/teams'
 import {
   useI18n,
   getRoleName,
@@ -32,7 +32,7 @@ import {
   RolePickerGrid,
 } from '../inputs'
 import { Icon } from '../atoms'
-import { IconName } from '../atoms/icon'
+import type { IconName } from '../atoms/icon'
 import {
   perceive,
   canRegisterAsTeam,

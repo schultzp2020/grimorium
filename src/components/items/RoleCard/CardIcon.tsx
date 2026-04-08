@@ -1,7 +1,7 @@
-import { getTeam, TeamId, TeamDefinition } from '../../../lib/teams'
+import { getTeam, type TeamId, type TeamDefinition } from '../../../lib/teams'
 import { cn } from '../../../lib/utils'
 import { Icon } from '../../atoms'
-import { IconName } from '../../atoms/icon'
+import type { IconName } from '../../atoms/icon'
 
 function ArcaneSeal({ team }: { team: TeamDefinition }) {
   // Build tick marks — more marks = more ornate

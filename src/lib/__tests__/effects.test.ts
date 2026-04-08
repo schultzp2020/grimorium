@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { resolveIntent } from '../pipeline'
 import { getAvailableDayActions } from '../pipeline/index'
 import { isMalfunctioning } from '../effects'
-import { KillIntent, NominateIntent } from '../pipeline/types'
+import type { KillIntent, NominateIntent } from '../pipeline/types'
 import {
   makePlayer,
   makeGame,

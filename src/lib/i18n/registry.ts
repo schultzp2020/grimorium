@@ -6,7 +6,7 @@
  * Shared/generic translations remain in the central translation files.
  */
 
-import { Language } from './types'
+import type { Language } from './types'
 
 // ─── Internal registries ─────────────────────────────────────────────────────
 

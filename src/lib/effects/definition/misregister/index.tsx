@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import {
-  EffectDefinition,
-  EffectDescriptionProps,
-  EffectConfigEditorProps,
+  type EffectDefinition,
+  type EffectDescriptionProps,
+  type EffectConfigEditorProps,
 } from '../../types'
-import { Perception } from '../../../pipeline/types'
+import type { Perception } from '../../../pipeline/types'
 import {
   registerEffectTranslations,
   getEffectTranslations,

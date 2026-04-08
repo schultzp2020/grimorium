@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
-import { PlayerState, GameState, hasEffect, EffectInstance } from '../../lib/types'
+import { type PlayerState, type GameState, hasEffect, type EffectInstance } from '../../lib/types'
 import { getEffect, getAllEffects, getEffectType, EFFECT_TYPE_BADGE_VARIANT } from '../../lib/effects'
-import { EffectDefinition } from '../../lib/effects/types'
+import type { EffectDefinition } from '../../lib/effects/types'
 import { useI18n, getEffectName as getRegistryEffectName } from '../../lib/i18n'
 import {
   Dialog,

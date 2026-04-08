@@ -1,22 +1,22 @@
 import {
-  Game,
-  GameState,
-  HistoryEntry,
-  PlayerState,
-  RichMessage,
+  type Game,
+  type GameState,
+  type HistoryEntry,
+  type PlayerState,
+  type RichMessage,
   generateId,
   getCurrentState,
   hasEffect,
   getAlivePlayers,
 } from './types'
 import { getRole } from './roles'
-import { RoleDefinition, NightActionResult, EffectToAdd } from './roles/types'
+import type { RoleDefinition, NightActionResult, EffectToAdd } from './roles/types'
 import {
   resolveIntent,
   applyPipelineChanges,
   checkDynamicWinConditions,
 } from './pipeline'
-import { NominateIntent, ExecuteIntent } from './pipeline/types'
+import type { NominateIntent, ExecuteIntent } from './pipeline/types'
 import { trackEvent } from './analytics'
 
 // ============================================================================

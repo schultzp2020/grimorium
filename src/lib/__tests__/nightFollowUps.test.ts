@@ -9,7 +9,7 @@ import {
   addEffectTo,
   resetPlayerCounter,
 } from './helpers'
-import { EffectDefinition, EffectId } from '../effects/types'
+import type { EffectDefinition, EffectId } from '../effects/types'
 
 // ============================================================================
 // MOCK getEffect so we can inject test effects with nightFollowUps

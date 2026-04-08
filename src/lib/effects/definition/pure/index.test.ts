@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import definition from '.'
-import { NominateIntent } from '../../../pipeline/types'
+import type { NominateIntent } from '../../../pipeline/types'
 import {
   makePlayer,
   makeState,

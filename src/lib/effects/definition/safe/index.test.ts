@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import definition from '.'
-import { KillIntent } from '../../../pipeline/types'
+import type { KillIntent } from '../../../pipeline/types'
 import {
   makePlayer,
   makeState,

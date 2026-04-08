@@ -1,6 +1,6 @@
-import { PlayerState, hasEffect } from '../../lib/types'
+import { type PlayerState, hasEffect } from '../../lib/types'
 import { getRole } from '../../lib/roles'
-import { getTeam, TeamId } from '../../lib/teams'
+import { getTeam, type TeamId } from '../../lib/teams'
 import {
   getEffect,
   getEffectType,

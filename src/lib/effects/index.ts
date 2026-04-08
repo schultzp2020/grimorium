@@ -1,4 +1,4 @@
-import { EffectDefinition, EffectId, EffectType } from './types'
+import type { EffectDefinition, EffectId, EffectType } from './types'
 import type { EffectInstance } from '../types'
 import type { TeamId } from '../teams'
 import Dead from './definition/dead'

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { RoleDefinition, SetupActionProps } from '../../../types'
+import type { RoleDefinition, SetupActionProps } from '../../../types'
 import { getAllRoles } from '../../../index'
 import {
   useI18n,

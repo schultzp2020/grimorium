@@ -1,8 +1,8 @@
-import { GameState, PlayerState, HistoryEntry, Game } from '../types'
-import { IconName } from '../../components/atoms/icon'
-import { TeamId } from '../teams'
-import { Intent, WinConditionCheck } from '../pipeline/types'
-import { Translations } from '../i18n/types'
+import type { GameState, PlayerState, HistoryEntry, Game } from '../types'
+import type { IconName } from '../../components/atoms/icon'
+import type { TeamId } from '../teams'
+import type { Intent, WinConditionCheck } from '../pipeline/types'
+import type { Translations } from '../i18n/types'
 
 // ============================================================================
 // EFFECT TYPES

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { GameState, PlayerState } from '../../lib/types'
+import type { GameState, PlayerState } from '../../lib/types'
 import { getRole, getAllRoles } from '../../lib/roles'
 import { getEffect, resolveCanRegisterAs } from '../../lib/effects'
 import {
@@ -7,8 +7,8 @@ import {
   getRoleName as getRegistryRoleName,
   getEffectName as getRegistryEffectName,
 } from '../../lib/i18n'
-import { Perception, PerceptionContext } from '../../lib/pipeline/types'
-import { TeamId } from '../../lib/teams'
+import type { Perception, PerceptionContext } from '../../lib/pipeline/types'
+import type { TeamId } from '../../lib/teams'
 import { Icon } from '../atoms'
 import { NarratorSetupLayout } from '../layouts'
 import { RolePickerGrid } from '../inputs/RolePickerGrid'

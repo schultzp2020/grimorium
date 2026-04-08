@@ -1,8 +1,8 @@
-import { EffectDefinition } from '../../types'
+import type { EffectDefinition } from '../../types'
 import {
-  IntentHandler,
-  KillIntent,
-  ExecuteIntent,
+  type IntentHandler,
+  type KillIntent,
+  type ExecuteIntent,
 } from '../../../pipeline/types'
 import { getRole } from '../../../roles'
 import { hasEffect, getAlivePlayers } from '../../../types'

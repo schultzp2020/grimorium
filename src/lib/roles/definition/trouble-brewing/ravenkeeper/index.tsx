@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { RoleDefinition } from '../../../types'
+import type { RoleDefinition } from '../../../types'
 import { getRole } from '../../../index'
 import { getTeam } from '../../../../teams'
 import {
@@ -9,7 +9,7 @@ import {
   getRoleName,
   getRoleTranslations,
 } from '../../../../i18n'
-import { Game, PlayerState } from '../../../../types'
+import type { Game, PlayerState } from '../../../../types'
 import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
 import { RoleCard } from '../../../../../components/items/RoleCard'
 import { PerceptionConfigStep } from '../../../../../components/items'
@@ -32,7 +32,7 @@ import {
 } from '../../../../pipeline'
 import { isMalfunctioning } from '../../../../effects'
 import { MalfunctionConfigStep } from '../../../../../components/items'
-import { Perception } from '../../../../pipeline/types'
+import type { Perception } from '../../../../pipeline/types'
 import { cn } from '../../../../../lib/utils'
 
 import en from './i18n/en'

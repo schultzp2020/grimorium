@@ -1,6 +1,6 @@
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { Icon } from '../atoms'
-import { IconName } from '../atoms/icon'
+import type { IconName } from '../atoms/icon'
 import { cn } from '../../lib/utils'
 import { useI18n } from '../../lib/i18n'
 import type { NightStepAudience } from '../../lib/roles/types'

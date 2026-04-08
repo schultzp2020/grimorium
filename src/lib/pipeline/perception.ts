@@ -1,8 +1,8 @@
-import { GameState, PlayerState, EffectInstance } from '../types'
+import type { GameState, PlayerState, EffectInstance } from '../types'
 import { getRole } from '../roles/index'
 import { getEffect, resolveCanRegisterAs } from '../effects'
-import { isEvilTeam, TeamId } from '../teams'
-import { Perception, PerceptionContext } from './types'
+import { isEvilTeam, type TeamId } from '../teams'
+import type { Perception, PerceptionContext } from './types'
 
 /**
  * Determine how a target player is perceived by an observer player.

@@ -1,4 +1,4 @@
-import { GameState, hasEffect } from '../../lib/types'
+import { type GameState, hasEffect } from '../../lib/types'
 import { getRole } from '../../lib/roles'
 import { useI18n, getRoleName } from '../../lib/i18n'
 import { Button, Badge, Icon } from '../atoms'

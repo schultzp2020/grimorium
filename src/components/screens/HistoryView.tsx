@@ -1,7 +1,7 @@
-import { Game, getCurrentState } from '../../lib/types'
+import { type Game, getCurrentState } from '../../lib/types'
 import { useI18n } from '../../lib/i18n'
 import { RichMessage } from '../items/RichMessage'
-import { Icon, IconName, BackButton } from '../atoms'
+import { Icon, type IconName, BackButton } from '../atoms'
 
 type Props = {
   game: Game

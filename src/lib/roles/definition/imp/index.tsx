@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { RoleDefinition } from '../../types'
+import type { RoleDefinition } from '../../types'
 import { isAlive, hasEffect } from '../../../types'
 import { isMalfunctioning } from '../../../effects'
 import {

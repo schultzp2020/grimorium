@@ -1,6 +1,6 @@
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { Icon, Button } from '../atoms'
-import { IconName } from '../atoms/icon'
+import type { IconName } from '../atoms/icon'
 import { ScreenFooter } from './ScreenFooter'
 import { useI18n, interpolate } from '../../lib/i18n'
 import { cn } from '../../lib/utils'

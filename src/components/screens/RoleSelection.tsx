@@ -1,22 +1,22 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { ROLES } from '../../lib/roles'
-import { RoleDefinition, RoleId } from '../../lib/roles/types'
-import { Language } from '../../lib/i18n/types'
+import type { RoleDefinition, RoleId } from '../../lib/roles/types'
+import type { Language } from '../../lib/i18n/types'
 import {
   SCRIPTS,
-  ScriptId,
+  type ScriptId,
   getRecommendedDistribution,
   applyDistributionModifiers,
 } from '../../lib/scripts'
 import {
-  GeneratedPool,
-  GeneratorPreset,
+  type GeneratedPool,
+  type GeneratorPreset,
 } from '../../lib/scripts/types'
 import {
   generateRolePools,
   selectPresetPools,
 } from '../../lib/scripts/generator'
-import { getTeam, TeamId } from '../../lib/teams'
+import { getTeam, type TeamId } from '../../lib/teams'
 import {
   useI18n,
   interpolate,

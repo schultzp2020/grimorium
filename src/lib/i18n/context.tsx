@@ -3,10 +3,10 @@ import {
   useContext,
   useState,
   useCallback,
-  ReactNode,
+  type ReactNode,
   useMemo,
 } from 'react'
-import { Language, Translations } from './types'
+import type { Language, Translations } from './types'
 import en from './translations/en'
 import es from './translations/es'
 

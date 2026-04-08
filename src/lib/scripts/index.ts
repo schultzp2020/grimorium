@@ -1,6 +1,6 @@
-import { ScriptDefinition, ScriptId, RoleDistribution } from './types'
-import { RoleId } from '../roles/types'
-import { TeamId } from '../teams/types'
+import type { ScriptDefinition, ScriptId, RoleDistribution } from './types'
+import type { RoleId } from '../roles/types'
+import type { TeamId } from '../teams/types'
 
 export type { ScriptId, ScriptDefinition, RoleDistribution } from './types'
 export type { GeneratorPreset, GeneratedPool } from './types'

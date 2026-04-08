@@ -1,5 +1,5 @@
-import { ReactNode, useEffect, useRef, useState } from 'react'
-import { getTeam, TeamId } from '../../lib/teams'
+import { type ReactNode, useEffect, useRef, useState } from 'react'
+import { getTeam, type TeamId } from '../../lib/teams'
 import { useShaderBackground } from '../../hooks/useShaderBackground'
 import { cn } from '../../lib/utils'
 

@@ -12,7 +12,7 @@ import {
   addEffectToPlayer,
   removeEffectFromPlayer,
 } from '../game'
-import { getCurrentState, hasEffect, PlayerState } from '../types'
+import { getCurrentState, hasEffect, type PlayerState } from '../types'
 import {
   makePlayer,
   makeGame,

@@ -1,11 +1,11 @@
 import {
-  Intent,
-  KillIntent,
-  NominateIntent,
-  ExecuteIntent,
-  StateChanges,
+  type Intent,
+  type KillIntent,
+  type NominateIntent,
+  type ExecuteIntent,
+  type StateChanges,
 } from './types'
-import { GameState } from '../types'
+import type { GameState } from '../types'
 
 // ============================================================================
 // DEFAULT RESOLVERS

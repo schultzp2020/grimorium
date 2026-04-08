@@ -1,6 +1,6 @@
 const es = {
-  name: "Disparo del Matador",
-  description: "Este jugador puede usar su habilidad de Matador para disparar a un jugador.",
-} as const;
+  name: 'Disparo del Matador',
+  description: 'Este jugador puede usar su habilidad de Matador para disparar a un jugador.',
+} as const
 
-export default es;
+export default es

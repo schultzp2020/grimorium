@@ -1,25 +1,22 @@
-import type { RoleDefinition } from "../../../types";
-import { isAlive } from "../../../../types";
-import { registerRoleTranslations } from "../../../../i18n";
-import { DefaultRoleReveal } from "../../../../../components/items/DefaultRoleReveal";
-import {
-  InfoRoleNightAction,
-  type InfoRoleConfig,
-} from "../../../../../components/night_steps/InfoRoleNightAction";
+import type { RoleDefinition } from '../../../types'
+import { isAlive } from '../../../../types'
+import { registerRoleTranslations } from '../../../../i18n'
+import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
+import { InfoRoleNightAction, type InfoRoleConfig } from '../../../../../components/night_steps/InfoRoleNightAction'
 
-import en from "./i18n/en";
-import es from "./i18n/es";
+import en from './i18n/en'
+import es from './i18n/es'
 
-registerRoleTranslations("librarian", "en", en);
-registerRoleTranslations("librarian", "es", es);
+registerRoleTranslations('librarian', 'en', en)
+registerRoleTranslations('librarian', 'es', es)
 
 const librarianConfig: InfoRoleConfig = {
-  roleId: "librarian",
-  icon: "bookMarked",
-  targetTeam: "outsider",
+  roleId: 'librarian',
+  icon: 'bookMarked',
+  targetTeam: 'outsider',
   historyKeys: {
-    discovered: "roles.librarian.history.discoveredOutsider",
-    noTarget: "roles.librarian.history.noOutsiders",
+    discovered: 'roles.librarian.history.discoveredOutsider',
+    noTarget: 'roles.librarian.history.noOutsiders',
   },
   getLabels: (roleT) => ({
     infoTitle: roleT.librarianInfo,
@@ -29,12 +26,12 @@ const librarianConfig: InfoRoleConfig = {
     showNoTargetLink: roleT.showNoOutsiders,
     mustIncludeTarget: roleT.mustIncludeOutsider,
   }),
-};
+}
 
 const definition: RoleDefinition = {
-  id: "librarian",
-  team: "townsfolk",
-  icon: "bookMarked",
+  id: 'librarian',
+  team: 'townsfolk',
+  icon: 'bookMarked',
   nightOrder: 11,
   chaos: 15,
   shouldWake: (game, player) => isAlive(player) && game.history.at(-1)?.stateAfter.round === 1,
@@ -42,6 +39,6 @@ const definition: RoleDefinition = {
   RoleReveal: DefaultRoleReveal,
 
   NightAction: (props) => <InfoRoleNightAction config={librarianConfig} {...props} />,
-};
+}
 
-export default definition;
+export default definition

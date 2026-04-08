@@ -1,31 +1,31 @@
-import type { FC } from "react";
-import type { IconName } from "../../components/atoms/icon";
-import type { EffectInstance, GameState, PlayerState } from "../types";
-import type { TeamId } from "../teams";
+import type { FC } from 'react'
+import type { IconName } from '../../components/atoms/icon'
+import type { EffectInstance, GameState, PlayerState } from '../types'
+import type { TeamId } from '../teams'
 import {
   type IntentHandler,
   type DayActionDefinition,
   type NightFollowUpDefinition,
   type WinConditionCheck,
   type PerceptionModifier,
-} from "../pipeline/types";
+} from '../pipeline/types'
 
 export type EffectId =
-  | "dead"
-  | "used_dead_vote"
-  | "safe"
-  | "red_herring"
-  | "pure"
-  | "slayer_bullet"
-  | "deflect"
-  | "martyrdom"
-  | "demon_successor"
-  | "misregister"
-  | "pending_role_reveal"
-  | "poisoned"
-  | "drunk"
-  | "butler_master"
-  | "imp_starpass_pending";
+  | 'dead'
+  | 'used_dead_vote'
+  | 'safe'
+  | 'red_herring'
+  | 'pure'
+  | 'slayer_bullet'
+  | 'deflect'
+  | 'martyrdom'
+  | 'demon_successor'
+  | 'misregister'
+  | 'pending_role_reveal'
+  | 'poisoned'
+  | 'drunk'
+  | 'butler_master'
+  | 'imp_starpass_pending'
 
 /**
  * Semantic type of an effect for badge styling.
@@ -37,44 +37,44 @@ export type EffectId =
  * - perception: affects how info roles see you
  * - pending: workflow, awaiting narrator action
  */
-export type EffectType = "buff" | "nerf" | "marker" | "passive" | "perception" | "pending";
+export type EffectType = 'buff' | 'nerf' | 'marker' | 'passive' | 'perception' | 'pending'
 
 export type EffectDefinition = {
-  id: EffectId;
-  icon: IconName;
+  id: EffectId
+  icon: IconName
 
   // Behavior modifiers
-  preventsNightWake?: boolean;
-  preventsVoting?: boolean;
-  preventsNomination?: boolean;
+  preventsNightWake?: boolean
+  preventsVoting?: boolean
+  preventsNomination?: boolean
 
   // Whether this effect causes the player's ability to malfunction
   // (e.g., Poisoned, Drunk — info roles give wrong info, passive abilities fail)
-  poisonsAbility?: boolean;
+  poisonsAbility?: boolean
 
   // Check if a player can vote given this effect (e.g., dead players can vote once)
   // Optionally receives `votes` if the voting context needs it (like Butler)
-  canVote?: (player: PlayerState, state: GameState, votes?: Record<string, boolean>) => boolean;
+  canVote?: (player: PlayerState, state: GameState, votes?: Record<string, boolean>) => boolean
 
   // Check if a player can nominate given this effect
-  canNominate?: (player: PlayerState, state: GameState) => boolean;
+  canNominate?: (player: PlayerState, state: GameState) => boolean
 
   // Pipeline intent handlers — intercept/modify/prevent intents
-  handlers?: IntentHandler[];
+  handlers?: IntentHandler[]
 
   // Day actions this effect enables (shown as buttons on the day phase)
-  dayActions?: DayActionDefinition[];
+  dayActions?: DayActionDefinition[]
 
   // Night follow-ups this effect enables (shown as items in the Night Dashboard)
   // Used for reactive behaviors like role change reveals
-  nightFollowUps?: NightFollowUpDefinition[];
+  nightFollowUps?: NightFollowUpDefinition[]
 
   // Win conditions this effect contributes
-  winConditions?: WinConditionCheck[];
+  winConditions?: WinConditionCheck[]
 
   // Perception modifiers — alter how the player carrying this effect
   // is perceived by information roles (e.g., Recluse, Spy)
-  perceptionModifiers?: PerceptionModifier[];
+  perceptionModifiers?: PerceptionModifier[]
 
   // Declares that a player with this effect could register as these teams
   // and/or alignments. Used by narrator-setup UIs (e.g. Investigator) to
@@ -85,20 +85,20 @@ export type EffectDefinition = {
   // a single generic effect (e.g., `misregister`) to be configured differently
   // for different roles (Recluse vs Spy).
   canRegisterAs?: {
-    teams?: TeamId[];
-    alignments?: ("good" | "evil")[];
-  };
+    teams?: TeamId[]
+    alignments?: ('good' | 'evil')[]
+  }
 
   /**
    * Semantic type for badge styling. Generic: buff/nerf/marker/passive/perception/pending.
    */
-  defaultType?: EffectType;
+  defaultType?: EffectType
 
   /**
    * Resolves the semantic type for a specific effect instance.
    * Use when the same effect can have different types based on context.
    */
-  getType?: (instance: EffectInstance) => EffectType;
+  getType?: (instance: EffectInstance) => EffectType
 
   /**
    * Custom description component for this effect.
@@ -108,7 +108,7 @@ export type EffectDefinition = {
    *
    * Falls back to the static i18n description when not provided.
    */
-  Description?: FC<EffectDescriptionProps>;
+  Description?: FC<EffectDescriptionProps>
 
   /**
    * Optional configuration editor for this effect.
@@ -118,15 +118,15 @@ export type EffectDefinition = {
    *
    * Effects without a ConfigEditor are added/removed with no configuration.
    */
-  ConfigEditor?: FC<EffectConfigEditorProps>;
-};
+  ConfigEditor?: FC<EffectConfigEditorProps>
+}
 
 export type EffectDescriptionProps = {
   /** The effect instance with its data */
-  instance: EffectInstance;
+  instance: EffectInstance
   /** Current language code */
-  language: string;
-};
+  language: string
+}
 
 /**
  * Props for an effect's configuration editor.
@@ -135,15 +135,15 @@ export type EffectDescriptionProps = {
  */
 export type EffectConfigEditorProps = {
   /** Current data (undefined when creating a new effect, populated when editing) */
-  data: Record<string, unknown> | undefined;
+  data: Record<string, unknown> | undefined
   /** Current game state — for player lists, role lists, etc. */
-  state: GameState;
+  state: GameState
   /** The player this effect is being added to / edited on */
-  playerId: string;
+  playerId: string
   /** Current language code */
-  language: string;
+  language: string
   /** Called when the narrator confirms the configuration */
-  onSave: (data: Record<string, unknown>) => void;
+  onSave: (data: Record<string, unknown>) => void
   /** Called when the narrator cancels */
-  onCancel: () => void;
-};
+  onCancel: () => void
+}

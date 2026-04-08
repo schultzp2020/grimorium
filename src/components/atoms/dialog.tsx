@@ -1,34 +1,34 @@
-import * as React from "react";
-import { useRef, useState, useCallback } from "react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { useDrag } from "@use-gesture/react";
-import { cn } from "../../lib/utils";
-import { useI18n } from "../../lib/i18n";
-import { Icon } from "./icon";
+import * as React from 'react'
+import { useRef, useState, useCallback } from 'react'
+import * as DialogPrimitive from '@radix-ui/react-dialog'
+import { useDrag } from '@use-gesture/react'
+import { cn } from '../../lib/utils'
+import { useI18n } from '../../lib/i18n'
+import { Icon } from './icon'
 
-const Dialog = DialogPrimitive.Root;
-const DialogTrigger = DialogPrimitive.Trigger;
-const DialogPortal = DialogPrimitive.Portal;
-const DialogClose = DialogPrimitive.Close;
+const Dialog = DialogPrimitive.Root
+const DialogTrigger = DialogPrimitive.Trigger
+const DialogPortal = DialogPrimitive.Portal
+const DialogClose = DialogPrimitive.Close
 
 function DialogOverlay({
   className,
   ref,
   ...props
 }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay> & {
-  ref?: React.Ref<React.ComponentRef<typeof DialogPrimitive.Overlay>>;
+  ref?: React.Ref<React.ComponentRef<typeof DialogPrimitive.Overlay>>
 }) {
   return (
     <DialogPrimitive.Overlay
       ref={ref}
       className={cn(
-        "fixed inset-0 z-50 bg-black/40 backdrop-blur-xs",
-        "data-[state=open]:animate-overlay-in data-[state=closed]:animate-overlay-out",
+        'fixed inset-0 z-50 bg-black/40 backdrop-blur-xs',
+        'data-[state=open]:animate-overlay-in data-[state=closed]:animate-overlay-out',
         className,
       )}
       {...props}
     />
-  );
+  )
 }
 
 // ============================================================================
@@ -36,9 +36,9 @@ function DialogOverlay({
 // ============================================================================
 
 /** Distance in px the user must drag to trigger a dismiss */
-const DISMISS_THRESHOLD = 120;
+const DISMISS_THRESHOLD = 120
 /** Velocity threshold for a quick flick dismiss (px/ms) */
-const VELOCITY_THRESHOLD = 0.5;
+const VELOCITY_THRESHOLD = 0.5
 
 // ============================================================================
 // DIALOG CONTENT WITH DRAG-TO-DISMISS
@@ -50,30 +50,30 @@ function DialogContent({
   ref,
   ...props
 }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
-  ref?: React.Ref<React.ComponentRef<typeof DialogPrimitive.Content>>;
+  ref?: React.Ref<React.ComponentRef<typeof DialogPrimitive.Content>>
 }) {
-  const { t } = useI18n();
-  const [dragY, setDragY] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
+  const { t } = useI18n()
+  const [dragY, setDragY] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
   // When true, the overlay fades via CSS transition instead of the
   // keyframe animation — so it transitions from its current drag-dimmed
   // opacity to 0 rather than flashing back to full opacity first.
-  const [dragDismissing, setDragDismissing] = useState(false);
-  const bodyRef = useRef<HTMLDivElement | null>(null);
-  const closeRef = useRef<HTMLButtonElement | null>(null);
+  const [dragDismissing, setDragDismissing] = useState(false)
+  const bodyRef = useRef<HTMLDivElement | null>(null)
+  const closeRef = useRef<HTMLButtonElement | null>(null)
 
   const dismiss = useCallback(() => {
     // Switch the overlay to transition mode so it fades from its current
     // opacity to 0 (CSS keyframe animations override inline styles, so
     // the animate-overlay-out would flash it back to opacity 1 first).
-    setDragDismissing(true);
+    setDragDismissing(true)
     // Just click close. The sheet stays at its current drag position via
     // the CSS `translate` property, which is independent of the `transform`
     // used by Radix's close animation. The close animation composes on top
     // of the drag offset — the sheet continues downward naturally.
     // animationend fires normally, Radix unmounts, fresh state on next open.
-    closeRef.current?.click();
-  }, []);
+    closeRef.current?.click()
+  }, [])
 
   // Reset drag state when the open animation starts. This handles the case
   // where the component isn't fully unmounted between close/open cycles —
@@ -81,76 +81,75 @@ function DialogContent({
   // because the sheet is at translateY(100%) (off-screen) at that point,
   // so removing the translate offset is invisible.
   const handleAnimationStart = useCallback((e: React.AnimationEvent) => {
-    if (e.animationName === "sheet-in") {
-      setDragY(0);
-      setIsDragging(false);
-      setDragDismissing(false);
+    if (e.animationName === 'sheet-in') {
+      setDragY(0)
+      setIsDragging(false)
+      setDragDismissing(false)
     }
-  }, []);
+  }, [])
 
   const bind = useDrag(
     ({ movement: [, my], velocity: [, vy], direction: [, dy], first, last, cancel, memo }) => {
       if (first) {
-        const scrollable = bodyRef.current;
+        const scrollable = bodyRef.current
         if (scrollable && scrollable.scrollTop > 0) {
-          cancel();
-          return;
+          cancel()
+          return
         }
-        return true;
+        return true
       }
 
-      const clampedY = Math.max(0, my);
+      const clampedY = Math.max(0, my)
 
       if (last) {
-        setIsDragging(false);
+        setIsDragging(false)
         if (clampedY > DISMISS_THRESHOLD || (vy > VELOCITY_THRESHOLD && dy > 0)) {
-          dismiss();
+          dismiss()
         } else {
-          setDragY(0);
+          setDragY(0)
         }
-        return memo;
+        return memo
       }
 
-      setIsDragging(true);
-      setDragY(clampedY);
-      return memo;
+      setIsDragging(true)
+      setDragY(clampedY)
+      return memo
     },
     {
-      axis: "y",
+      axis: 'y',
       filterTaps: true,
       from: [0, 0],
       pointer: { touch: true },
     },
-  );
+  )
 
   // Compute overlay opacity based on drag distance (only during active drag).
-  const overlayOpacity = dragY > 0 ? Math.max(0, 1 - dragY / 400) : undefined;
+  const overlayOpacity = dragY > 0 ? Math.max(0, 1 - dragY / 400) : undefined
 
   // Use CSS `translate` for drag offset — this is independent of `transform`
   // which the Radix open/close animations use. They compose without conflict.
-  const contentStyle: React.CSSProperties & Record<string, string> = {};
+  const contentStyle: React.CSSProperties & Record<string, string> = {}
   if (dragY > 0) {
-    contentStyle.translate = `0 ${dragY}px`;
+    contentStyle.translate = `0 ${dragY}px`
   }
   if (!isDragging && dragY > 0) {
     // Smooth snap-back transition when releasing below threshold
-    contentStyle.transition = "translate 300ms ease-out";
+    contentStyle.transition = 'translate 300ms ease-out'
   }
 
   return (
     <DialogPortal>
       <DialogPrimitive.Overlay
         className={cn(
-          "fixed inset-0 z-50 bg-black/40 backdrop-blur-xs",
+          'fixed inset-0 z-50 bg-black/40 backdrop-blur-xs',
           // When drag-dismissing, skip the keyframe animation — it would
           // flash the overlay back to opacity 1 (its first keyframe).
           // Instead, we use a CSS transition to fade from current opacity to 0.
-          !dragDismissing &&
-            "data-[state=open]:animate-overlay-in data-[state=closed]:animate-overlay-out",
+          !dragDismissing && 'data-[state=open]:animate-overlay-in data-[state=closed]:animate-overlay-out',
         )}
         style={
           dragDismissing
-            ? { opacity: 0, transition: "opacity 200ms ease-out" }
+            ? { opacity: 0, transition: 'opacity 200ms ease-out' }
             : overlayOpacity !== undefined
               ? { opacity: overlayOpacity }
               : undefined
@@ -160,82 +159,77 @@ function DialogContent({
         ref={ref}
         onAnimationStart={handleAnimationStart}
         className={cn(
-          "fixed z-50 w-full max-w-lg",
+          'fixed z-50 w-full max-w-lg',
           // Mobile: bottom sheet style
-          "bottom-0 left-0 right-0 max-h-[85vh]",
+          'bottom-0 left-0 right-0 max-h-[85vh]',
           // Styling
-          "bg-grimoire-dark border-t border-mystic-gold/30 rounded-t-2xl",
-          "overflow-hidden flex flex-col",
+          'bg-grimoire-dark border-t border-mystic-gold/30 rounded-t-2xl',
+          'overflow-hidden flex flex-col',
           // Keyframe animations for open/close — uses `transform` which is
           // independent of the CSS `translate` property used for drag offset
-          "data-[state=open]:animate-sheet-in data-[state=closed]:animate-sheet-out",
+          'data-[state=open]:animate-sheet-in data-[state=closed]:animate-sheet-out',
           className,
         )}
         style={contentStyle}
         {...props}
       >
         {/* Drag handle area — main drag target */}
-        <div
-          {...bind()}
-          className="flex justify-center py-3 cursor-grab active:cursor-grabbing touch-none"
-        >
+        <div {...bind()} className='flex cursor-grab touch-none justify-center py-3 active:cursor-grabbing'>
           <div
             className={cn(
-              "w-12 h-1 rounded-full transition-all duration-150",
-              isDragging ? "bg-parchment-500/60 w-16" : "bg-parchment-500/30",
+              'w-12 h-1 rounded-full transition-all duration-150',
+              isDragging ? 'bg-parchment-500/60 w-16' : 'bg-parchment-500/30',
             )}
           />
         </div>
         <DialogContentInner bodyRef={bodyRef}>{children}</DialogContentInner>
         <DialogPrimitive.Close
           ref={closeRef}
-          className="absolute right-3 top-3 p-3 rounded-full text-parchment-400 hover:text-parchment-100 hover:bg-white/10 active:bg-white/20 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+          className='absolute top-3 right-3 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-3 text-parchment-400 transition-colors hover:bg-white/10 hover:text-parchment-100 active:bg-white/20'
         >
-          <Icon name="x" size="md" />
-          <span className="sr-only">{t.ui.close}</span>
+          <Icon name='x' size='md' />
+          <span className='sr-only'>{t.ui.close}</span>
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>
     </DialogPortal>
-  );
+  )
 }
 
 /**
  * Inner wrapper that passes the body ref to DialogBody children via context.
  * This lets the drag handler know when the body is scrolled.
  */
-const DialogBodyRefContext = React.createContext<React.RefObject<HTMLDivElement | null> | null>(
-  null,
-);
+const DialogBodyRefContext = React.createContext<React.RefObject<HTMLDivElement | null> | null>(null)
 
 function DialogContentInner({
   children,
   bodyRef,
 }: {
-  children: React.ReactNode;
-  bodyRef: React.RefObject<HTMLDivElement | null>;
+  children: React.ReactNode
+  bodyRef: React.RefObject<HTMLDivElement | null>
 }) {
-  return <DialogBodyRefContext.Provider value={bodyRef}>{children}</DialogBodyRefContext.Provider>;
+  return <DialogBodyRefContext.Provider value={bodyRef}>{children}</DialogBodyRefContext.Provider>
 }
 
 const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn("px-6 pb-4 text-center", className)} {...props} />
-);
-DialogHeader.displayName = "DialogHeader";
+  <div className={cn('px-6 pb-4 text-center', className)} {...props} />
+)
+DialogHeader.displayName = 'DialogHeader'
 
 function DialogTitle({
   className,
   ref,
   ...props
 }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title> & {
-  ref?: React.Ref<React.ComponentRef<typeof DialogPrimitive.Title>>;
+  ref?: React.Ref<React.ComponentRef<typeof DialogPrimitive.Title>>
 }) {
   return (
     <DialogPrimitive.Title
       ref={ref}
-      className={cn("font-tarot text-xl text-parchment-100 tracking-wider uppercase", className)}
+      className={cn('font-tarot text-xl text-parchment-100 tracking-wider uppercase', className)}
       {...props}
     />
-  );
+  )
 }
 
 function DialogDescription({
@@ -243,34 +237,26 @@ function DialogDescription({
   ref,
   ...props
 }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description> & {
-  ref?: React.Ref<React.ComponentRef<typeof DialogPrimitive.Description>>;
+  ref?: React.Ref<React.ComponentRef<typeof DialogPrimitive.Description>>
 }) {
-  return (
-    <DialogPrimitive.Description
-      ref={ref}
-      className={cn("text-sm text-parchment-400", className)}
-      {...props}
-    />
-  );
+  return <DialogPrimitive.Description ref={ref} className={cn('text-sm text-parchment-400', className)} {...props} />
 }
 
 const DialogBody = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
-  const bodyRef = React.useContext(DialogBodyRefContext);
+  const bodyRef = React.useContext(DialogBodyRefContext)
 
   const setRef = useCallback(
     (node: HTMLDivElement | null) => {
       if (bodyRef) {
-        (bodyRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+        ;(bodyRef as React.MutableRefObject<HTMLDivElement | null>).current = node
       }
     },
     [bodyRef],
-  );
+  )
 
-  return (
-    <div ref={setRef} className={cn("flex-1 overflow-y-auto px-6 pb-6", className)} {...props} />
-  );
-};
-DialogBody.displayName = "DialogBody";
+  return <div ref={setRef} className={cn('flex-1 overflow-y-auto px-6 pb-6', className)} {...props} />
+}
+DialogBody.displayName = 'DialogBody'
 
 export {
   Dialog,
@@ -283,4 +269,4 @@ export {
   DialogTitle,
   DialogDescription,
   DialogBody,
-};
+}

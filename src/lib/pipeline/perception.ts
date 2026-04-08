@@ -1,8 +1,8 @@
-import type { GameState, PlayerState, EffectInstance } from "../types";
-import { getRole } from "../roles/index";
-import { getEffect, resolveCanRegisterAs } from "../effects";
-import { isEvilTeam, type TeamId } from "../teams";
-import type { Perception, PerceptionContext } from "./types";
+import type { GameState, PlayerState, EffectInstance } from '../types'
+import { getRole } from '../roles/index'
+import { getEffect, resolveCanRegisterAs } from '../effects'
+import { isEvilTeam, type TeamId } from '../teams'
+import type { Perception, PerceptionContext } from './types'
 
 /**
  * Determine how a target player is perceived by an observer player.
@@ -25,42 +25,36 @@ export function perceive(
   context: PerceptionContext,
   state: GameState,
 ): Perception {
-  const role = getRole(targetPlayer.roleId);
-  const team = role?.team ?? "townsfolk";
+  const role = getRole(targetPlayer.roleId)
+  const team = role?.team ?? 'townsfolk'
 
   let perception: Perception = {
     roleId: targetPlayer.roleId,
     team,
-    alignment: isEvilTeam(team) ? "evil" : "good",
-  };
+    alignment: isEvilTeam(team) ? 'evil' : 'good',
+  }
 
   // Collect and apply perception modifiers from the target's effects
   for (const effectInstance of targetPlayer.effects) {
-    const effectDef = getEffect(effectInstance.type);
-    if (!effectDef?.perceptionModifiers) continue;
+    const effectDef = getEffect(effectInstance.type)
+    if (!effectDef?.perceptionModifiers) continue
 
     for (const modifier of effectDef.perceptionModifiers) {
       // Check if this modifier applies to the current context
-      const contexts = Array.isArray(modifier.context) ? modifier.context : [modifier.context];
-      if (!contexts.includes(context)) continue;
+      const contexts = Array.isArray(modifier.context) ? modifier.context : [modifier.context]
+      if (!contexts.includes(context)) continue
 
       // Check if this modifier is restricted to specific observer roles
       if (modifier.observerRoles) {
-        if (!modifier.observerRoles.includes(observerPlayer.roleId)) continue;
+        if (!modifier.observerRoles.includes(observerPlayer.roleId)) continue
       }
 
       // Apply the modification
-      perception = modifier.modify(
-        perception,
-        targetPlayer,
-        observerPlayer,
-        state,
-        effectInstance.data,
-      );
+      perception = modifier.modify(perception, targetPlayer, observerPlayer, state, effectInstance.data)
     }
   }
 
-  return perception;
+  return perception
 }
 
 /**
@@ -76,11 +70,11 @@ export function perceive(
  */
 export function canRegisterAsTeam(player: PlayerState, team: TeamId): boolean {
   for (const effectInstance of player.effects) {
-    const effectDef = getEffect(effectInstance.type);
-    const canRegisterAs = resolveCanRegisterAs(effectInstance, effectDef);
-    if (canRegisterAs?.teams?.includes(team)) return true;
+    const effectDef = getEffect(effectInstance.type)
+    const canRegisterAs = resolveCanRegisterAs(effectInstance, effectDef)
+    if (canRegisterAs?.teams?.includes(team)) return true
   }
-  return false;
+  return false
 }
 
 /**
@@ -92,13 +86,13 @@ export function canRegisterAsTeam(player: PlayerState, team: TeamId): boolean {
  * Used by auto-calculating roles (Chef, Empath) to detect ambiguous players
  * that need narrator configuration before calculating results.
  */
-export function canRegisterAsAlignment(player: PlayerState, alignment: "good" | "evil"): boolean {
+export function canRegisterAsAlignment(player: PlayerState, alignment: 'good' | 'evil'): boolean {
   for (const effectInstance of player.effects) {
-    const effectDef = getEffect(effectInstance.type);
-    const canRegisterAs = resolveCanRegisterAs(effectInstance, effectDef);
-    if (canRegisterAs?.alignments?.includes(alignment)) return true;
+    const effectDef = getEffect(effectInstance.type)
+    const canRegisterAs = resolveCanRegisterAs(effectInstance, effectDef)
+    if (canRegisterAs?.alignments?.includes(alignment)) return true
   }
-  return false;
+  return false
 }
 
 /**
@@ -113,22 +107,18 @@ export function canRegisterAsAlignment(player: PlayerState, alignment: "good" | 
  * - "team" context: checks `canRegisterAs.teams`
  * - "role" context: checks both (misregistration at any level affects role perception)
  */
-export function getAmbiguousPlayers(
-  players: PlayerState[],
-  context: PerceptionContext,
-): PlayerState[] {
+export function getAmbiguousPlayers(players: PlayerState[], context: PerceptionContext): PlayerState[] {
   return players.filter((player) => {
     for (const effectInstance of player.effects) {
-      const effectDef = getEffect(effectInstance.type);
-      const canRegisterAs = resolveCanRegisterAs(effectInstance, effectDef);
-      if (!canRegisterAs) continue;
-      if (context === "alignment" && canRegisterAs.alignments?.length) return true;
-      if (context === "team" && canRegisterAs.teams?.length) return true;
-      if (context === "role" && (canRegisterAs.teams?.length || canRegisterAs.alignments?.length))
-        return true;
+      const effectDef = getEffect(effectInstance.type)
+      const canRegisterAs = resolveCanRegisterAs(effectInstance, effectDef)
+      if (!canRegisterAs) continue
+      if (context === 'alignment' && canRegisterAs.alignments?.length) return true
+      if (context === 'team' && canRegisterAs.teams?.length) return true
+      if (context === 'role' && (canRegisterAs.teams?.length || canRegisterAs.alignments?.length)) return true
     }
-    return false;
-  });
+    return false
+  })
 }
 
 /**
@@ -143,24 +133,21 @@ export function getAmbiguousPlayers(
  * This is used locally within NightAction components — no game events are emitted.
  * The overrides are ephemeral and only affect the current calculation.
  */
-export function applyPerceptionOverrides(
-  state: GameState,
-  overrides: Record<string, Partial<Perception>>,
-): GameState {
-  if (Object.keys(overrides).length === 0) return state;
+export function applyPerceptionOverrides(state: GameState, overrides: Record<string, Partial<Perception>>): GameState {
+  if (Object.keys(overrides).length === 0) return state
 
   return {
     ...state,
     players: state.players.map((player) => {
-      const override = overrides[player.id];
-      if (!override) return player;
+      const override = overrides[player.id]
+      if (!override) return player
 
       // Find effects that declare canRegisterAs (on definition or instance)
       // and inject perceiveAs data
       const updatedEffects: EffectInstance[] = player.effects.map((effectInstance) => {
-        const effectDef = getEffect(effectInstance.type);
-        const canRegisterAs = resolveCanRegisterAs(effectInstance, effectDef);
-        if (!canRegisterAs) return effectInstance;
+        const effectDef = getEffect(effectInstance.type)
+        const canRegisterAs = resolveCanRegisterAs(effectInstance, effectDef)
+        if (!canRegisterAs) return effectInstance
 
         return {
           ...effectInstance,
@@ -168,10 +155,10 @@ export function applyPerceptionOverrides(
             ...effectInstance.data,
             perceiveAs: override,
           },
-        };
-      });
+        }
+      })
 
-      return { ...player, effects: updatedEffects };
+      return { ...player, effects: updatedEffects }
     }),
-  };
+  }
 }

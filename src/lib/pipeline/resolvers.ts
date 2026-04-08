@@ -1,11 +1,5 @@
-import {
-  type Intent,
-  type KillIntent,
-  type NominateIntent,
-  type ExecuteIntent,
-  type StateChanges,
-} from "./types";
-import type { GameState } from "../types";
+import { type Intent, type KillIntent, type NominateIntent, type ExecuteIntent, type StateChanges } from './types'
+import type { GameState } from '../types'
 
 // ============================================================================
 // DEFAULT RESOLVERS
@@ -14,41 +8,41 @@ import type { GameState } from "../types";
 // by any handler. They produce the "default" state changes for each intent.
 // ============================================================================
 
-type IntentResolver = (intent: Intent, state: GameState) => StateChanges;
+type IntentResolver = (intent: Intent, state: GameState) => StateChanges
 
 /**
  * Default kill resolution: add a "dead" effect to the target.
  * No history entry needed — death announcements happen in startDay().
  */
 function resolveKill(intent: Intent, _state: GameState): StateChanges {
-  const kill = intent as KillIntent;
+  const kill = intent as KillIntent
   return {
     entries: [],
     addEffects: {
       [kill.targetId]: [
         {
-          type: "dead",
+          type: 'dead',
           data: { cause: kill.cause },
-          expiresAt: "never",
+          expiresAt: 'never',
         },
       ],
     },
-  };
+  }
 }
 
 /**
  * Default nomination resolution: record the nomination and transition to voting.
  */
 function resolveNominate(intent: Intent, _state: GameState): StateChanges {
-  const nom = intent as NominateIntent;
+  const nom = intent as NominateIntent
   return {
     entries: [
       {
-        type: "nomination",
+        type: 'nomination',
         message: [
           {
-            type: "i18n",
-            key: "history.nominates",
+            type: 'i18n',
+            key: 'history.nominates',
             params: {
               nominator: nom.nominatorId,
               nominee: nom.nomineeId,
@@ -63,22 +57,22 @@ function resolveNominate(intent: Intent, _state: GameState): StateChanges {
     ],
     // Phase stays 'day' — the GameScreen state machine handles showing
     // the voting UI via its own Screen type, independently of Phase.
-  };
+  }
 }
 
 /**
  * Default execution resolution: kill the player and record the execution.
  */
 function resolveExecute(intent: Intent, _state: GameState): StateChanges {
-  const exec = intent as ExecuteIntent;
+  const exec = intent as ExecuteIntent
   return {
     entries: [
       {
-        type: "execution",
+        type: 'execution',
         message: [
           {
-            type: "i18n",
-            key: "history.executed",
+            type: 'i18n',
+            key: 'history.executed',
             params: { player: exec.playerId },
           },
         ],
@@ -88,13 +82,13 @@ function resolveExecute(intent: Intent, _state: GameState): StateChanges {
     addEffects: {
       [exec.playerId]: [
         {
-          type: "dead",
+          type: 'dead',
           data: { cause: exec.cause },
-          expiresAt: "never",
+          expiresAt: 'never',
         },
       ],
     },
-  };
+  }
 }
 
 // ============================================================================
@@ -105,8 +99,8 @@ const resolvers: Record<string, IntentResolver> = {
   kill: resolveKill,
   nominate: resolveNominate,
   execute: resolveExecute,
-};
+}
 
 export function getDefaultResolver(intentType: string): IntentResolver | undefined {
-  return resolvers[intentType];
+  return resolvers[intentType]
 }

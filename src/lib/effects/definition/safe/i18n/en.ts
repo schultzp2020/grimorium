@@ -1,6 +1,6 @@
 const en = {
-  name: "Safe",
+  name: 'Safe',
   description: "This player is protected from the Demon's kill.",
-} as const;
+} as const
 
-export default en;
+export default en

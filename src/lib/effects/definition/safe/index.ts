@@ -1,32 +1,32 @@
-import type { EffectDefinition } from "../../types";
-import type { IntentHandler, KillIntent } from "../../../pipeline/types";
-import { registerEffectTranslations } from "../../../i18n";
+import type { EffectDefinition } from '../../types'
+import type { IntentHandler, KillIntent } from '../../../pipeline/types'
+import { registerEffectTranslations } from '../../../i18n'
 
-import en from "./i18n/en";
-import es from "./i18n/es";
+import en from './i18n/en'
+import es from './i18n/es'
 
-registerEffectTranslations("safe", "en", en);
-registerEffectTranslations("safe", "es", es);
+registerEffectTranslations('safe', 'en', en)
+registerEffectTranslations('safe', 'es', es)
 
 const safeHandler: IntentHandler = {
-  intentType: "kill",
+  intentType: 'kill',
   priority: 10, // After deflect (5) so redirected kills can still be blocked
   appliesTo: (intent, effectPlayer) => {
-    return intent.type === "kill" && intent.targetId === effectPlayer.id;
+    return intent.type === 'kill' && intent.targetId === effectPlayer.id
   },
   handle: (intent, effectPlayer) => {
-    const kill = intent as KillIntent;
+    const kill = intent as KillIntent
     return {
-      action: "prevent",
-      reason: "protected",
+      action: 'prevent',
+      reason: 'protected',
       stateChanges: {
         entries: [
           {
-            type: "night_action",
+            type: 'night_action',
             message: [
               {
-                type: "i18n",
-                key: "roles.imp.history.failedToKill",
+                type: 'i18n',
+                key: 'roles.imp.history.failedToKill',
                 params: {
                   player: kill.sourceId,
                   target: effectPlayer.id,
@@ -34,23 +34,23 @@ const safeHandler: IntentHandler = {
               },
             ],
             data: {
-              action: "kill_failed",
+              action: 'kill_failed',
               sourceId: kill.sourceId,
               targetId: effectPlayer.id,
-              reason: "safe",
+              reason: 'safe',
             },
           },
         ],
       },
-    };
+    }
   },
-};
+}
 
 const definition: EffectDefinition = {
-  id: "safe",
-  icon: "shield",
-  defaultType: "buff",
+  id: 'safe',
+  icon: 'shield',
+  defaultType: 'buff',
   handlers: [safeHandler],
-};
+}
 
-export default definition;
+export default definition

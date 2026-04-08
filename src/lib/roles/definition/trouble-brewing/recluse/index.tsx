@@ -1,17 +1,17 @@
-import type { RoleDefinition } from "../../../types";
-import { DefaultRoleReveal } from "../../../../../components/items/DefaultRoleReveal";
-import { registerRoleTranslations } from "../../../../i18n";
+import type { RoleDefinition } from '../../../types'
+import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
+import { registerRoleTranslations } from '../../../../i18n'
 
-import en from "./i18n/en";
-import es from "./i18n/es";
+import en from './i18n/en'
+import es from './i18n/es'
 
-registerRoleTranslations("recluse", "en", en);
-registerRoleTranslations("recluse", "es", es);
+registerRoleTranslations('recluse', 'en', en)
+registerRoleTranslations('recluse', 'es', es)
 
 const definition: RoleDefinition = {
-  id: "recluse",
-  team: "outsider",
-  icon: "candleHolderLit",
+  id: 'recluse',
+  team: 'outsider',
+  icon: 'candleHolderLit',
   nightOrder: null, // Doesn't wake at night — passive ability
   chaos: 55,
 
@@ -19,12 +19,12 @@ const definition: RoleDefinition = {
   // canRegisterAs is stored on the instance data so the generic effect works for both Recluse and Spy
   initialEffects: [
     {
-      type: "misregister",
-      expiresAt: "never",
+      type: 'misregister',
+      expiresAt: 'never',
       data: {
         canRegisterAs: {
-          teams: ["minion", "demon"],
-          alignments: ["evil"],
+          teams: ['minion', 'demon'],
+          alignments: ['evil'],
         },
       },
     },
@@ -33,6 +33,6 @@ const definition: RoleDefinition = {
   RoleReveal: DefaultRoleReveal,
 
   NightAction: null,
-};
+}
 
-export default definition;
+export default definition

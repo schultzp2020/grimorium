@@ -79,42 +79,42 @@ This document explains every system in the codebase, how they interconnect, and 
 
 ```typescript
 type Game = {
-  id: string;
-  name: string;
-  createdAt: number;
-  history: HistoryEntry[]; // The entire game state is here
-};
+  id: string
+  name: string
+  createdAt: number
+  history: HistoryEntry[] // The entire game state is here
+}
 
 type HistoryEntry = {
-  id: string;
-  timestamp: number;
-  type: EventType;
-  message: RichMessage; // i18n-ready display messages
-  data: Record<string, unknown>; // Structured event data
-  stateAfter: GameState; // Full state snapshot after this event
-};
+  id: string
+  timestamp: number
+  type: EventType
+  message: RichMessage // i18n-ready display messages
+  data: Record<string, unknown> // Structured event data
+  stateAfter: GameState // Full state snapshot after this event
+}
 
 type GameState = {
-  phase: Phase; // "setup" | "night" | "day" | "voting" | "ended"
-  round: number; // 0 = setup, 1+ = game rounds
-  players: PlayerState[];
-  winner: Team | null;
-};
+  phase: Phase // "setup" | "night" | "day" | "voting" | "ended"
+  round: number // 0 = setup, 1+ = game rounds
+  players: PlayerState[]
+  winner: Team | null
+}
 
 type PlayerState = {
-  id: string;
-  name: string;
-  roleId: string;
-  effects: EffectInstance[]; // All active effects on this player
-};
+  id: string
+  name: string
+  roleId: string
+  effects: EffectInstance[] // All active effects on this player
+}
 
 type EffectInstance = {
-  id: string;
-  type: string; // References an EffectId
-  data?: Record<string, unknown>; // Instance-specific data
-  sourcePlayerId?: string;
-  expiresAt?: "end_of_night" | "end_of_day" | "never";
-};
+  id: string
+  type: string // References an EffectId
+  data?: Record<string, unknown> // Instance-specific data
+  sourcePlayerId?: string
+  expiresAt?: 'end_of_night' | 'end_of_day' | 'never'
+}
 ```
 
 ### How State Evolves
@@ -182,11 +182,11 @@ This separation exists because the pipeline may return `needs_input` (requiring 
 
 ```typescript
 type NightRoleStatus = {
-  roleId: string;
-  playerId: string;
-  playerName: string;
-  status: "pending" | "done";
-};
+  roleId: string
+  playerId: string
+  playerName: string
+  status: 'pending' | 'done'
+}
 ```
 
 Only roles whose `shouldWake()` returns `true` (or is undefined) and who have a `nightOrder` appear in this list. Roles that don't need to wake are excluded entirely.
@@ -209,18 +209,18 @@ Only roles whose `shouldWake()` returns `true` (or is undefined) and who have a 
 
 ```typescript
 type RoleDefinition = {
-  id: RoleId;
-  team: TeamId; // "townsfolk" | "outsider" | "minion" | "demon"
-  icon: IconName;
-  nightOrder: number | null; // Lower = wakes earlier. null = doesn't wake
-  shouldWake?: (game, player) => boolean; // Conditional waking
-  initialEffects?: EffectToAdd[]; // Effects added at game creation
-  winConditions?: WinConditionCheck[]; // Dynamic win conditions
-  nightSteps?: NightStepDefinition[]; // Declarative night action step list (see §4a)
-  RoleReveal: FC<RoleRevealProps>; // Component shown when player learns their role
-  NightAction: FC<NightActionProps> | null; // Night action component (null = no action)
-  SetupAction?: FC<SetupActionProps>; // Pre-revelation narrator setup (see §4b)
-};
+  id: RoleId
+  team: TeamId // "townsfolk" | "outsider" | "minion" | "demon"
+  icon: IconName
+  nightOrder: number | null // Lower = wakes earlier. null = doesn't wake
+  shouldWake?: (game, player) => boolean // Conditional waking
+  initialEffects?: EffectToAdd[] // Effects added at game creation
+  winConditions?: WinConditionCheck[] // Dynamic win conditions
+  nightSteps?: NightStepDefinition[] // Declarative night action step list (see §4a)
+  RoleReveal: FC<RoleRevealProps> // Component shown when player learns their role
+  NightAction: FC<NightActionProps> | null // Night action component (null = no action)
+  SetupAction?: FC<SetupActionProps> // Pre-revelation narrator setup (see §4b)
+}
 ```
 
 ### Night Action Result
@@ -229,12 +229,12 @@ When a role's `NightAction` component calls `onComplete()`, it provides:
 
 ```typescript
 type NightActionResult = {
-  entries: Omit<HistoryEntry, "id" | "timestamp" | "stateAfter">[]; // History log
-  stateUpdates?: Partial<GameState>;
-  addEffects?: Record<string, EffectToAdd[]>; // playerId -> effects to add
-  removeEffects?: Record<string, string[]>; // playerId -> effect types to remove
-  intent?: Intent; // Optional intent for the pipeline
-};
+  entries: Omit<HistoryEntry, 'id' | 'timestamp' | 'stateAfter'>[] // History log
+  stateUpdates?: Partial<GameState>
+  addEffects?: Record<string, EffectToAdd[]> // playerId -> effects to add
+  removeEffects?: Record<string, string[]> // playerId -> effect types to remove
+  intent?: Intent // Optional intent for the pipeline
+}
 ```
 
 **Key:** `entries`, `stateUpdates`, `addEffects`, and `removeEffects` are applied **directly** (they are the role's own bookkeeping). The `intent` is sent through the **pipeline** for other effects to intercept.
@@ -278,11 +278,11 @@ Roles declare their steps via the optional `nightSteps` field on `RoleDefinition
 
 ```typescript
 type NightStepDefinition = {
-  id: string;
-  icon: IconName;
-  getLabel: (t: Translations) => string;
-  condition?: (game: Game, player: PlayerState, state: GameState) => boolean;
-};
+  id: string
+  icon: IconName
+  getLabel: (t: Translations) => string
+  condition?: (game: Game, player: PlayerState, state: GameState) => boolean
+}
 ```
 
 - `condition` makes steps **dynamic** — they only appear when the condition is true (e.g., "Configure Perceptions" only shows when ambiguous players exist).
@@ -299,21 +299,21 @@ The shared layout component renders the step list with:
 
 ```typescript
 type NightStep = {
-  id: string;
-  icon: IconName;
-  label: string;
-  status: "pending" | "done" | "active";
-};
+  id: string
+  icon: IconName
+  label: string
+  status: 'pending' | 'done' | 'active'
+}
 
 // Props
 type Props = {
-  icon: IconName;
-  roleName: string;
-  playerName: string;
-  isEvil?: boolean;
-  steps: NightStep[];
-  onSelectStep: (stepId: string) => void;
-};
+  icon: IconName
+  roleName: string
+  playerName: string
+  isEvil?: boolean
+  steps: NightStep[]
+  onSelectStep: (stepId: string) => void
+}
 ```
 
 #### How Roles Build Steps at Runtime
@@ -322,28 +322,28 @@ The `NightAction` component reads its role's `nightSteps` (or hardcodes a step a
 
 ```typescript
 const steps: NightStep[] = useMemo(() => {
-  const result: NightStep[] = [];
+  const result: NightStep[] = []
 
   // Conditional step — only appears when ambiguous players exist
   if (needsPerceptionConfig) {
     result.push({
-      id: "configure_perceptions",
-      icon: "eye",
+      id: 'configure_perceptions',
+      icon: 'eye',
       label: t.game.stepConfigurePerceptions,
-      status: perceptionConfigDone ? "done" : "pending",
-    });
+      status: perceptionConfigDone ? 'done' : 'pending',
+    })
   }
 
   // Always-present step
   result.push({
-    id: "show_result",
-    icon: "chefHat",
+    id: 'show_result',
+    icon: 'chefHat',
     label: t.game.stepShowResult,
-    status: "pending",
-  });
+    status: 'pending',
+  })
 
-  return result;
-}, [needsPerceptionConfig, perceptionConfigDone, t]);
+  return result
+}, [needsPerceptionConfig, perceptionConfigDone, t])
 ```
 
 #### Current Role Step Configurations
@@ -374,16 +374,16 @@ Some roles require narrator configuration **before** role revelation begins. The
 
 ```typescript
 type SetupActionProps = {
-  player: PlayerState;
-  state: GameState;
-  onComplete: (result: SetupActionResult) => void;
-};
+  player: PlayerState
+  state: GameState
+  onComplete: (result: SetupActionResult) => void
+}
 
 type SetupActionResult = {
-  changeRole?: string; // Change the player's roleId
-  addEffects?: Record<string, EffectToAdd[]>;
-  removeEffects?: Record<string, string[]>;
-};
+  changeRole?: string // Change the player's roleId
+  addEffects?: Record<string, EffectToAdd[]>
+  removeEffects?: Record<string, string[]>
+}
 ```
 
 #### How Setup Actions Work
@@ -432,38 +432,38 @@ Effects are the primary mechanism for modular game behavior. They attach to play
 
 ```typescript
 type EffectDefinition = {
-  id: EffectId;
-  icon: IconName;
+  id: EffectId
+  icon: IconName
 
   // Behavior modifiers (simple boolean flags)
-  preventsNightWake?: boolean;
-  preventsVoting?: boolean;
-  preventsNomination?: boolean;
+  preventsNightWake?: boolean
+  preventsVoting?: boolean
+  preventsNomination?: boolean
 
   // Malfunction flag — when true, the player's ability malfunctions
   // (info roles give wrong info, action roles' effects don't apply,
   // passive handlers are skipped, win conditions are disabled)
-  poisonsAbility?: boolean;
+  poisonsAbility?: boolean
 
   // Conditional behavior
-  canVote?: (player, state) => boolean;
-  canNominate?: (player, state) => boolean;
+  canVote?: (player, state) => boolean
+  canNominate?: (player, state) => boolean
 
   // Pipeline integration
-  handlers?: IntentHandler[]; // Intercept/modify intents
-  dayActions?: DayActionDefinition[]; // Register day-phase abilities
-  nightFollowUps?: NightFollowUpDefinition[]; // Register reactive night-phase actions
-  winConditions?: WinConditionCheck[]; // Register custom win conditions
-  perceptionModifiers?: PerceptionModifier[]; // Alter perceived identity
+  handlers?: IntentHandler[] // Intercept/modify intents
+  dayActions?: DayActionDefinition[] // Register day-phase abilities
+  nightFollowUps?: NightFollowUpDefinition[] // Register reactive night-phase actions
+  winConditions?: WinConditionCheck[] // Register custom win conditions
+  perceptionModifiers?: PerceptionModifier[] // Alter perceived identity
 
   // Misregistration declaration — used by perception query utilities
   // (getAmbiguousPlayers, canRegisterAsTeam, canRegisterAsAlignment)
   // to detect players needing narrator perception configuration
   canRegisterAs?: {
-    teams?: TeamId[];
-    alignments?: ("good" | "evil")[];
-  };
-};
+    teams?: TeamId[]
+    alignments?: ('good' | 'evil')[]
+  }
+}
 ```
 
 ### Current Effects
@@ -508,9 +508,9 @@ The malfunction system handles Poisoned and Drunk effects. When a player is malf
 Effects declare `poisonsAbility: true` to cause malfunction. The `isMalfunctioning()` helper checks if a player has any such effect:
 
 ```typescript
-import { isMalfunctioning } from "../../../effects";
+import { isMalfunctioning } from '../../../effects'
 
-const malfunctioning = isMalfunctioning(player);
+const malfunctioning = isMalfunctioning(player)
 // true if player has any effect with poisonsAbility: true (e.g., "poisoned", "drunk")
 ```
 
@@ -545,17 +545,17 @@ A narrator-only screen for configuring false results when a role is malfunctioni
 
 ```typescript
 type Props = {
-  type: "number" | "boolean" | "role";
-  roleIcon: string;
-  roleName: string;
-  playerName: string;
+  type: 'number' | 'boolean' | 'role'
+  roleIcon: string
+  roleName: string
+  playerName: string
   // For "number" type:
-  numberRange?: [number, number];
-  onComplete: (value: number | boolean | string) => void;
+  numberRange?: [number, number]
+  onComplete: (value: number | boolean | string) => void
   // For "boolean" type:
-  trueLabel?: string;
-  falseLabel?: string;
-};
+  trueLabel?: string
+  falseLabel?: string
+}
 ```
 
 - **number**: Shown for Chef, Empath — narrator picks a false count
@@ -582,10 +582,10 @@ The Intent Pipeline is the core mechanism for decoupled role/effect interactions
 ### Intent Types
 
 ```typescript
-type KillIntent = { type: "kill"; sourceId: string; targetId: string; cause: string };
-type NominateIntent = { type: "nominate"; nominatorId: string; nomineeId: string };
-type ExecuteIntent = { type: "execute"; playerId: string; cause: string };
-type Intent = KillIntent | NominateIntent | ExecuteIntent;
+type KillIntent = { type: 'kill'; sourceId: string; targetId: string; cause: string }
+type NominateIntent = { type: 'nominate'; nominatorId: string; nomineeId: string }
+type ExecuteIntent = { type: 'execute'; playerId: string; cause: string }
+type Intent = KillIntent | NominateIntent | ExecuteIntent
 ```
 
 ### Pipeline Flow
@@ -623,25 +623,25 @@ type Intent = KillIntent | NominateIntent | ExecuteIntent;
 
 ```typescript
 type IntentHandler = {
-  intentType: Intent["type"] | Intent["type"][]; // Which intents to handle
-  priority: number; // Lower = runs first
-  appliesTo: (intent, effectPlayer, state) => boolean; // Guard condition
-  handle: (intent, effectPlayer, state, game) => HandlerResult; // Logic
-};
+  intentType: Intent['type'] | Intent['type'][] // Which intents to handle
+  priority: number // Lower = runs first
+  appliesTo: (intent, effectPlayer, state) => boolean // Guard condition
+  handle: (intent, effectPlayer, state, game) => HandlerResult // Logic
+}
 ```
 
 ### HandlerResult
 
 ```typescript
 type HandlerResult =
-  | { action: "allow"; stateChanges?: StateChanges }
-  | { action: "prevent"; reason: string; stateChanges?: StateChanges }
-  | { action: "redirect"; newIntent: Intent; stateChanges?: StateChanges }
+  | { action: 'allow'; stateChanges?: StateChanges }
+  | { action: 'prevent'; reason: string; stateChanges?: StateChanges }
+  | { action: 'redirect'; newIntent: Intent; stateChanges?: StateChanges }
   | {
-      action: "request_ui";
-      UIComponent: FC<PipelineInputProps>;
-      resume: (result: unknown) => HandlerResult;
-    };
+      action: 'request_ui'
+      UIComponent: FC<PipelineInputProps>
+      resume: (result: unknown) => HandlerResult
+    }
 ```
 
 ### StateChanges
@@ -650,11 +650,11 @@ The unified structure for describing changes across the pipeline:
 
 ```typescript
 type StateChanges = {
-  entries: Omit<HistoryEntry, "id" | "timestamp" | "stateAfter">[];
-  stateUpdates?: Partial<GameState>;
-  addEffects?: Record<string, EffectToAdd[]>;
-  removeEffects?: Record<string, string[]>;
-};
+  entries: Omit<HistoryEntry, 'id' | 'timestamp' | 'stateAfter'>[]
+  stateUpdates?: Partial<GameState>
+  addEffects?: Record<string, EffectToAdd[]>
+  removeEffects?: Record<string, string[]>
+}
 ```
 
 Multiple `StateChanges` from different handlers are merged via `mergeStateChanges()`.
@@ -709,7 +709,7 @@ The Perception System decouples information-gathering roles from roles that alte
 Information roles never check `getRole(player.roleId).team` directly. Instead, they call:
 
 ```typescript
-const perception = perceive(targetPlayer, observerPlayer, context, state);
+const perception = perceive(targetPlayer, observerPlayer, context, state)
 // perception = { roleId, team, alignment }
 ```
 
@@ -718,25 +718,25 @@ This starts with the target's actual identity, then applies **perception modifie
 ### Perception Types
 
 ```typescript
-type PerceptionContext = "alignment" | "team" | "role";
+type PerceptionContext = 'alignment' | 'team' | 'role'
 
 type Perception = {
-  roleId: string; // What role they appear to be
-  team: TeamId; // What team they appear on
-  alignment: "good" | "evil"; // What alignment they appear to have
-};
+  roleId: string // What role they appear to be
+  team: TeamId // What team they appear on
+  alignment: 'good' | 'evil' // What alignment they appear to have
+}
 
 type PerceptionModifier = {
-  context: PerceptionContext | PerceptionContext[]; // When to apply
-  observerRoles?: string[]; // Optional: only for specific observer roles
+  context: PerceptionContext | PerceptionContext[] // When to apply
+  observerRoles?: string[] // Optional: only for specific observer roles
   modify: (
     perception: Perception,
     targetPlayer: PlayerState,
     observerPlayer: PlayerState,
     state: GameState,
     effectData?: Record<string, unknown>, // Data from the EffectInstance
-  ) => Perception;
-};
+  ) => Perception
+}
 ```
 
 ### PerceptionContext
@@ -752,27 +752,27 @@ type PerceptionModifier = {
 **Auto-calculating roles** (Chef, Empath):
 
 ```typescript
-const perception = perceive(targetPlayer, chefPlayer, "alignment", state);
-const isEvil = perception.alignment === "evil";
+const perception = perceive(targetPlayer, chefPlayer, 'alignment', state)
+const isEvil = perception.alignment === 'evil'
 ```
 
 **Narrator-setup roles** (Washerwoman, Librarian, Investigator):
 
 ```typescript
 // For team highlighting in player lists:
-const perception = perceive(p, observerPlayer, "team", state);
-const registersTownsfolk = perception.team === "townsfolk";
+const perception = perceive(p, observerPlayer, 'team', state)
+const registersTownsfolk = perception.team === 'townsfolk'
 
 // For role display in step 2:
-const pPerception = perceive(p, observerPlayer, "role", state);
-const perceivedRole = getRole(pPerception.roleId);
+const pPerception = perceive(p, observerPlayer, 'role', state)
+const perceivedRole = getRole(pPerception.roleId)
 ```
 
 **Role-reveal roles** (Undertaker, Ravenkeeper):
 
 ```typescript
-const perception = perceive(executedPlayer, undertakerPlayer, "role", state);
-const executedRole = getRole(perception.roleId);
+const perception = perceive(executedPlayer, undertakerPlayer, 'role', state)
+const executedRole = getRole(perception.roleId)
 ```
 
 ### Perception Query Utilities
@@ -786,8 +786,8 @@ Beyond `perceive()` and `canRegisterAsTeam()`, the perception system provides ut
 Companion to `canRegisterAsTeam()`. Returns `true` if the player has any active effect whose `canRegisterAs.alignments` includes the target alignment. Used by auto-calculating roles (Chef, Empath) to detect players that may need perception configuration.
 
 ```typescript
-canRegisterAsAlignment(reclusePlayer, "evil"); // true (recluse_misregister declares it)
-canRegisterAsAlignment(villagerPlayer, "evil"); // false
+canRegisterAsAlignment(reclusePlayer, 'evil') // true (recluse_misregister declares it)
+canRegisterAsAlignment(villagerPlayer, 'evil') // false
 ```
 
 #### `getAmbiguousPlayers(players, context)`
@@ -795,7 +795,7 @@ canRegisterAsAlignment(villagerPlayer, "evil"); // false
 Returns the subset of `players` that have effects declaring `canRegisterAs` for the given perception context. This is how roles detect "do I need a perception config step?" **without referencing any specific role or effect**.
 
 ```typescript
-const ambiguous = getAmbiguousPlayers(state.players.filter(isAlive), "alignment");
+const ambiguous = getAmbiguousPlayers(state.players.filter(isAlive), 'alignment')
 // Returns players with effects that declare canRegisterAs.alignments (e.g., Recluse)
 ```
 
@@ -810,8 +810,8 @@ Context matching rules:
 Creates a **local-only copy** of `GameState` where each overridden player's misregistration effect has `perceiveAs` data injected. No game events are emitted — this is purely ephemeral.
 
 ```typescript
-const overrides = { [recluseId]: { alignment: "evil" } };
-const localState = applyPerceptionOverrides(state, overrides);
+const overrides = { [recluseId]: { alignment: 'evil' } }
+const localState = applyPerceptionOverrides(state, overrides)
 // Now perceive(recluse, observer, "alignment", localState).alignment === "evil"
 ```
 
@@ -825,14 +825,14 @@ A narrator-only screen where the narrator configures how ambiguous players regis
 
 ```typescript
 type Props = {
-  ambiguousPlayers: PlayerState[]; // From getAmbiguousPlayers()
-  context: PerceptionContext; // What aspect is being configured
-  state: GameState;
-  roleIcon: string;
-  roleName: string;
-  playerName: string;
-  onComplete: (overrides: Record<string, Partial<Perception>>) => void;
-};
+  ambiguousPlayers: PlayerState[] // From getAmbiguousPlayers()
+  context: PerceptionContext // What aspect is being configured
+  state: GameState
+  roleIcon: string
+  roleName: string
+  playerName: string
+  onComplete: (overrides: Record<string, Partial<Perception>>) => void
+}
 ```
 
 For each ambiguous player, it shows:
@@ -862,14 +862,14 @@ On an `EffectDefinition`, add `perceptionModifiers`. Example for a hypothetical 
 ```typescript
 perceptionModifiers: [
   {
-    context: ["alignment", "team", "role"],
+    context: ['alignment', 'team', 'role'],
     modify: (perception, _target, _observer, _state, effectData) => {
-      const overrides = effectData?.perceiveAs as Partial<Perception> | undefined;
-      if (!overrides) return perception;
-      return { ...perception, ...overrides };
+      const overrides = effectData?.perceiveAs as Partial<Perception> | undefined
+      if (!overrides) return perception
+      return { ...perception, ...overrides }
     },
   },
-];
+]
 ```
 
 The narrator would configure the effect's instance data when assigning it (e.g., `{ perceiveAs: { team: "minion", alignment: "evil", roleId: "poisoner" } }`).
@@ -901,26 +901,26 @@ Day actions are abilities that can be used during the day phase. They are regist
 
 ```typescript
 type DayActionDefinition = {
-  id: string;
-  icon: IconName;
-  getLabel: (t) => string; // i18n label
-  getDescription: (t) => string; // i18n description
-  condition: (player, state) => boolean; // When is this action available?
-  ActionComponent: FC<DayActionProps>; // The UI for this action
-};
+  id: string
+  icon: IconName
+  getLabel: (t) => string // i18n label
+  getDescription: (t) => string // i18n description
+  condition: (player, state) => boolean // When is this action available?
+  ActionComponent: FC<DayActionProps> // The UI for this action
+}
 
 type DayActionProps = {
-  state: GameState;
-  playerId: string;
-  onComplete: (result: DayActionResult) => void;
-  onBack: () => void;
-};
+  state: GameState
+  playerId: string
+  onComplete: (result: DayActionResult) => void
+  onBack: () => void
+}
 
 type DayActionResult = {
-  entries: Omit<HistoryEntry, "id" | "timestamp" | "stateAfter">[];
-  addEffects?: Record<string, EffectToAdd[]>;
-  removeEffects?: Record<string, string[]>;
-};
+  entries: Omit<HistoryEntry, 'id' | 'timestamp' | 'stateAfter'>[]
+  addEffects?: Record<string, EffectToAdd[]>
+  removeEffects?: Record<string, string[]>
+}
 ```
 
 ### How Day Actions Are Collected
@@ -943,25 +943,25 @@ Night follow-ups are reactive actions that appear in the Night Dashboard during 
 
 ```typescript
 type NightFollowUpDefinition = {
-  id: string;
-  icon: IconName;
-  getLabel: (t) => string; // i18n label
-  condition: (player, state, game) => boolean; // When is this follow-up needed?
-  ActionComponent: FC<NightFollowUpProps>; // The UI for this follow-up
-};
+  id: string
+  icon: IconName
+  getLabel: (t) => string // i18n label
+  condition: (player, state, game) => boolean // When is this follow-up needed?
+  ActionComponent: FC<NightFollowUpProps> // The UI for this follow-up
+}
 
 type NightFollowUpProps = {
-  state: GameState;
-  game: Game;
-  playerId: string;
-  onComplete: (result: NightFollowUpResult) => void;
-};
+  state: GameState
+  game: Game
+  playerId: string
+  onComplete: (result: NightFollowUpResult) => void
+}
 
 type NightFollowUpResult = {
-  entries: Omit<HistoryEntry, "id" | "timestamp" | "stateAfter">[];
-  addEffects?: Record<string, EffectToAdd[]>;
-  removeEffects?: Record<string, string[]>;
-};
+  entries: Omit<HistoryEntry, 'id' | 'timestamp' | 'stateAfter'>[]
+  addEffects?: Record<string, EffectToAdd[]>
+  removeEffects?: Record<string, string[]>
+}
 ```
 
 ### How Night Follow-Ups Are Collected
@@ -1019,12 +1019,12 @@ Win conditions are checked at multiple points during the game.
 Effects and roles can declare `winConditions`:
 
 ```typescript
-type WinConditionTrigger = "after_execution" | "end_of_day" | "after_state_change";
+type WinConditionTrigger = 'after_execution' | 'end_of_day' | 'after_state_change'
 
 type WinConditionCheck = {
-  trigger: WinConditionTrigger;
-  check: (state: GameState, game: Game) => "townsfolk" | "demon" | null;
-};
+  trigger: WinConditionTrigger
+  check: (state: GameState, game: Game) => 'townsfolk' | 'demon' | null
+}
 ```
 
 `checkDynamicWinConditions()` in `pipeline/index.ts` iterates over all players' effects and roles, checking win conditions that match the given triggers.
@@ -1152,7 +1152,7 @@ Icons are referenced by `IconName` string. The `Icon` component maps these to Lu
 ### Usage
 
 ```typescript
-const { t } = useI18n();
+const { t } = useI18n()
 // t.game.choosePlayerToKill, t.roles.imp.name, t.effects.dead.name, etc.
 ```
 
@@ -1252,7 +1252,7 @@ If you need a new category of game action that should be interceptable:
 1. **Define the intent type** in `src/lib/pipeline/types.ts`:
 
    ```typescript
-   type MyNewIntent = { type: "my_new" /* fields */ };
+   type MyNewIntent = { type: 'my_new' /* fields */ }
    ```
 
    Add it to the `Intent` union.
@@ -1339,34 +1339,34 @@ Tests must validate **features and behavior**, not definition metadata. Do not t
 To test that information roles handle deception correctly (e.g., a Recluse appearing evil to the Chef), mock `getEffect` to inject a test effect with perception modifiers:
 
 ```typescript
-import { vi } from "vitest";
-import { EffectDefinition, EffectId } from "../../../effects/types";
+import { vi } from 'vitest'
+import { EffectDefinition, EffectId } from '../../../effects/types'
 
-vi.mock("../../../effects", async (importOriginal) => {
-  const actual = (await importOriginal()) as Record<string, unknown>;
+vi.mock('../../../effects', async (importOriginal) => {
+  const actual = (await importOriginal()) as Record<string, unknown>
   return {
     ...actual,
     getEffect: (effectId: string) => {
-      if (testEffects[effectId]) return testEffects[effectId];
-      return (actual.getEffect as (id: string) => EffectDefinition | undefined)(effectId);
+      if (testEffects[effectId]) return testEffects[effectId]
+      return (actual.getEffect as (id: string) => EffectDefinition | undefined)(effectId)
     },
-  };
-});
+  }
+})
 
-const testEffects: Record<string, EffectDefinition> = {};
+const testEffects: Record<string, EffectDefinition> = {}
 
 // In tests:
-testEffects["appears_evil"] = {
-  id: "appears_evil" as EffectId,
-  icon: "user",
+testEffects['appears_evil'] = {
+  id: 'appears_evil' as EffectId,
+  icon: 'user',
   perceptionModifiers: [
     {
-      context: "alignment",
-      modify: (p) => ({ ...p, alignment: "evil" }),
+      context: 'alignment',
+      modify: (p) => ({ ...p, alignment: 'evil' }),
     },
   ],
-};
-const player = addEffectTo(makePlayer({ roleId: "villager" }), "appears_evil");
+}
+const player = addEffectTo(makePlayer({ roleId: 'villager' }), 'appears_evil')
 // Now `perceive(player, observer, "alignment", state).alignment` === "evil"
 ```
 
@@ -1394,11 +1394,11 @@ Always test both directions:
 If a role or effect has no testable behavior of its own (e.g., Villager, or roles whose behavior is entirely on a separate effect), create a minimal test:
 
 ```typescript
-import { it, expect } from "vitest";
+import { it, expect } from 'vitest'
 
-it("Villager has no testable features", () => {
-  expect(true);
-});
+it('Villager has no testable features', () => {
+  expect(true)
+})
 ```
 
 ### After Modifying Code

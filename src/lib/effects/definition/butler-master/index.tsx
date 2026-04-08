@@ -1,83 +1,67 @@
-import { useState } from "react";
-import type { EffectDefinition, EffectConfigEditorProps } from "../../types";
-import { registerEffectTranslations, getEffectTranslations } from "../../../i18n";
-import type { Language } from "../../../i18n";
-import { Button, Icon } from "../../../../components/atoms";
+import { useState } from 'react'
+import type { EffectDefinition, EffectConfigEditorProps } from '../../types'
+import { registerEffectTranslations, getEffectTranslations } from '../../../i18n'
+import type { Language } from '../../../i18n'
+import { Button, Icon } from '../../../../components/atoms'
 
-import en from "./i18n/en";
-import es from "./i18n/es";
+import en from './i18n/en'
+import es from './i18n/es'
 
-registerEffectTranslations("butler_master", "en", en);
-registerEffectTranslations("butler_master", "es", es);
+registerEffectTranslations('butler_master', 'en', en)
+registerEffectTranslations('butler_master', 'es', es)
 
-function ButlerMasterConfigEditor({
-  data,
-  state,
-  playerId,
-  language,
-  onSave,
-  onCancel,
-}: EffectConfigEditorProps) {
-  const t = getEffectTranslations("butler_master", language as Language);
-  const [selectedMasterId, setSelectedMasterId] = useState<string | null>(
-    (data?.masterId as string) ?? null,
-  );
+function ButlerMasterConfigEditor({ data, state, playerId, language, onSave, onCancel }: EffectConfigEditorProps) {
+  const t = getEffectTranslations('butler_master', language as Language)
+  const [selectedMasterId, setSelectedMasterId] = useState<string | null>((data?.masterId as string) ?? null)
 
   // Show all players except the Butler themselves
-  const players = state.players.filter((p) => p.id !== playerId);
+  const players = state.players.filter((p) => p.id !== playerId)
 
   const handleSave = () => {
-    if (!selectedMasterId) return;
-    onSave({ ...data, masterId: selectedMasterId });
-  };
+    if (!selectedMasterId) return
+    onSave({ ...data, masterId: selectedMasterId })
+  }
 
   return (
-    <div className="space-y-4">
-      <p className="text-parchment-300 text-xs font-bold uppercase tracking-wider">
-        {t.configSelectMaster as string}
-      </p>
-      <div className="space-y-1 max-h-48 overflow-y-auto">
+    <div className='space-y-4'>
+      <p className='text-xs font-bold tracking-wider text-parchment-300 uppercase'>{t.configSelectMaster as string}</p>
+      <div className='max-h-48 space-y-1 overflow-y-auto'>
         {players.map((p) => {
-          const isSelected = selectedMasterId === p.id;
+          const isSelected = selectedMasterId === p.id
           return (
             <button
               key={p.id}
               onClick={() => setSelectedMasterId(p.id)}
-              className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-colors text-left text-sm ${
+              className={`flex w-full items-center gap-3 rounded-lg border p-3 text-left text-sm transition-colors ${
                 isSelected
-                  ? "bg-violet-500/20 border-violet-400/50 text-violet-200"
-                  : "bg-white/5 border-white/10 text-parchment-300 hover:border-white/30"
+                  ? 'border-violet-400/50 bg-violet-500/20 text-violet-200'
+                  : 'border-white/10 bg-white/5 text-parchment-300 hover:border-white/30'
               }`}
             >
               <Icon
-                name={isSelected ? "circleDot" : "circle"}
-                size="sm"
-                className={isSelected ? "text-violet-400" : "text-parchment-500"}
+                name={isSelected ? 'circleDot' : 'circle'}
+                size='sm'
+                className={isSelected ? 'text-violet-400' : 'text-parchment-500'}
               />
               <span>{p.name}</span>
             </button>
-          );
+          )
         })}
       </div>
 
-      <div className="flex gap-2 pt-2">
-        <Button onClick={onCancel} variant="ghost" className="flex-1">
+      <div className='flex gap-2 pt-2'>
+        <Button onClick={onCancel} variant='ghost' className='flex-1'>
           {t.configCancel as string}
         </Button>
-        <Button
-          onClick={handleSave}
-          variant="primary"
-          className="flex-1"
-          disabled={!selectedMasterId}
-        >
+        <Button onClick={handleSave} variant='primary' className='flex-1' disabled={!selectedMasterId}>
           {t.configSave as string}
         </Button>
       </div>
     </div>
-  );
+  )
 }
 
-import { hasEffect } from "../../../types";
+import { hasEffect } from '../../../types'
 
 /**
  * Butler Master — marks which player is the Butler's chosen master.
@@ -91,26 +75,25 @@ import { hasEffect } from "../../../types";
  * with how the physical game works.
  */
 const definition: EffectDefinition = {
-  id: "butler_master",
-  icon: "handHeart",
-  defaultType: "marker",
+  id: 'butler_master',
+  icon: 'handHeart',
+  defaultType: 'marker',
   ConfigEditor: ButlerMasterConfigEditor,
   preventsVoting: true,
   canVote: (player, _state, votes) => {
     // If the Butler is dead, they lose their ability, so the restriction lifts
-    if (hasEffect(player, "dead")) return true;
+    if (hasEffect(player, 'dead')) return true
 
     // If we're not in an active voting session or don't have vote data, default allow so they aren't fully disabled globally
-    if (!votes) return true;
+    if (!votes) return true
 
     // Check if the master has voted
-    const masterId = player.effects.find((e) => e.type === "butler_master")?.data
-      ?.masterId as string;
-    if (!masterId) return true; // No master assigned, no restriction
+    const masterId = player.effects.find((e) => e.type === 'butler_master')?.data?.masterId as string
+    if (!masterId) return true // No master assigned, no restriction
 
     // Can only vote if the master has voted
-    return !!votes[masterId];
+    return !!votes[masterId]
   },
-};
+}
 
-export default definition;
+export default definition

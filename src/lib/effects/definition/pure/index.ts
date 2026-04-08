@@ -1,14 +1,14 @@
-import type { EffectDefinition } from "../../types";
-import type { IntentHandler, NominateIntent } from "../../../pipeline/types";
-import type { PlayerState } from "../../../types";
-import { getRole } from "../../../roles";
-import { registerEffectTranslations } from "../../../i18n";
+import type { EffectDefinition } from '../../types'
+import type { IntentHandler, NominateIntent } from '../../../pipeline/types'
+import type { PlayerState } from '../../../types'
+import { getRole } from '../../../roles'
+import { registerEffectTranslations } from '../../../i18n'
 
-import en from "./i18n/en";
-import es from "./i18n/es";
+import en from './i18n/en'
+import es from './i18n/es'
 
-registerEffectTranslations("pure", "en", en);
-registerEffectTranslations("pure", "es", es);
+registerEffectTranslations('pure', 'en', en)
+registerEffectTranslations('pure', 'es', es)
 
 /**
  * Determine a player's actual team.
@@ -23,40 +23,40 @@ registerEffectTranslations("pure", "es", es);
  */
 function getActualTeam(player: PlayerState): string {
   for (const eff of player.effects) {
-    const actualRole = eff.data?.actualRole as string | undefined;
+    const actualRole = eff.data?.actualRole as string | undefined
     if (actualRole) {
-      return getRole(actualRole)?.team ?? "townsfolk";
+      return getRole(actualRole)?.team ?? 'townsfolk'
     }
   }
-  return getRole(player.roleId)?.team ?? "townsfolk";
+  return getRole(player.roleId)?.team ?? 'townsfolk'
 }
 
 const pureHandler: IntentHandler = {
-  intentType: "nominate",
+  intentType: 'nominate',
   priority: 10,
   appliesTo: (intent, effectPlayer) => {
-    return intent.type === "nominate" && (intent as NominateIntent).nomineeId === effectPlayer.id;
+    return intent.type === 'nominate' && (intent as NominateIntent).nomineeId === effectPlayer.id
   },
   handle: (intent, effectPlayer, state) => {
-    const nom = intent as NominateIntent;
-    const nominator = state.players.find((p) => p.id === nom.nominatorId);
-    if (!nominator) return { action: "allow" };
+    const nom = intent as NominateIntent
+    const nominator = state.players.find((p) => p.id === nom.nominatorId)
+    if (!nominator) return { action: 'allow' }
 
-    const isTownsfolk = getActualTeam(nominator) === "townsfolk";
+    const isTownsfolk = getActualTeam(nominator) === 'townsfolk'
 
     if (isTownsfolk) {
       // Townsfolk nominates Virgin → Nominator is executed immediately
       return {
-        action: "prevent",
-        reason: "virgin_triggered",
+        action: 'prevent',
+        reason: 'virgin_triggered',
         stateChanges: {
           entries: [
             {
-              type: "virgin_execution",
+              type: 'virgin_execution',
               message: [
                 {
-                  type: "i18n",
-                  key: "roles.virgin.history.townsfolkExecuted",
+                  type: 'i18n',
+                  key: 'roles.virgin.history.townsfolkExecuted',
                   params: {
                     nominator: nom.nominatorId,
                   },
@@ -69,33 +69,33 @@ const pureHandler: IntentHandler = {
               },
             },
           ],
-          stateUpdates: { phase: "day" },
+          stateUpdates: { phase: 'day' },
           addEffects: {
             [nom.nominatorId]: [
               {
-                type: "dead",
-                data: { cause: "virgin" },
-                expiresAt: "never",
+                type: 'dead',
+                data: { cause: 'virgin' },
+                expiresAt: 'never',
               },
             ],
           },
           removeEffects: {
-            [effectPlayer.id]: ["pure"],
+            [effectPlayer.id]: ['pure'],
           },
         },
-      };
+      }
     } else {
       // Non-townsfolk nominates Virgin → loses purity, nomination proceeds
       return {
-        action: "allow",
+        action: 'allow',
         stateChanges: {
           entries: [
             {
-              type: "virgin_spent",
+              type: 'virgin_spent',
               message: [
                 {
-                  type: "i18n",
-                  key: "roles.virgin.history.lostPurity",
+                  type: 'i18n',
+                  key: 'roles.virgin.history.lostPurity',
                   params: {
                     nominator: nom.nominatorId,
                   },
@@ -109,19 +109,19 @@ const pureHandler: IntentHandler = {
             },
           ],
           removeEffects: {
-            [effectPlayer.id]: ["pure"],
+            [effectPlayer.id]: ['pure'],
           },
         },
-      };
+      }
     }
   },
-};
+}
 
 const definition: EffectDefinition = {
-  id: "pure",
-  icon: "flowerLotus",
-  defaultType: "passive",
+  id: 'pure',
+  icon: 'flowerLotus',
+  defaultType: 'passive',
   handlers: [pureHandler],
-};
+}
 
-export default definition;
+export default definition

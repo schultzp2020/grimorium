@@ -1,7 +1,7 @@
-import type { ReactNode } from "react";
-import { useHandback } from "../context/PlayerFacingContext";
-import { CardLink } from "../items/TeamBackground";
-import { Button, type ButtonProps } from "../atoms";
+import type { ReactNode } from 'react'
+import { useHandback } from '../context/PlayerFacingContext'
+import { CardLink } from '../items/TeamBackground'
+import { Button, type ButtonProps } from '../atoms'
 
 /**
  * A CardLink that automatically routes its onClick through the
@@ -15,16 +15,16 @@ export function HandbackCardLink({
   isEvil,
   children,
 }: {
-  onClick: () => void;
-  isEvil: boolean;
-  children: ReactNode;
+  onClick: () => void
+  isEvil: boolean
+  children: ReactNode
 }) {
-  const { requestHandback } = useHandback();
+  const { requestHandback } = useHandback()
   return (
     <CardLink onClick={() => requestHandback(onClick)} isEvil={isEvil}>
       {children}
     </CardLink>
-  );
+  )
 }
 
 /**
@@ -33,10 +33,7 @@ export function HandbackCardLink({
  *
  * MUST be rendered inside a <PlayerFacingScreen> to work.
  */
-export function HandbackButton({
-  onClick,
-  ...rest
-}: Omit<ButtonProps, "onClick"> & { onClick: () => void }) {
-  const { requestHandback } = useHandback();
-  return <Button onClick={() => requestHandback(onClick)} {...rest} />;
+export function HandbackButton({ onClick, ...rest }: Omit<ButtonProps, 'onClick'> & { onClick: () => void }) {
+  const { requestHandback } = useHandback()
+  return <Button onClick={() => requestHandback(onClick)} {...rest} />
 }

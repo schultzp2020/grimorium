@@ -6,14 +6,14 @@
  * Shared/generic translations remain in the central translation files.
  */
 
-import type { Language } from "./types";
+import type { Language } from './types'
 
 // ─── Internal registries ─────────────────────────────────────────────────────
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const roleTranslations: Record<string, Record<string, Record<string, any>>> = {};
+const roleTranslations: Record<string, Record<string, Record<string, any>>> = {}
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const effectTranslations: Record<string, Record<string, Record<string, any>>> = {};
+const effectTranslations: Record<string, Record<string, Record<string, any>>> = {}
 
 // ─── Registration functions ──────────────────────────────────────────────────
 
@@ -27,8 +27,8 @@ export function registerRoleTranslations(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   translations: Record<string, any>,
 ): void {
-  roleTranslations[roleId] ??= {};
-  roleTranslations[roleId][lang] = translations;
+  roleTranslations[roleId] ??= {}
+  roleTranslations[roleId][lang] = translations
 }
 
 /**
@@ -41,8 +41,8 @@ export function registerEffectTranslations(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   translations: Record<string, any>,
 ): void {
-  effectTranslations[effectId] ??= {};
-  effectTranslations[effectId][lang] = translations;
+  effectTranslations[effectId] ??= {}
+  effectTranslations[effectId][lang] = translations
 }
 
 // ─── Lookup functions ────────────────────────────────────────────────────────
@@ -53,7 +53,7 @@ export function registerEffectTranslations(
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getRoleTranslations(roleId: string, lang: Language): Record<string, any> {
-  return roleTranslations[roleId]?.[lang] ?? roleTranslations[roleId]?.["en"] ?? {};
+  return roleTranslations[roleId]?.[lang] ?? roleTranslations[roleId]?.['en'] ?? {}
 }
 
 /**
@@ -62,39 +62,39 @@ export function getRoleTranslations(roleId: string, lang: Language): Record<stri
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getEffectTranslations(effectId: string, lang: Language): Record<string, any> {
-  return effectTranslations[effectId]?.[lang] ?? effectTranslations[effectId]?.["en"] ?? {};
+  return effectTranslations[effectId]?.[lang] ?? effectTranslations[effectId]?.['en'] ?? {}
 }
 
 // ─── Convenience helpers ─────────────────────────────────────────────────────
 
 /** Get a role's display name for the given language. */
 export function getRoleName(roleId: string, lang: Language): string {
-  return (getRoleTranslations(roleId, lang).name as string) ?? roleId;
+  return (getRoleTranslations(roleId, lang).name as string) ?? roleId
 }
 
 /** Get a role's description for the given language. */
 export function getRoleDescription(roleId: string, lang: Language): string {
-  return (getRoleTranslations(roleId, lang).description as string) ?? "";
+  return (getRoleTranslations(roleId, lang).description as string) ?? ''
 }
 
 /** Get an effect's display name for the given language. */
 export function getEffectName(effectId: string, lang: Language): string {
-  return (getEffectTranslations(effectId, lang).name as string) ?? effectId;
+  return (getEffectTranslations(effectId, lang).name as string) ?? effectId
 }
 
 /** Get an effect's description for the given language. */
 export function getEffectDescription(effectId: string, lang: Language): string {
-  return (getEffectTranslations(effectId, lang).description as string) ?? "";
+  return (getEffectTranslations(effectId, lang).description as string) ?? ''
 }
 
 /** Get a role's flavor quote for the given language. */
 export function getRoleQuote(roleId: string, lang: Language): string {
-  return (getRoleTranslations(roleId, lang).quote as string) ?? "";
+  return (getRoleTranslations(roleId, lang).quote as string) ?? ''
 }
 
 /** Get a role's ability/condition lines for the given language. */
 export function getRoleLines(roleId: string, lang: Language): { type: string; text: string }[] {
-  const lines = getRoleTranslations(roleId, lang).lines;
-  if (Array.isArray(lines)) return lines as { type: string; text: string }[];
-  return [];
+  const lines = getRoleTranslations(roleId, lang).lines
+  if (Array.isArray(lines)) return lines as { type: string; text: string }[]
+  return []
 }

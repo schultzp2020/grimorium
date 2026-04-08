@@ -1,10 +1,10 @@
-import { useCallback, useRef, useState } from "react";
-import { getGameSummaries, getCurrentGameId, type GameSummary } from "../../lib/storage";
-import { useI18n } from "../../lib/i18n";
-import { Icon } from "../atoms";
-import { MysticDivider } from "../items";
-import { useShaderBackground } from "../../hooks/useShaderBackground";
-import { cn } from "../../lib/utils";
+import { useCallback, useRef, useState } from 'react'
+import { getGameSummaries, getCurrentGameId, type GameSummary } from '../../lib/storage'
+import { useI18n } from '../../lib/i18n'
+import { Icon } from '../atoms'
+import { MysticDivider } from '../items'
+import { useShaderBackground } from '../../hooks/useShaderBackground'
+import { cn } from '../../lib/utils'
 
 // =============================================================================
 // GRIMOIRE BACKGROUND SHADER
@@ -129,139 +129,133 @@ void main(){
   col *= vig;
   gl_FragColor = vec4(col, 1.0);
 }
-`;
+`
 
 // =============================================================================
 // MODULE STATE
 // =============================================================================
 
 /** Survives component remounts within the same page session */
-let hasOpenedGrimoire = false;
+let hasOpenedGrimoire = false
 
 // =============================================================================
 // TYPES
 // =============================================================================
 
 type Props = {
-  onNewGame: () => void;
-  onContinue: (gameId: string) => void;
-  onLoadGame: (gameId: string) => void;
-  onRolesLibrary: () => void;
-  onHowToPlay: () => void;
-};
+  onNewGame: () => void
+  onContinue: (gameId: string) => void
+  onLoadGame: (gameId: string) => void
+  onRolesLibrary: () => void
+  onHowToPlay: () => void
+}
 
-type Phase = "sealed" | "breaking" | "open";
+type Phase = 'sealed' | 'breaking' | 'open'
 
 // =============================================================================
 // BURST PARTICLE GEOMETRY
 // =============================================================================
 
 const BURST_PARTICLES = Array.from({ length: 8 }, (_, i) => {
-  const angle = (i / 8) * Math.PI * 2;
+  const angle = (i / 8) * Math.PI * 2
   return {
     x: Math.cos(angle) * 90,
     y: Math.sin(angle) * 90,
     delay: i * 25,
-  };
-});
+  }
+})
 
 // =============================================================================
 // MAIN COMPONENT
 // =============================================================================
 
-export function MainMenu({
-  onNewGame,
-  onContinue,
-  onLoadGame,
-  onRolesLibrary,
-  onHowToPlay,
-}: Props) {
-  const { language, t } = useI18n();
-  const games = getGameSummaries();
-  const currentGameId = getCurrentGameId();
-  const currentGame = games.find((g) => g.id === currentGameId);
-  const hasActiveGame = !!(currentGame && currentGame.phase !== "ended");
+export function MainMenu({ onNewGame, onContinue, onLoadGame, onRolesLibrary, onHowToPlay }: Props) {
+  const { language, t } = useI18n()
+  const games = getGameSummaries()
+  const currentGameId = getCurrentGameId()
+  const currentGame = games.find((g) => g.id === currentGameId)
+  const hasActiveGame = !!(currentGame && currentGame.phase !== 'ended')
 
-  const [phase, setPhase] = useState<Phase>(() => (hasOpenedGrimoire ? "open" : "sealed"));
-  const [showPastGames, setShowPastGames] = useState(false);
-  const [pastGamesClosing, setPastGamesClosing] = useState(false);
+  const [phase, setPhase] = useState<Phase>(() => (hasOpenedGrimoire ? 'open' : 'sealed'))
+  const [showPastGames, setShowPastGames] = useState(false)
+  const [pastGamesClosing, setPastGamesClosing] = useState(false)
 
   // Shader background
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  useShaderBackground(canvasRef, GRIMOIRE_SHADER);
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  useShaderBackground(canvasRef, GRIMOIRE_SHADER)
 
   // ── Handlers ────────────────────────────────────────────────────────────
 
   const handleBreakSeal = useCallback(() => {
-    if (phase !== "sealed") return;
-    setPhase("breaking");
+    if (phase !== 'sealed') return
+    setPhase('breaking')
     setTimeout(() => {
-      hasOpenedGrimoire = true;
-      setPhase("open");
-    }, 700);
-  }, [phase]);
+      hasOpenedGrimoire = true
+      setPhase('open')
+    }, 700)
+  }, [phase])
 
   const openPastGames = useCallback(() => {
-    setShowPastGames(true);
-    setPastGamesClosing(false);
-  }, []);
+    setShowPastGames(true)
+    setPastGamesClosing(false)
+  }, [])
 
   const closePastGames = useCallback(() => {
-    setPastGamesClosing(true);
+    setPastGamesClosing(true)
     setTimeout(() => {
-      setShowPastGames(false);
-      setPastGamesClosing(false);
-    }, 250);
-  }, []);
+      setShowPastGames(false)
+      setPastGamesClosing(false)
+    }, 250)
+  }, [])
 
   const formatDate = (timestamp: number) => {
-    const locale = language === "es" ? "es-ES" : "en-US";
+    const locale = language === 'es' ? 'es-ES' : 'en-US'
     return new Date(timestamp).toLocaleDateString(locale, {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
 
   const formatPhase = (game: GameSummary) => {
-    if (game.phase === "ended") return t.mainMenu.completed;
-    if (game.phase === "setup") return t.mainMenu.settingUp;
-    return `${t.mainMenu.round} ${game.round} - ${game.phase}`;
-  };
+    if (game.phase === 'ended') return t.mainMenu.completed
+    if (game.phase === 'setup') return t.mainMenu.settingUp
+    return `${t.mainMenu.round} ${game.round} - ${game.phase}`
+  }
 
   // ── Render ──────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-app relative flex flex-col">
+    <div className='relative flex min-h-app flex-col'>
       {/* Shader background canvas */}
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full bg-grimoire-darker" />
+      <canvas ref={canvasRef} className='absolute inset-0 h-full w-full bg-grimoire-darker' />
 
       {/* Content layer */}
-      <div className="relative z-10 flex-1 flex flex-col p-4">
+      <div className='relative z-10 flex flex-1 flex-col p-4'>
         {/* Space for floating language toggle */}
-        <div className="h-8 shrink-0" />
+        <div className='h-8 shrink-0' />
 
-        <div className="flex-1 flex flex-col items-center justify-center max-w-md mx-auto w-full">
-          {phase !== "open" ? (
+        <div className='mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center'>
+          {phase !== 'open' ? (
             /* ═══════════ SEALED / BREAKING VIEW ═══════════ */
             <button
               onClick={handleBreakSeal}
-              className="flex flex-col items-center text-center focus:outline-hidden active:scale-[0.98] transition-transform"
+              className='flex flex-col items-center text-center transition-transform focus:outline-hidden active:scale-[0.98]'
               aria-label={t.mainMenu.tapToOpen}
             >
               {/* Arcane Seal */}
-              <div className="relative w-36 h-36 sm:w-44 sm:h-44 mb-8">
+              <div className='relative mb-8 h-36 w-36 sm:h-44 sm:w-44'>
                 {/* Outer ring */}
                 <div
                   className={cn(
-                    "absolute inset-0 rounded-full border border-mystic-gold/20",
-                    phase === "breaking" ? "grimoire-seal-break" : "card-seal-outer",
+                    'absolute inset-0 rounded-full border border-mystic-gold/20',
+                    phase === 'breaking' ? 'grimoire-seal-break' : 'card-seal-outer',
                   )}
                   style={
-                    phase === "breaking"
+                    phase === 'breaking'
                       ? ({
-                          "--break-duration": "600ms",
+                          '--break-duration': '600ms',
                         } as React.CSSProperties)
                       : undefined
                   }
@@ -269,12 +263,12 @@ export function MainMenu({
                   {Array.from({ length: 12 }).map((_, i) => (
                     <div
                       key={i}
-                      className="absolute top-0 left-1/2 -translate-x-1/2 h-full"
+                      className='absolute top-0 left-1/2 h-full -translate-x-1/2'
                       style={{
                         transform: `rotate(${(360 / 12) * i}deg)`,
                       }}
                     >
-                      <div className="w-px h-2.5 mx-auto bg-mystic-gold/20" />
+                      <div className='mx-auto h-2.5 w-px bg-mystic-gold/20' />
                     </div>
                   ))}
                 </div>
@@ -282,14 +276,14 @@ export function MainMenu({
                 {/* Inner ring */}
                 <div
                   className={cn(
-                    "absolute inset-4 sm:inset-5 rounded-full border border-mystic-gold/15",
-                    phase === "breaking" ? "grimoire-seal-break" : "card-seal-inner",
+                    'absolute inset-4 sm:inset-5 rounded-full border border-mystic-gold/15',
+                    phase === 'breaking' ? 'grimoire-seal-break' : 'card-seal-inner',
                   )}
                   style={
-                    phase === "breaking"
+                    phase === 'breaking'
                       ? ({
-                          "--break-duration": "600ms",
-                          "--break-delay": "60ms",
+                          '--break-duration': '600ms',
+                          '--break-delay': '60ms',
                         } as React.CSSProperties)
                       : undefined
                   }
@@ -297,12 +291,12 @@ export function MainMenu({
                   {Array.from({ length: 8 }).map((_, i) => (
                     <div
                       key={i}
-                      className="absolute top-0 left-1/2 -translate-x-1/2 h-full"
+                      className='absolute top-0 left-1/2 h-full -translate-x-1/2'
                       style={{
                         transform: `rotate(${(360 / 8) * i}deg)`,
                       }}
                     >
-                      <div className="w-px h-2 mx-auto bg-mystic-gold/15" />
+                      <div className='mx-auto h-2 w-px bg-mystic-gold/15' />
                     </div>
                   ))}
                 </div>
@@ -310,30 +304,30 @@ export function MainMenu({
                 {/* Eye icon center */}
                 <div
                   className={cn(
-                    "absolute inset-0 flex items-center justify-center",
-                    phase === "breaking" && "grimoire-seal-fade",
+                    'absolute inset-0 flex items-center justify-center',
+                    phase === 'breaking' && 'grimoire-seal-fade',
                   )}
                 >
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-mystic-gold/10 border border-mystic-gold/30 flex items-center justify-center shadow-tarot-glow">
-                    <Icon name="eye" size="3xl" className="text-mystic-gold text-glow-gold" />
+                  <div className='flex h-16 w-16 items-center justify-center rounded-full border border-mystic-gold/30 bg-mystic-gold/10 shadow-tarot-glow sm:h-20 sm:w-20'>
+                    <Icon name='eye' size='3xl' className='text-mystic-gold text-glow-gold' />
                   </div>
                 </div>
 
                 {/* Burst particles (only during break) */}
-                {phase === "breaking" &&
+                {phase === 'breaking' &&
                   BURST_PARTICLES.map((particle, i) => (
                     <div
                       key={i}
-                      className="grimoire-burst-particle"
+                      className='grimoire-burst-particle'
                       style={
                         {
-                          left: "50%",
-                          top: "50%",
-                          marginLeft: "-3px",
-                          marginTop: "-3px",
-                          "--burst-x": `${particle.x}px`,
-                          "--burst-y": `${particle.y}px`,
-                          "--burst-delay": `${particle.delay}ms`,
+                          left: '50%',
+                          top: '50%',
+                          marginLeft: '-3px',
+                          marginTop: '-3px',
+                          '--burst-x': `${particle.x}px`,
+                          '--burst-y': `${particle.y}px`,
+                          '--burst-delay': `${particle.delay}ms`,
                         } as React.CSSProperties
                       }
                     />
@@ -341,22 +335,20 @@ export function MainMenu({
               </div>
 
               {/* Title & subtitle */}
-              <div className={cn(phase === "breaking" && "grimoire-seal-fade")}>
-                <h1 className="font-tarot text-3xl sm:text-4xl font-bold text-parchment-100 tracking-widest-xl uppercase mb-3">
+              <div className={cn(phase === 'breaking' && 'grimoire-seal-fade')}>
+                <h1 className='mb-3 font-tarot text-3xl font-bold tracking-widest-xl text-parchment-100 uppercase sm:text-4xl'>
                   {t.mainMenu.title}
                 </h1>
-                <p className="text-parchment-400 text-sm tracking-wider mb-6">
-                  {t.mainMenu.subtitle}
-                </p>
+                <p className='mb-6 text-sm tracking-wider text-parchment-400'>{t.mainMenu.subtitle}</p>
                 <MysticDivider />
               </div>
 
               {/* Tap to open prompt */}
               <p
                 className={cn(
-                  "mt-8 text-parchment-400/60 text-sm tracking-widest uppercase",
-                  phase === "sealed" && "animate-breathe",
-                  phase === "breaking" && "grimoire-seal-fade",
+                  'mt-8 text-parchment-400/60 text-sm tracking-widest uppercase',
+                  phase === 'sealed' && 'animate-breathe',
+                  phase === 'breaking' && 'grimoire-seal-fade',
                 )}
               >
                 {t.mainMenu.tapToOpen}
@@ -367,45 +359,42 @@ export function MainMenu({
             <>
               {/* Compact title */}
               <div
-                className="text-center mb-8 grimoire-menu-reveal"
-                style={{ "--reveal-delay": "0ms" } as React.CSSProperties}
+                className='grimoire-menu-reveal mb-8 text-center'
+                style={{ '--reveal-delay': '0ms' } as React.CSSProperties}
               >
-                <h1 className="font-tarot text-2xl sm:text-3xl font-bold text-parchment-100 tracking-widest-xl uppercase mb-2">
+                <h1 className='mb-2 font-tarot text-2xl font-bold tracking-widest-xl text-parchment-100 uppercase sm:text-3xl'>
                   {t.mainMenu.title}
                 </h1>
                 <MysticDivider />
               </div>
 
               {/* Action Cards */}
-              <div className="w-full space-y-4 mb-10">
+              <div className='mb-10 w-full space-y-4'>
                 {/* Continue Game */}
                 {hasActiveGame && currentGame && (
-                  <div
-                    className="grimoire-menu-reveal"
-                    style={{ "--reveal-delay": "80ms" } as React.CSSProperties}
-                  >
+                  <div className='grimoire-menu-reveal' style={{ '--reveal-delay': '80ms' } as React.CSSProperties}>
                     <button
                       onClick={() => onContinue(currentGame.id)}
-                      className="relative w-full p-5 rounded-xl bg-gradient-to-r from-mystic-gold/15 to-mystic-bronze/10 border border-mystic-gold/25 card-border-glow transition-all group"
+                      className='card-border-glow group relative w-full rounded-xl border border-mystic-gold/25 bg-gradient-to-r from-mystic-gold/15 to-mystic-bronze/10 p-5 transition-all'
                       style={
                         {
-                          "--glow-color": "rgba(212, 175, 55, 0.3)",
+                          '--glow-color': 'rgba(212, 175, 55, 0.3)',
                         } as React.CSSProperties
                       }
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="text-left">
-                          <div className="font-tarot text-lg text-mystic-gold tracking-wider uppercase">
+                      <div className='flex items-center justify-between'>
+                        <div className='text-left'>
+                          <div className='font-tarot text-lg tracking-wider text-mystic-gold uppercase'>
                             {t.mainMenu.continueGame}
                           </div>
-                          <div className="text-sm text-parchment-400 mt-1">
+                          <div className='mt-1 text-sm text-parchment-400'>
                             {currentGame.name} • {formatPhase(currentGame)}
                           </div>
                         </div>
                         <Icon
-                          name="play"
-                          size="lg"
-                          className="text-mystic-gold group-hover:scale-110 transition-transform"
+                          name='play'
+                          size='lg'
+                          className='text-mystic-gold transition-transform group-hover:scale-110'
                         />
                       </div>
                     </button>
@@ -414,35 +403,33 @@ export function MainMenu({
 
                 {/* New Game */}
                 <div
-                  className="grimoire-menu-reveal"
+                  className='grimoire-menu-reveal'
                   style={
                     {
-                      "--reveal-delay": hasActiveGame ? "160ms" : "80ms",
+                      '--reveal-delay': hasActiveGame ? '160ms' : '80ms',
                     } as React.CSSProperties
                   }
                 >
                   <button
                     onClick={onNewGame}
-                    className="relative w-full p-5 rounded-xl bg-gradient-to-r from-indigo-900/40 to-purple-900/30 border border-indigo-500/25 card-border-glow transition-all group"
+                    className='card-border-glow group relative w-full rounded-xl border border-indigo-500/25 bg-gradient-to-r from-indigo-900/40 to-purple-900/30 p-5 transition-all'
                     style={
                       {
-                        "--glow-color": "rgba(99, 102, 241, 0.25)",
+                        '--glow-color': 'rgba(99, 102, 241, 0.25)',
                       } as React.CSSProperties
                     }
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="text-left">
-                        <div className="font-tarot text-lg text-parchment-100 tracking-wider uppercase">
+                    <div className='flex items-center justify-between'>
+                      <div className='text-left'>
+                        <div className='font-tarot text-lg tracking-wider text-parchment-100 uppercase'>
                           {t.mainMenu.newGame}
                         </div>
-                        <div className="text-sm text-parchment-400 mt-1">
-                          {t.mainMenu.startFreshGame}
-                        </div>
+                        <div className='mt-1 text-sm text-parchment-400'>{t.mainMenu.startFreshGame}</div>
                       </div>
                       <Icon
-                        name="sparkles"
-                        size="lg"
-                        className="text-indigo-400 group-hover:scale-110 transition-transform"
+                        name='sparkles'
+                        size='lg'
+                        className='text-indigo-400 transition-transform group-hover:scale-110'
                       />
                     </div>
                   </button>
@@ -451,35 +438,35 @@ export function MainMenu({
 
               {/* Footer links */}
               <div
-                className="flex flex-wrap justify-center items-center gap-x-3 gap-y-3 px-4 grimoire-menu-reveal"
+                className='grimoire-menu-reveal flex flex-wrap items-center justify-center gap-x-3 gap-y-3 px-4'
                 style={
                   {
-                    "--reveal-delay": hasActiveGame ? "280ms" : "200ms",
+                    '--reveal-delay': hasActiveGame ? '280ms' : '200ms',
                   } as React.CSSProperties
                 }
               >
                 <button
                   onClick={onHowToPlay}
-                  className="text-sm text-parchment-400 hover:text-parchment-200 underline underline-offset-4 decoration-1 decoration-parchment-500/40 transition-colors tracking-wider"
+                  className='text-sm tracking-wider text-parchment-400 underline decoration-parchment-500/40 decoration-1 underline-offset-4 transition-colors hover:text-parchment-200'
                 >
                   {t.howToPlay.title}
                 </button>
 
-                <span className="text-parchment-500/40 hidden sm:inline">·</span>
+                <span className='hidden text-parchment-500/40 sm:inline'>·</span>
 
                 <button
                   onClick={onRolesLibrary}
-                  className="text-sm text-parchment-400 hover:text-parchment-200 underline underline-offset-4 decoration-1 decoration-parchment-500/40 transition-colors tracking-wider"
+                  className='text-sm tracking-wider text-parchment-400 underline decoration-parchment-500/40 decoration-1 underline-offset-4 transition-colors hover:text-parchment-200'
                 >
                   {t.mainMenu.rolesLibrary}
                 </button>
 
                 {games.length > 0 && (
                   <>
-                    <span className="text-parchment-500/40">·</span>
+                    <span className='text-parchment-500/40'>·</span>
                     <button
                       onClick={openPastGames}
-                      className="text-sm text-parchment-400 hover:text-parchment-200 underline underline-offset-4 decoration-1 decoration-parchment-500/40 transition-colors tracking-wider"
+                      className='text-sm tracking-wider text-parchment-400 underline decoration-parchment-500/40 decoration-1 underline-offset-4 transition-colors hover:text-parchment-200'
                     >
                       {t.mainMenu.previousGames}
                     </button>
@@ -493,12 +480,12 @@ export function MainMenu({
 
       {/* ═══════════ PAST GAMES BOTTOM SHEET ═══════════ */}
       {showPastGames && (
-        <div className="fixed inset-0 z-50">
+        <div className='fixed inset-0 z-50'>
           {/* Overlay */}
           <div
             className={cn(
-              "absolute inset-0 bg-black/60",
-              pastGamesClosing ? "animate-overlay-out" : "animate-overlay-in",
+              'absolute inset-0 bg-black/60',
+              pastGamesClosing ? 'animate-overlay-out' : 'animate-overlay-in',
             )}
             onClick={closePastGames}
           />
@@ -506,59 +493,52 @@ export function MainMenu({
           {/* Sheet */}
           <div
             className={cn(
-              "absolute bottom-0 left-0 right-0 bg-grimoire-dark rounded-t-2xl border-t border-parchment-500/10 max-h-[70vh] flex flex-col",
-              pastGamesClosing ? "animate-sheet-out" : "animate-sheet-in",
+              'absolute bottom-0 left-0 right-0 bg-grimoire-dark rounded-t-2xl border-t border-parchment-500/10 max-h-[70vh] flex flex-col',
+              pastGamesClosing ? 'animate-sheet-out' : 'animate-sheet-in',
             )}
           >
             {/* Drag handle */}
-            <div className="flex justify-center pt-3 pb-1">
-              <div className="w-10 h-1 rounded-full bg-parchment-500/30" />
+            <div className='flex justify-center pt-3 pb-1'>
+              <div className='h-1 w-10 rounded-full bg-parchment-500/30' />
             </div>
 
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-3">
-              <div className="flex items-center gap-2 text-parchment-300">
-                <Icon name="history" size="sm" />
-                <span className="font-tarot text-lg tracking-wider uppercase">
-                  {t.mainMenu.previousGames}
-                </span>
+            <div className='flex items-center justify-between px-5 py-3'>
+              <div className='flex items-center gap-2 text-parchment-300'>
+                <Icon name='history' size='sm' />
+                <span className='font-tarot text-lg tracking-wider uppercase'>{t.mainMenu.previousGames}</span>
               </div>
-              <button
-                onClick={closePastGames}
-                className="p-2 -mr-2 rounded-lg hover:bg-white/5 transition-colors"
-              >
-                <Icon name="x" size="sm" className="text-parchment-400" />
+              <button onClick={closePastGames} className='-mr-2 rounded-lg p-2 transition-colors hover:bg-white/5'>
+                <Icon name='x' size='sm' className='text-parchment-400' />
               </button>
             </div>
 
             {/* Game list */}
-            <div className="flex-1 overflow-y-auto px-3 pb-8">
-              <div className="space-y-1">
+            <div className='flex-1 overflow-y-auto px-3 pb-8'>
+              <div className='space-y-1'>
                 {games.map((game) => (
                   <button
                     key={game.id}
                     onClick={() => {
-                      closePastGames();
-                      onLoadGame(game.id);
+                      closePastGames()
+                      onLoadGame(game.id)
                     }}
-                    className="w-full py-3 px-4 text-left hover:bg-white/5 rounded-lg transition-colors group min-h-[44px]"
+                    className='group min-h-[44px] w-full rounded-lg px-4 py-3 text-left transition-colors hover:bg-white/5'
                   >
-                    <div className="flex items-start gap-3">
+                    <div className='flex items-start gap-3'>
                       <Icon
-                        name={game.phase === "ended" ? "checkCircle" : "circle"}
-                        size="sm"
+                        name={game.phase === 'ended' ? 'checkCircle' : 'circle'}
+                        size='sm'
                         className={cn(
-                          "mt-0.5 shrink-0",
-                          game.phase === "ended" ? "text-green-500/70" : "text-parchment-500",
+                          'mt-0.5 shrink-0',
+                          game.phase === 'ended' ? 'text-green-500/70' : 'text-parchment-500',
                         )}
                       />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-parchment-200 group-hover:text-parchment-100 truncate">
-                          {game.name}
-                        </div>
-                        <div className="text-xs text-parchment-500">
-                          {game.playerCount} {t.common.players.toLowerCase()} • {formatPhase(game)}{" "}
-                          • {formatDate(game.createdAt)}
+                      <div className='min-w-0 flex-1'>
+                        <div className='truncate text-parchment-200 group-hover:text-parchment-100'>{game.name}</div>
+                        <div className='text-xs text-parchment-500'>
+                          {game.playerCount} {t.common.players.toLowerCase()} • {formatPhase(game)} •{' '}
+                          {formatDate(game.createdAt)}
                         </div>
                       </div>
                     </div>
@@ -570,5 +550,5 @@ export function MainMenu({
         </div>
       )}
     </div>
-  );
+  )
 }

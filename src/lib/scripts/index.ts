@@ -1,93 +1,93 @@
-import type { ScriptDefinition, ScriptId, RoleDistribution } from "./types";
-import type { RoleId } from "../roles/types";
-import type { TeamId } from "../teams/types";
+import type { ScriptDefinition, ScriptId, RoleDistribution } from './types'
+import type { RoleId } from '../roles/types'
+import type { TeamId } from '../teams/types'
 
-export type { ScriptId, ScriptDefinition, RoleDistribution } from "./types";
-export type { GeneratorPreset, GeneratedPool } from "./types";
+export type { ScriptId, ScriptDefinition, RoleDistribution } from './types'
+export type { GeneratorPreset, GeneratedPool } from './types'
 
 // ============================================================================
 // ALL ROLE IDS (static list to avoid circular dependency with roles module)
 // ============================================================================
 
 const ALL_ROLE_IDS: RoleId[] = [
-  "villager",
-  "imp",
-  "washerwoman",
-  "librarian",
-  "investigator",
-  "chef",
-  "empath",
-  "fortune_teller",
-  "undertaker",
-  "monk",
-  "ravenkeeper",
-  "soldier",
-  "virgin",
-  "slayer",
-  "mayor",
-  "saint",
-  "scarlet_woman",
-  "recluse",
-  "poisoner",
-  "drunk",
-  "butler",
-  "baron",
-  "spy",
-];
+  'villager',
+  'imp',
+  'washerwoman',
+  'librarian',
+  'investigator',
+  'chef',
+  'empath',
+  'fortune_teller',
+  'undertaker',
+  'monk',
+  'ravenkeeper',
+  'soldier',
+  'virgin',
+  'slayer',
+  'mayor',
+  'saint',
+  'scarlet_woman',
+  'recluse',
+  'poisoner',
+  'drunk',
+  'butler',
+  'baron',
+  'spy',
+]
 
 // ============================================================================
 // SCRIPT DEFINITIONS
 // ============================================================================
 
 export const SCRIPTS: Record<ScriptId, ScriptDefinition> = {
-  "trouble-brewing": {
-    id: "trouble-brewing",
-    icon: "scrollText",
+  'trouble-brewing': {
+    id: 'trouble-brewing',
+    icon: 'scrollText',
     roles: [
-      "washerwoman",
-      "librarian",
-      "investigator",
-      "chef",
-      "empath",
-      "fortune_teller",
-      "undertaker",
-      "monk",
-      "ravenkeeper",
-      "soldier",
-      "virgin",
-      "slayer",
-      "mayor",
-      "saint",
-      "recluse",
-      "villager",
-      "scarlet_woman",
-      "poisoner",
-      "drunk",
-      "butler",
-      "baron",
-      "spy",
-      "imp",
+      'washerwoman',
+      'librarian',
+      'investigator',
+      'chef',
+      'empath',
+      'fortune_teller',
+      'undertaker',
+      'monk',
+      'ravenkeeper',
+      'soldier',
+      'virgin',
+      'slayer',
+      'mayor',
+      'saint',
+      'recluse',
+      'villager',
+      'scarlet_woman',
+      'poisoner',
+      'drunk',
+      'butler',
+      'baron',
+      'spy',
+      'imp',
     ],
     enforceDistribution: true,
   },
   custom: {
-    id: "custom",
-    icon: "settings",
+    id: 'custom',
+    icon: 'settings',
     roles: ALL_ROLE_IDS,
     enforceDistribution: false,
   },
-};
+}
 
 // ============================================================================
 // SCRIPT HELPERS
 // ============================================================================
 
 export function getScript(scriptId: ScriptId): ScriptDefinition {
-  return SCRIPTS[scriptId];
+  return SCRIPTS[scriptId]
 }
 
 export function getAllScripts(): ScriptDefinition[] {
-  return Object.values(SCRIPTS);
+  return Object.values(SCRIPTS)
 }
 
 // ============================================================================
@@ -101,24 +101,24 @@ export function getAllScripts(): ScriptDefinition[] {
  * 10: 7/0/2/1, 11: 7/1/2/1, 12: 7/2/2/1, 13: 9/0/3/1, etc.
  */
 export function getRecommendedDistribution(playerCount: number): RoleDistribution | null {
-  if (playerCount < 5) return null;
+  if (playerCount < 5) return null
 
-  const demon = 1;
-  let minion: number;
-  let outsider: number;
+  const demon = 1
+  let minion: number
+  let outsider: number
 
   if (playerCount <= 6) {
-    minion = 1;
-    outsider = playerCount - 5;
+    minion = 1
+    outsider = playerCount - 5
   } else {
-    const k = Math.floor((playerCount - 7) / 3);
-    minion = 1 + k;
-    outsider = (playerCount - 7) % 3;
+    const k = Math.floor((playerCount - 7) / 3)
+    minion = 1 + k
+    outsider = (playerCount - 7) % 3
   }
 
-  const townsfolk = playerCount - demon - minion - outsider;
+  const townsfolk = playerCount - demon - minion - outsider
 
-  return { townsfolk, outsider, minion, demon };
+  return { townsfolk, outsider, minion, demon }
 }
 
 /**
@@ -132,14 +132,14 @@ export function applyDistributionModifiers(
   base: RoleDistribution,
   modifiers: (Partial<Record<TeamId, number>> | undefined)[],
 ): RoleDistribution {
-  const result = { ...base };
+  const result = { ...base }
 
   for (const modifier of modifiers) {
-    if (!modifier) continue;
+    if (!modifier) continue
     for (const [teamId, delta] of Object.entries(modifier)) {
-      result[teamId as TeamId] = Math.max(0, result[teamId as TeamId] + delta);
+      result[teamId as TeamId] = Math.max(0, result[teamId as TeamId] + delta)
     }
   }
 
-  return result;
+  return result
 }

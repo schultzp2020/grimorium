@@ -1,25 +1,19 @@
-import { useState } from "react";
-import type { RoleDefinition } from "../../../types";
-import {
-  useI18n,
-  interpolate,
-  registerRoleTranslations,
-  getRoleName,
-  getRoleTranslations,
-} from "../../../../i18n";
-import { DefaultRoleReveal } from "../../../../../components/items/DefaultRoleReveal";
-import { NightActionLayout, NightStepListLayout } from "../../../../../components/layouts";
-import type { NightStep } from "../../../../../components/layouts";
-import { PlayerPickerList } from "../../../../../components/inputs";
-import { Button, Icon } from "../../../../../components/atoms";
-import { isAlive } from "../../../../types";
-import { isMalfunctioning } from "../../../../effects";
+import { useState } from 'react'
+import type { RoleDefinition } from '../../../types'
+import { useI18n, interpolate, registerRoleTranslations, getRoleName, getRoleTranslations } from '../../../../i18n'
+import { DefaultRoleReveal } from '../../../../../components/items/DefaultRoleReveal'
+import { NightActionLayout, NightStepListLayout } from '../../../../../components/layouts'
+import type { NightStep } from '../../../../../components/layouts'
+import { PlayerPickerList } from '../../../../../components/inputs'
+import { Button, Icon } from '../../../../../components/atoms'
+import { isAlive } from '../../../../types'
+import { isMalfunctioning } from '../../../../effects'
 
-import en from "./i18n/en";
-import es from "./i18n/es";
+import en from './i18n/en'
+import es from './i18n/es'
 
-registerRoleTranslations("butler", "en", en);
-registerRoleTranslations("butler", "es", es);
+registerRoleTranslations('butler', 'en', en)
+registerRoleTranslations('butler', 'es', es)
 
 /**
  * The Butler — Outsider role.
@@ -36,49 +30,49 @@ registerRoleTranslations("butler", "es", es);
  * can vote freely during the day.
  */
 const definition: RoleDefinition = {
-  id: "butler",
-  team: "outsider",
-  icon: "conciergeBell",
+  id: 'butler',
+  team: 'outsider',
+  icon: 'conciergeBell',
   nightOrder: 35, // Late — the Butler's choice doesn't interact with other night abilities
   chaos: 20,
 
   nightSteps: [
     {
-      id: "choose_master",
-      icon: "conciergeBell",
+      id: 'choose_master',
+      icon: 'conciergeBell',
       getLabel: (t) => t.game.stepChooseMaster,
-      audience: "player_choice",
+      audience: 'player_choice',
     },
   ],
 
   RoleReveal: DefaultRoleReveal,
 
   NightAction: ({ state, player, onComplete }) => {
-    const { t, language } = useI18n();
-    const [phase, setPhase] = useState<"step_list" | "choose_master">("step_list");
-    const [selectedMaster, setSelectedMaster] = useState<string | null>(null);
+    const { t, language } = useI18n()
+    const [phase, setPhase] = useState<'step_list' | 'choose_master'>('step_list')
+    const [selectedMaster, setSelectedMaster] = useState<string | null>(null)
 
-    const roleT = getRoleTranslations("butler", language);
+    const roleT = getRoleTranslations('butler', language)
 
     // Can choose any alive player except themselves
-    const otherAlivePlayers = state.players.filter((p) => isAlive(p) && p.id !== player.id);
+    const otherAlivePlayers = state.players.filter((p) => isAlive(p) && p.id !== player.id)
 
-    const malfunctioning = isMalfunctioning(player);
+    const malfunctioning = isMalfunctioning(player)
 
     const handleConfirm = () => {
-      if (!selectedMaster) return;
+      if (!selectedMaster) return
 
-      const master = state.players.find((p) => p.id === selectedMaster);
-      if (!master) return;
+      const master = state.players.find((p) => p.id === selectedMaster)
+      if (!master) return
 
       onComplete({
         entries: [
           {
-            type: "night_action",
+            type: 'night_action',
             message: [
               {
-                type: "i18n",
-                key: "roles.butler.history.choseMaster",
+                type: 'i18n',
+                key: 'roles.butler.history.choseMaster',
                 params: {
                   player: player.id,
                   target: master.id,
@@ -86,9 +80,9 @@ const definition: RoleDefinition = {
               },
             ],
             data: {
-              roleId: "butler",
+              roleId: 'butler',
               playerId: player.id,
-              action: "choose_master",
+              action: 'choose_master',
               masterId: master.id,
               ...(malfunctioning ? { malfunctioned: true } : {}),
             },
@@ -97,43 +91,43 @@ const definition: RoleDefinition = {
         // Remove any previous butler_master effect, then add new one
         // When malfunctioning, the effect is NOT applied
         removeEffects: {
-          [player.id]: ["butler_master"],
+          [player.id]: ['butler_master'],
         },
         ...(!malfunctioning && {
           addEffects: {
             [player.id]: [
               {
-                type: "butler_master",
+                type: 'butler_master',
                 data: { masterId: master.id },
-                expiresAt: "never",
+                expiresAt: 'never',
               },
             ],
           },
         }),
-      });
-    };
+      })
+    }
 
     // Step List Phase
-    if (phase === "step_list") {
+    if (phase === 'step_list') {
       const steps: NightStep[] = [
         {
-          id: "choose_master",
-          icon: "handHeart",
+          id: 'choose_master',
+          icon: 'handHeart',
           label: t.game.stepChooseMaster,
-          status: "pending",
-          audience: "player_choice" as const,
+          status: 'pending',
+          audience: 'player_choice' as const,
         },
-      ];
+      ]
 
       return (
         <NightStepListLayout
-          icon="handHeart"
-          roleName={getRoleName("butler", language)}
+          icon='handHeart'
+          roleName={getRoleName('butler', language)}
           playerName={player.name}
           steps={steps}
-          onSelectStep={() => setPhase("choose_master")}
+          onSelectStep={() => setPhase('choose_master')}
         />
-      );
+      )
     }
 
     return (
@@ -141,31 +135,25 @@ const definition: RoleDefinition = {
         player={player}
         title={roleT.info}
         description={interpolate(roleT.selectPlayerAsMaster, { player: player.name })}
-        audience="player_choice"
+        audience='player_choice'
       >
-        <div className="mb-6">
+        <div className='mb-6'>
           <PlayerPickerList
             players={otherAlivePlayers}
             selected={selectedMaster ? [selectedMaster] : []}
             onSelect={setSelectedMaster}
             selectionCount={1}
-            variant="blue"
+            variant='blue'
           />
         </div>
 
-        <Button
-          onClick={handleConfirm}
-          disabled={!selectedMaster}
-          fullWidth
-          size="lg"
-          variant="night"
-        >
-          <Icon name="handHeart" size="md" className="mr-2" />
+        <Button onClick={handleConfirm} disabled={!selectedMaster} fullWidth size='lg' variant='night'>
+          <Icon name='handHeart' size='md' className='mr-2' />
           {t.common.confirm}
         </Button>
       </NightActionLayout>
-    );
+    )
   },
-};
+}
 
-export default definition;
+export default definition

@@ -1,45 +1,39 @@
-import { useState } from "react";
-import {
-  type EffectDefinition,
-  type EffectDescriptionProps,
-  type EffectConfigEditorProps,
-} from "../../types";
-import type { Perception } from "../../../pipeline/types";
-import { registerEffectTranslations, getEffectTranslations } from "../../../i18n";
-import type { Language } from "../../../i18n";
-import { Badge, Button, Icon } from "../../../../components/atoms";
-import type { TeamId } from "../../../teams";
+import { useState } from 'react'
+import { type EffectDefinition, type EffectDescriptionProps, type EffectConfigEditorProps } from '../../types'
+import type { Perception } from '../../../pipeline/types'
+import { registerEffectTranslations, getEffectTranslations } from '../../../i18n'
+import type { Language } from '../../../i18n'
+import { Badge, Button, Icon } from '../../../../components/atoms'
+import type { TeamId } from '../../../teams'
 
-import en from "./i18n/en";
-import es from "./i18n/es";
+import en from './i18n/en'
+import es from './i18n/es'
 
-registerEffectTranslations("misregister", "en", en);
-registerEffectTranslations("misregister", "es", es);
+registerEffectTranslations('misregister', 'en', en)
+registerEffectTranslations('misregister', 'es', es)
 
 // Badge variant for alignment rendering
-const ALIGNMENT_BADGE_VARIANT: Record<string, "townsfolk" | "demon"> = {
-  good: "townsfolk",
-  evil: "demon",
-};
+const ALIGNMENT_BADGE_VARIANT: Record<string, 'townsfolk' | 'demon'> = {
+  good: 'townsfolk',
+  evil: 'demon',
+}
 
 function MisregisterDescription({ instance, language }: EffectDescriptionProps) {
-  const t = getEffectTranslations("misregister", language as Language);
-  const canRegisterAs = instance.data?.canRegisterAs as
-    | { teams?: string[]; alignments?: string[] }
-    | undefined;
+  const t = getEffectTranslations('misregister', language as Language)
+  const canRegisterAs = instance.data?.canRegisterAs as { teams?: string[]; alignments?: string[] } | undefined
 
-  if (!canRegisterAs) return null;
+  if (!canRegisterAs) return null
 
-  const alignments = canRegisterAs.alignments ?? [];
-  const teams = canRegisterAs.teams ?? [];
+  const alignments = canRegisterAs.alignments ?? []
+  const teams = canRegisterAs.teams ?? []
 
-  if (alignments.length === 0 && teams.length === 0) return null;
+  if (alignments.length === 0 && teams.length === 0) return null
 
   return (
-    <span className="inline-flex flex-wrap items-center gap-1">
+    <span className='inline-flex flex-wrap items-center gap-1'>
       <span>{t.mightRegisterAs as string}</span>
       {alignments.map((a) => (
-        <Badge key={`alignment-${a}`} variant={ALIGNMENT_BADGE_VARIANT[a] ?? "default"}>
+        <Badge key={`alignment-${a}`} variant={ALIGNMENT_BADGE_VARIANT[a] ?? 'default'}>
           {(t[`alignment_${a}`] as string) ?? a}
         </Badge>
       ))}
@@ -49,39 +43,37 @@ function MisregisterDescription({ instance, language }: EffectDescriptionProps) 
         </Badge>
       ))}
     </span>
-  );
+  )
 }
 
-const ALL_TEAMS: TeamId[] = ["townsfolk", "outsider", "minion", "demon"];
-const ALL_ALIGNMENTS: ("good" | "evil")[] = ["good", "evil"];
+const ALL_TEAMS: TeamId[] = ['townsfolk', 'outsider', 'minion', 'demon']
+const ALL_ALIGNMENTS: ('good' | 'evil')[] = ['good', 'evil']
 
 function MisregisterConfigEditor({ data, language, onSave, onCancel }: EffectConfigEditorProps) {
-  const t = getEffectTranslations("misregister", language as Language);
+  const t = getEffectTranslations('misregister', language as Language)
 
-  const existing = data?.canRegisterAs as { teams?: string[]; alignments?: string[] } | undefined;
+  const existing = data?.canRegisterAs as { teams?: string[]; alignments?: string[] } | undefined
 
-  const [selectedTeams, setSelectedTeams] = useState<Set<string>>(new Set(existing?.teams ?? []));
-  const [selectedAlignments, setSelectedAlignments] = useState<Set<string>>(
-    new Set(existing?.alignments ?? []),
-  );
+  const [selectedTeams, setSelectedTeams] = useState<Set<string>>(new Set(existing?.teams ?? []))
+  const [selectedAlignments, setSelectedAlignments] = useState<Set<string>>(new Set(existing?.alignments ?? []))
 
   const toggleTeam = (team: string) => {
     setSelectedTeams((prev) => {
-      const next = new Set(prev);
-      if (next.has(team)) next.delete(team);
-      else next.add(team);
-      return next;
-    });
-  };
+      const next = new Set(prev)
+      if (next.has(team)) next.delete(team)
+      else next.add(team)
+      return next
+    })
+  }
 
   const toggleAlignment = (alignment: string) => {
     setSelectedAlignments((prev) => {
-      const next = new Set(prev);
-      if (next.has(alignment)) next.delete(alignment);
-      else next.add(alignment);
-      return next;
-    });
-  };
+      const next = new Set(prev)
+      if (next.has(alignment)) next.delete(alignment)
+      else next.add(alignment)
+      return next
+    })
+  }
 
   const handleSave = () => {
     onSave({
@@ -90,78 +82,76 @@ function MisregisterConfigEditor({ data, language, onSave, onCancel }: EffectCon
         teams: Array.from(selectedTeams),
         alignments: Array.from(selectedAlignments),
       },
-    });
-  };
+    })
+  }
 
-  const hasSelection = selectedTeams.size > 0 || selectedAlignments.size > 0;
+  const hasSelection = selectedTeams.size > 0 || selectedAlignments.size > 0
 
   return (
-    <div className="space-y-4">
+    <div className='space-y-4'>
       {/* Alignments */}
       <div>
-        <p className="text-parchment-300 text-xs font-bold uppercase tracking-wider mb-2">
+        <p className='mb-2 text-xs font-bold tracking-wider text-parchment-300 uppercase'>
           {t.configAlignments as string}
         </p>
-        <div className="flex gap-2">
+        <div className='flex gap-2'>
           {ALL_ALIGNMENTS.map((alignment) => {
-            const isSelected = selectedAlignments.has(alignment);
+            const isSelected = selectedAlignments.has(alignment)
             return (
               <button
                 key={alignment}
                 onClick={() => toggleAlignment(alignment)}
-                className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-lg border transition-colors text-sm font-medium ${
+                className={`flex flex-1 items-center justify-center gap-2 rounded-lg border p-3 text-sm font-medium transition-colors ${
                   isSelected
-                    ? alignment === "good"
-                      ? "bg-blue-500/20 border-blue-400/50 text-blue-200"
-                      : "bg-red-500/20 border-red-400/50 text-red-200"
-                    : "bg-white/5 border-white/10 text-parchment-400 hover:border-white/30"
+                    ? alignment === 'good'
+                      ? 'border-blue-400/50 bg-blue-500/20 text-blue-200'
+                      : 'border-red-400/50 bg-red-500/20 text-red-200'
+                    : 'border-white/10 bg-white/5 text-parchment-400 hover:border-white/30'
                 }`}
               >
-                <Icon name={isSelected ? "checkSquare" : "square"} size="sm" />
+                <Icon name={isSelected ? 'checkSquare' : 'square'} size='sm' />
                 {(t[`alignment_${alignment}`] as string) ?? alignment}
               </button>
-            );
+            )
           })}
         </div>
       </div>
 
       {/* Teams */}
       <div>
-        <p className="text-parchment-300 text-xs font-bold uppercase tracking-wider mb-2">
-          {t.configTeams as string}
-        </p>
-        <div className="grid grid-cols-2 gap-2">
+        <p className='mb-2 text-xs font-bold tracking-wider text-parchment-300 uppercase'>{t.configTeams as string}</p>
+        <div className='grid grid-cols-2 gap-2'>
           {ALL_TEAMS.map((team) => {
-            const isSelected = selectedTeams.has(team);
+            const isSelected = selectedTeams.has(team)
             return (
               <button
                 key={team}
                 onClick={() => toggleTeam(team)}
-                className={`flex items-center gap-2 p-3 rounded-lg border transition-colors text-sm ${
+                className={`flex items-center gap-2 rounded-lg border p-3 text-sm transition-colors ${
                   isSelected
-                    ? "bg-white/10 border-white/30 text-parchment-100"
-                    : "bg-white/5 border-white/10 text-parchment-400 hover:border-white/30"
+                    ? 'border-white/30 bg-white/10 text-parchment-100'
+                    : 'border-white/10 bg-white/5 text-parchment-400 hover:border-white/30'
                 }`}
               >
-                <Icon name={isSelected ? "checkSquare" : "square"} size="sm" />
+                <Icon name={isSelected ? 'checkSquare' : 'square'} size='sm' />
                 <Badge variant={team}>{(t[`team_${team}`] as string) ?? team}</Badge>
               </button>
-            );
+            )
           })}
         </div>
       </div>
 
       {/* Buttons */}
-      <div className="flex gap-2 pt-2">
-        <Button onClick={onCancel} variant="ghost" className="flex-1">
+      <div className='flex gap-2 pt-2'>
+        <Button onClick={onCancel} variant='ghost' className='flex-1'>
           {t.configCancel as string}
         </Button>
-        <Button onClick={handleSave} variant="primary" className="flex-1" disabled={!hasSelection}>
+        <Button onClick={handleSave} variant='primary' className='flex-1' disabled={!hasSelection}>
           {t.configSave as string}
         </Button>
       </div>
     </div>
-  );
+  )
 }
 
 /**
@@ -181,21 +171,21 @@ function MisregisterConfigEditor({ data, language, onSave, onCancel }: EffectCon
  * - Spy — evil player that might register as good / Townsfolk / Outsider
  */
 const definition: EffectDefinition = {
-  id: "misregister",
-  icon: "drama",
-  defaultType: "perception",
+  id: 'misregister',
+  icon: 'drama',
+  defaultType: 'perception',
   perceptionModifiers: [
     {
-      context: ["alignment", "team", "role"],
+      context: ['alignment', 'team', 'role'],
       modify: (perception, _target, _observer, _state, effectData) => {
-        const overrides = effectData?.perceiveAs as Partial<Perception> | undefined;
-        if (!overrides) return perception;
-        return { ...perception, ...overrides };
+        const overrides = effectData?.perceiveAs as Partial<Perception> | undefined
+        if (!overrides) return perception
+        return { ...perception, ...overrides }
       },
     },
   ],
   Description: MisregisterDescription,
   ConfigEditor: MisregisterConfigEditor,
-};
+}
 
-export default definition;
+export default definition

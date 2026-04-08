@@ -1,27 +1,27 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react'
 
 type StepSectionProps = {
-  step: number;
-  label: string;
-  count?: { current: number; max: number };
-  children: ReactNode;
-};
+  step: number
+  label: string
+  count?: { current: number; max: number }
+  children: ReactNode
+}
 
 export function StepSection({ step, label, count, children }: StepSectionProps) {
   return (
-    <div className="mb-6">
-      <div className="flex items-center gap-2 mb-3">
-        <span className="w-6 h-6 rounded-full bg-blue-500/30 text-blue-300 text-xs flex items-center justify-center font-bold">
+    <div className='mb-6'>
+      <div className='mb-3 flex items-center gap-2'>
+        <span className='flex h-6 w-6 items-center justify-center rounded-full bg-blue-500/30 text-xs font-bold text-blue-300'>
           {step}
         </span>
-        <span className="text-parchment-300 text-sm">{label}</span>
+        <span className='text-sm text-parchment-300'>{label}</span>
         {count && (
-          <span className="text-parchment-500 text-xs">
+          <span className='text-xs text-parchment-500'>
             ({count.current}/{count.max})
           </span>
         )}
       </div>
-      <div className="space-y-2">{children}</div>
+      <div className='space-y-2'>{children}</div>
     </div>
-  );
+  )
 }

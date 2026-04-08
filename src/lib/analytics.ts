@@ -7,17 +7,17 @@
 
 // Bot detection — matches common crawlers and headless browsers
 const BOT_PATTERN =
-  /bot|crawler|spider|crawling|googlebot|bingbot|yandexbot|duckduckbot|slurp|baiduspider|facebookexternalhit|linkedinbot|twitterbot|applebot|semrushbot|ahrefsbot|mj12bot|dotbot|petalbot|bytespider|headlesschrome|phantomjs|prerender/i;
+  /bot|crawler|spider|crawling|googlebot|bingbot|yandexbot|duckduckbot|slurp|baiduspider|facebookexternalhit|linkedinbot|twitterbot|applebot|semrushbot|ahrefsbot|mj12bot|dotbot|petalbot|bytespider|headlesschrome|phantomjs|prerender/i
 
 function isBot(): boolean {
-  if (typeof navigator === "undefined") return true;
-  return BOT_PATTERN.test(navigator.userAgent);
+  if (typeof navigator === 'undefined') return true
+  return BOT_PATTERN.test(navigator.userAgent)
 }
 
 // Typed reference to the global gtag function
 declare global {
   interface Window {
-    gtag?: (...args: unknown[]) => void;
+    gtag?: (...args: unknown[]) => void
   }
 }
 
@@ -25,12 +25,9 @@ declare global {
  * Send a custom GA4 event. Silently no-ops if gtag is missing or if the
  * visitor looks like a bot.
  */
-export function trackEvent(
-  eventName: string,
-  params?: Record<string, string | number | boolean>,
-): void {
-  if (isBot()) return;
-  if (typeof window === "undefined" || !window.gtag) return;
+export function trackEvent(eventName: string, params?: Record<string, string | number | boolean>): void {
+  if (isBot()) return
+  if (typeof window === 'undefined' || !window.gtag) return
 
-  window.gtag("event", eventName, params);
+  window.gtag('event', eventName, params)
 }

@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 120,
+  "singleQuote": true,
+  "jsxSingleQuote": true,
+  "semi": false,
+  "trailingComma": "all",
+  "endOfLine": "lf",
+  "ignorePatterns": ["dist/", "node_modules/", "playwright-report/", "test-results/"],
+  "sortTailwindcss": {
+    "stylesheet": "src/index.css"
+  },
+  "sortPackageJson": true
+}

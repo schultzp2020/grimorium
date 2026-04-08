@@ -1,33 +1,33 @@
-import { useState } from "react";
-import type { GameState, PlayerState } from "../../lib/types";
-import type { AvailableDayAction } from "../../lib/pipeline/types";
-import { useI18n, interpolate } from "../../lib/i18n";
-import { Button, Icon } from "../atoms";
-import { Grimoire } from "../items/Grimoire";
-import { MysticDivider } from "../items";
-import { ScreenFooter } from "../layouts/ScreenFooter";
-import { cn } from "../../lib/utils";
-import type { BlockStatus } from "../../lib/game";
+import { useState } from 'react'
+import type { GameState, PlayerState } from '../../lib/types'
+import type { AvailableDayAction } from '../../lib/pipeline/types'
+import { useI18n, interpolate } from '../../lib/i18n'
+import { Button, Icon } from '../atoms'
+import { Grimoire } from '../items/Grimoire'
+import { MysticDivider } from '../items'
+import { ScreenFooter } from '../layouts/ScreenFooter'
+import { cn } from '../../lib/utils'
+import type { BlockStatus } from '../../lib/game'
 
 type NightSummary = {
-  deaths: string[];
-  round: number;
-};
+  deaths: string[]
+  round: number
+}
 
 type Props = {
-  state: GameState;
-  blockStatus: BlockStatus;
-  dayActions: AvailableDayAction[];
-  nightSummary?: NightSummary;
-  nominationsBlocked?: boolean;
-  onNominate: () => void;
-  onDayAction: (action: AvailableDayAction) => void;
-  onEndDay: () => void;
-  onMainMenu: () => void;
-  onShowRoleCard?: (player: PlayerState) => void;
-  onEditEffects?: (player: PlayerState) => void;
-  onOpenGrimoirePlayer?: (player: PlayerState) => void;
-};
+  state: GameState
+  blockStatus: BlockStatus
+  dayActions: AvailableDayAction[]
+  nightSummary?: NightSummary
+  nominationsBlocked?: boolean
+  onNominate: () => void
+  onDayAction: (action: AvailableDayAction) => void
+  onEndDay: () => void
+  onMainMenu: () => void
+  onShowRoleCard?: (player: PlayerState) => void
+  onEditEffects?: (player: PlayerState) => void
+  onOpenGrimoirePlayer?: (player: PlayerState) => void
+}
 
 export function DayPhase({
   state,
@@ -43,77 +43,75 @@ export function DayPhase({
   onEditEffects,
   onOpenGrimoirePlayer,
 }: Props) {
-  const { t } = useI18n();
-  const [summaryExpanded, setSummaryExpanded] = useState(true);
-  const [grimoireExpanded, setGrimoireExpanded] = useState(false);
+  const { t } = useI18n()
+  const [summaryExpanded, setSummaryExpanded] = useState(true)
+  const [grimoireExpanded, setGrimoireExpanded] = useState(false)
 
   const deadPlayers = nightSummary
     ? nightSummary.deaths.map((id) => state.players.find((p) => p.id === id)).filter(Boolean)
-    : [];
+    : []
 
   return (
-    <div className="min-h-app bg-gradient-to-b from-orange-950 via-amber-950 to-grimoire-dark flex flex-col">
+    <div className='flex min-h-app flex-col bg-gradient-to-b from-orange-950 via-amber-950 to-grimoire-dark'>
       {/* Header */}
-      <div className="bg-gradient-to-b from-amber-900/50 to-transparent px-4 py-4">
-        <div className="max-w-lg mx-auto">
+      <div className='bg-gradient-to-b from-amber-900/50 to-transparent px-4 py-4'>
+        <div className='mx-auto max-w-lg'>
           {/* Menu button row */}
-          <div className="flex items-center mb-4">
+          <div className='mb-4 flex items-center'>
             <button
               onClick={onMainMenu}
-              className="p-3 -ml-3 text-parchment-500 hover:text-parchment-200 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+              className='-ml-3 flex min-h-[44px] min-w-[44px] items-center justify-center p-3 text-parchment-500 transition-colors hover:text-parchment-200'
             >
-              <Icon name="menu" size="md" />
+              <Icon name='menu' size='md' />
             </button>
           </div>
 
           {/* Title section */}
-          <div className="text-center">
-            <div className="flex justify-center mb-2">
-              <Icon name="sun" size="3xl" className="text-amber-400 text-glow-gold" />
+          <div className='text-center'>
+            <div className='mb-2 flex justify-center'>
+              <Icon name='sun' size='3xl' className='text-amber-400 text-glow-gold' />
             </div>
-            <h1 className="font-tarot text-2xl text-parchment-100 tracking-widest-xl uppercase">
+            <h1 className='font-tarot text-2xl tracking-widest-xl text-parchment-100 uppercase'>
               {t.game.day} {state.round}
             </h1>
-            <p className="text-parchment-400 text-sm">{t.game.discussionAndNominations}</p>
+            <p className='text-sm text-parchment-400'>{t.game.discussionAndNominations}</p>
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="flex-1 px-4 pb-4 max-w-lg mx-auto w-full overflow-y-auto">
+      <div className='mx-auto w-full max-w-lg flex-1 overflow-y-auto px-4 pb-4'>
         {/* Night Summary Section (collapsible, default expanded) */}
         {nightSummary && (
-          <div className="mb-6">
+          <div className='mb-6'>
             <button
               onClick={() => setSummaryExpanded(!summaryExpanded)}
-              className="w-full flex items-center gap-2 mb-2 px-1 group"
+              className='group mb-2 flex w-full items-center gap-2 px-1'
             >
-              <Icon name="moon" size="sm" className="text-indigo-400" />
-              <span className="font-tarot text-sm text-parchment-100 tracking-wider uppercase flex-1 text-left">
+              <Icon name='moon' size='sm' className='text-indigo-400' />
+              <span className='flex-1 text-left font-tarot text-sm tracking-wider text-parchment-100 uppercase'>
                 {interpolate(t.game.nightSummary, {
                   round: nightSummary.round,
                 })}
               </span>
               <Icon
-                name={summaryExpanded ? "chevronUp" : "chevronDown"}
-                size="sm"
-                className="text-parchment-500 group-hover:text-parchment-300 transition-colors"
+                name={summaryExpanded ? 'chevronUp' : 'chevronDown'}
+                size='sm'
+                className='text-parchment-500 transition-colors group-hover:text-parchment-300'
               />
             </button>
             {summaryExpanded && (
-              <div className="bg-indigo-950/30 rounded-xl border border-indigo-500/20 p-3">
+              <div className='rounded-xl border border-indigo-500/20 bg-indigo-950/30 p-3'>
                 {deadPlayers.length === 0 ? (
-                  <p className="text-parchment-400 text-sm text-center py-2">
-                    {t.game.noDeathsLastNight}
-                  </p>
+                  <p className='py-2 text-center text-sm text-parchment-400'>{t.game.noDeathsLastNight}</p>
                 ) : (
-                  <div className="space-y-2">
+                  <div className='space-y-2'>
                     {deadPlayers.map((player) =>
                       player ? (
-                        <div key={player.id} className="flex items-center gap-2 text-sm">
-                          <Icon name="skull" size="sm" className="text-red-400" />
-                          <span className="text-parchment-200">{player.name}</span>
-                          <span className="text-red-400/70 text-xs">
+                        <div key={player.id} className='flex items-center gap-2 text-sm'>
+                          <Icon name='skull' size='sm' className='text-red-400' />
+                          <span className='text-parchment-200'>{player.name}</span>
+                          <span className='text-xs text-red-400/70'>
                             {interpolate(t.game.dawnDeathAnnouncement, {
                               player: player.name,
                             })}
@@ -129,20 +127,20 @@ export function DayPhase({
         )}
 
         {/* Daytime Actions (primary section — above Grimoire) */}
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-3 px-1">
-            <Icon name="swords" size="sm" className="text-red-400" />
-            <span className="font-tarot text-sm text-parchment-100 tracking-wider uppercase">
+        <div className='mb-6'>
+          <div className='mb-3 flex items-center gap-2 px-1'>
+            <Icon name='swords' size='sm' className='text-red-400' />
+            <span className='font-tarot text-sm tracking-wider text-parchment-100 uppercase'>
               {t.game.daytimeActions}
             </span>
           </div>
 
           {/* Block Status Banner */}
           {blockStatus && (
-            <div className="bg-red-900/30 border border-red-500/40 rounded-xl p-3 mb-3">
-              <div className="flex items-center gap-2">
-                <Icon name="swords" size="sm" className="text-red-400" />
-                <span className="text-red-200 text-sm font-medium">
+            <div className='mb-3 rounded-xl border border-red-500/40 bg-red-900/30 p-3'>
+              <div className='flex items-center gap-2'>
+                <Icon name='swords' size='sm' className='text-red-400' />
+                <span className='text-sm font-medium text-red-200'>
                   {interpolate(t.game.currentBlock, {
                     player: blockStatus.playerName,
                     count: blockStatus.voteCount,
@@ -152,33 +150,29 @@ export function DayPhase({
             </div>
           )}
 
-          <div className="space-y-2">
+          <div className='space-y-2'>
             {/* Nomination Button — disabled when nominations are blocked (e.g., Virgin execution) */}
             <button
               onClick={nominationsBlocked ? undefined : onNominate}
               disabled={nominationsBlocked}
               className={cn(
-                "w-full flex items-center gap-4 p-4 rounded-xl transition-colors group bg-gradient-to-r border",
+                'w-full flex items-center gap-4 p-4 rounded-xl transition-colors group bg-gradient-to-r border',
                 nominationsBlocked
-                  ? "from-gray-900/30 to-gray-800/20 border-gray-500/20 opacity-50 cursor-not-allowed"
-                  : "from-red-900/30 to-red-800/20 border-red-500/30 hover:border-red-500/50",
+                  ? 'from-gray-900/30 to-gray-800/20 border-gray-500/20 opacity-50 cursor-not-allowed'
+                  : 'from-red-900/30 to-red-800/20 border-red-500/30 hover:border-red-500/50',
               )}
             >
-              <div className="w-12 h-12 rounded-full flex items-center justify-center transition-transform bg-red-900/40 border border-red-500/40 group-hover:scale-105">
-                <Icon name="userX" size="lg" className="text-red-400" />
+              <div className='flex h-12 w-12 items-center justify-center rounded-full border border-red-500/40 bg-red-900/40 transition-transform group-hover:scale-105'>
+                <Icon name='userX' size='lg' className='text-red-400' />
               </div>
-              <div className="flex-1 text-left">
-                <div className="font-tarot text-parchment-100 tracking-wider uppercase">
-                  {t.game.newNomination}
-                </div>
-                <p className="text-parchment-500 text-xs mt-0.5">
-                  {t.game.accusePlayerDescription}
-                </p>
+              <div className='flex-1 text-left'>
+                <div className='font-tarot tracking-wider text-parchment-100 uppercase'>{t.game.newNomination}</div>
+                <p className='mt-0.5 text-xs text-parchment-500'>{t.game.accusePlayerDescription}</p>
               </div>
               <Icon
-                name="arrowRight"
-                size="md"
-                className="text-parchment-500 group-hover:text-parchment-300 transition-colors"
+                name='arrowRight'
+                size='md'
+                className='text-parchment-500 transition-colors group-hover:text-parchment-300'
               />
             </button>
 
@@ -187,21 +181,19 @@ export function DayPhase({
               <button
                 key={action.id}
                 onClick={() => onDayAction(action)}
-                className="w-full flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-amber-900/30 to-orange-800/20 border border-amber-500/30 hover:border-amber-500/50 transition-colors group"
+                className='group flex w-full items-center gap-4 rounded-xl border border-amber-500/30 bg-gradient-to-r from-amber-900/30 to-orange-800/20 p-4 transition-colors hover:border-amber-500/50'
               >
-                <div className="w-12 h-12 rounded-full bg-amber-900/40 border border-amber-500/40 flex items-center justify-center group-hover:scale-105 transition-transform">
-                  <Icon name={action.icon} size="lg" className="text-amber-400" />
+                <div className='flex h-12 w-12 items-center justify-center rounded-full border border-amber-500/40 bg-amber-900/40 transition-transform group-hover:scale-105'>
+                  <Icon name={action.icon} size='lg' className='text-amber-400' />
                 </div>
-                <div className="flex-1 text-left">
-                  <div className="font-tarot text-parchment-100 tracking-wider uppercase">
-                    {action.label}
-                  </div>
-                  <p className="text-parchment-500 text-xs mt-0.5">{action.description}</p>
+                <div className='flex-1 text-left'>
+                  <div className='font-tarot tracking-wider text-parchment-100 uppercase'>{action.label}</div>
+                  <p className='mt-0.5 text-xs text-parchment-500'>{action.description}</p>
                 </div>
                 <Icon
-                  name="arrowRight"
-                  size="md"
-                  className="text-parchment-500 group-hover:text-parchment-300 transition-colors"
+                  name='arrowRight'
+                  size='md'
+                  className='text-parchment-500 transition-colors group-hover:text-parchment-300'
                 />
               </button>
             ))}
@@ -209,31 +201,29 @@ export function DayPhase({
         </div>
 
         {/* Divider */}
-        <MysticDivider className="mb-6" />
+        <MysticDivider className='mb-6' />
 
         {/* Grimoire Section (collapsible, default collapsed) */}
-        <div className="mb-6">
+        <div className='mb-6'>
           <button
             onClick={() => setGrimoireExpanded(!grimoireExpanded)}
-            className="w-full flex items-center gap-2 mb-2 px-1 group"
+            className='group mb-2 flex w-full items-center gap-2 px-1'
           >
-            <Icon name="bookUser" size="sm" className="text-mystic-gold" />
-            <span className="font-tarot text-sm text-parchment-100 tracking-wider uppercase flex-1 text-left">
+            <Icon name='bookUser' size='sm' className='text-mystic-gold' />
+            <span className='flex-1 text-left font-tarot text-sm tracking-wider text-parchment-100 uppercase'>
               {t.game.grimoire}
             </span>
             <Icon
-              name={grimoireExpanded ? "chevronUp" : "chevronDown"}
-              size="sm"
+              name={grimoireExpanded ? 'chevronUp' : 'chevronDown'}
+              size='sm'
               className={cn(
-                "transition-colors",
-                grimoireExpanded
-                  ? "text-parchment-400"
-                  : "text-parchment-500 group-hover:text-parchment-300",
+                'transition-colors',
+                grimoireExpanded ? 'text-parchment-400' : 'text-parchment-500 group-hover:text-parchment-300',
               )}
             />
           </button>
           {grimoireExpanded && (
-            <div className="bg-white/5 rounded-xl border border-white/10 overflow-hidden">
+            <div className='overflow-hidden rounded-xl border border-white/10 bg-white/5'>
               <Grimoire
                 state={state}
                 compact
@@ -247,14 +237,14 @@ export function DayPhase({
       </div>
 
       {/* Footer */}
-      <ScreenFooter borderColor="border-indigo-500/30">
-        <Button onClick={onEndDay} fullWidth size="lg" variant="dawn">
-          <Icon name="moon" size="md" className="mr-2" />
+      <ScreenFooter borderColor='border-indigo-500/30'>
+        <Button onClick={onEndDay} fullWidth size='lg' variant='dawn'>
+          <Icon name='moon' size='md' className='mr-2' />
           {blockStatus
             ? interpolate(t.game.endDayExecute, { player: blockStatus.playerName })
             : t.game.endDayNoExecution}
         </Button>
       </ScreenFooter>
     </div>
-  );
+  )
 }

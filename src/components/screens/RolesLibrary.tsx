@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useMemo } from 'react'
 
 import { getRoleDescription, getRoleName, useI18n } from '../../lib/i18n'
@@ -12,16 +13,17 @@ import { RoleCard } from '../items/RoleCard'
 import { CardLink, TeamBackground } from '../items/TeamBackground'
 
 interface Props {
-  selectedRoleId: RoleId | null
-  onBack: () => void
-  onSelectRole: (roleId: RoleId) => void
-  onDeselectRole: () => void
+  selectedRoleId?: RoleId | null
 }
 
 const TEAM_ORDER: TeamId[] = ['townsfolk', 'outsider', 'minion', 'demon']
 
-export function RolesLibrary({ selectedRoleId, onBack, onSelectRole, onDeselectRole }: Props) {
+export function RolesLibrary({ selectedRoleId = null }: Props) {
   const { t, language } = useI18n()
+  const navigate = useNavigate()
+  const onBack = () => void navigate({ to: '/' })
+  const onSelectRole = (id: RoleId) => void navigate({ to: '/roles/$roleId', params: { roleId: id } })
+  const onDeselectRole = () => void navigate({ to: '/roles' })
 
   // Get all roles from the Trouble Brewing script (currently the only one)
   const scriptRoles = SCRIPTS['trouble-brewing'].roles

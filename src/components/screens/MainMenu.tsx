@@ -377,7 +377,7 @@ export function MainMenu() {
                   <div className='grimoire-menu-reveal' style={{ '--reveal-delay': '80ms' } as React.CSSProperties}>
                     <button
                       type='button'
-                      onClick={() => navigate({ to: '/game/$gameId', params: { gameId: currentGame.id } })}
+                      onClick={() => void navigate({ to: '/game/$gameId', params: { gameId: currentGame.id } })}
                       className='card-border-glow group relative w-full rounded-xl border border-mystic-gold/25 bg-linear-to-r from-mystic-gold/15 to-mystic-bronze/10 p-5 transition-all'
                       style={
                         {
@@ -415,7 +415,7 @@ export function MainMenu() {
                 >
                   <button
                     type='button'
-                    onClick={() => navigate({ to: '/new-game/players' })}
+                    onClick={() => void navigate({ to: '/new-game/players' })}
                     className='card-border-glow group relative w-full rounded-xl border border-indigo-500/25 bg-linear-to-r from-indigo-900/40 to-purple-900/30 p-5 transition-all'
                     style={
                       {
@@ -451,7 +451,7 @@ export function MainMenu() {
               >
                 <button
                   type='button'
-                  onClick={() => navigate({ to: '/how-to-play' })}
+                  onClick={() => void navigate({ to: '/how-to-play' })}
                   className='text-sm tracking-wider text-parchment-400 underline decoration-parchment-500/40 decoration-1 underline-offset-4 transition-colors hover:text-parchment-200'
                 >
                   {t.howToPlay.title}
@@ -461,7 +461,7 @@ export function MainMenu() {
 
                 <button
                   type='button'
-                  onClick={() => navigate({ to: '/roles' })}
+                  onClick={() => void navigate({ to: '/roles' })}
                   className='text-sm tracking-wider text-parchment-400 underline decoration-parchment-500/40 decoration-1 underline-offset-4 transition-colors hover:text-parchment-200'
                 >
                   {t.mainMenu.rolesLibrary}
@@ -534,7 +534,7 @@ export function MainMenu() {
                     key={game.id}
                     onClick={() => {
                       closePastGames()
-                      navigate({ to: '/game/$gameId', params: { gameId: game.id } })
+                      void navigate({ to: '/game/$gameId', params: { gameId: game.id } })
                     }}
                     className='group min-h-11 w-full rounded-lg px-4 py-3 text-left transition-colors hover:bg-white/5'
                   >

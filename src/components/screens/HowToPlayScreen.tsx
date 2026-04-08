@@ -1,11 +1,9 @@
+import { useNavigate } from '@tanstack/react-router'
+
 import { useI18n } from '../../lib/i18n'
 import { BackButton, Icon } from '../atoms'
 import { MysticDivider } from '../items'
 import { RoleCard } from '../items/RoleCard'
-
-interface Props {
-  onBack: () => void
-}
 
 /**
  * Simple parser to render **bold** text in translations.
@@ -23,8 +21,10 @@ function parseBold(text: string) {
   )
 }
 
-export function HowToPlayScreen({ onBack }: Props) {
+export function HowToPlayScreen() {
   const { t } = useI18n()
+  const navigate = useNavigate()
+  const onBack = () => void navigate({ to: '/' })
   const hp = t.howToPlay
 
   const scrollTo = (id: string) => {

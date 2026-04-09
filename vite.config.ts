@@ -26,7 +26,7 @@ export default defineConfig({
   // Tauri: prevent Vite from obscuring Rust errors
   clearScreen: false,
 
-  base: '/',
+  base: process.env.VITE_BASE_URL ?? '/',
   plugins: [
     tanstackRouter({
       target: 'react',
